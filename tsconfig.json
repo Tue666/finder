@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "typeRoots": ["./@types", "./node_modules/@types"],
+    "resolveJsonModule": true,
+    "declaration": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "esModuleInterop": true,
+    "baseUrl": "src"
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.d.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "out",
+    ".babelrc",
+    "bundles",
+    "coverage",
+    "test/*"
+  ]
+}

@@ -1,0 +1,148 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Conversation {
+  _id: ID!
+  createdAt: DateTime!
+  isDeleted: Boolean!
+  keyword: String!
+  lastMessage: Message
+  members: [User!]!
+  messagePin: Message
+  updatedAt: DateTime!
+}
+
+input CreateConversationInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateMessageInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateTagInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum GenderEnum {
+  FEMALE
+  MALE
+}
+
+type GeoLocation {
+  """[lng, lat]"""
+  coordinates: [Float!]
+  type: String
+}
+
+type MatchRequest {
+  createdAt: DateTime
+  senderId: User
+}
+
+type Message {
+  _id: ID!
+  conversion_id: Conversation!
+  createdAt: DateTime!
+  isDeleted: Boolean!
+  keyword: String!
+  receiver: User!
+  sender: User!
+  text: String
+  type: MessageType!
+  updatedAt: DateTime!
+  urlMessageImage: String
+}
+
+enum MessageType {
+  IMAGE
+  TEXT
+}
+
+type Mutation {
+  createConversation(createConversationInput: CreateConversationInput!): Conversation!
+  createMessage(createMessageInput: CreateMessageInput!): Message!
+  createTag(createTagInput: CreateTagInput!): Tag!
+  removeConversation(id: Int!): Conversation!
+  removeMessage(id: Int!): Message!
+  removeTag(id: Int!): Tag!
+  updateConversation(updateConversationInput: UpdateConversationInput!): Conversation!
+  updateMessage(updateMessageInput: UpdateMessageInput!): Message!
+  updateTag(updateTagInput: UpdateTagInput!): Tag!
+}
+
+"""
+A field whose value conforms with the standard mongodb object ID as described here: https://docs.mongodb.com/manual/reference/method/ObjectId/#ObjectId. Example: 5e5677d71bdc2ae76344968c
+"""
+scalar ObjectID
+
+type Query {
+  confirmMail(token: String!): Boolean!
+  conversation(id: Int!): Conversation!
+  message(id: Int!): Message!
+  providedQuery(file: Upload!, id: ObjectID!): String!
+  tag(id: Int!): Tag!
+  test(test: Boolean!): String!
+}
+
+type Tag {
+  _id: ID!
+  createdAt: DateTime!
+  isDeleted: Boolean!
+  keyword: String!
+  name: String
+  slug: String!
+  updatedAt: DateTime!
+}
+
+input UpdateConversationInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateMessageInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateTagInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+type User {
+  _id: ID!
+  address: String
+  birthDays: DateTime
+  createdAt: DateTime
+  email: String!
+  gender: GenderEnum!
+  getLocation: GeoLocation
+  images: [String!]
+  isDeleted: Boolean
+  keyword: String
+  lastActive: DateTime
+  matchRequest: [MatchRequest!]
+  matched: [String!]
+  phoneNumber: String
+  showMeTinder: Boolean
+  slug: String!
+  tags: [Tag!]
+  updatedAt: DateTime
+  username: String!
+}
