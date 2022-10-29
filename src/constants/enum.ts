@@ -30,3 +30,12 @@ export enum MessageType {
 registerEnumType(MessageType, {
   name: 'MessageType',
 });
+
+export enum RegisterType {
+  GOOGLE = 'Google',
+  FACEBOOK = 'Facebook',
+  NORMAL = 'Normal',
+}
+registerEnumType(RegisterType, {
+  name: 'RegisterType',
+});

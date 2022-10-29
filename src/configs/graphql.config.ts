@@ -12,15 +12,45 @@ export class GraphqlService implements GqlOptionsFactory {
         credentials: true,
         origin: '*',
       },
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      buildSchemaOptions: { dateScalarMode: 'isoDate' },
       context: ({ req, res }) => ({ req, res }),
-
       debug: false,
-      resolvers: {
-        Upload: GraphQLUpload,
-        ObjectID: ObjectIDResolver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      subscriptions: { 'graphql-ws': true },
+      sortSchema: true,
+      csrfPrevention: true,
+      cache: 'bounded',
+      formatError: (error: any) => {
+        // Graphql Error
+        const formattedError = {
+          message: error.message,
+          code: error?.extensions?.code || 'INTERNAL_SERVER_ERROR',
+        };
+
+        const extensions = error?.extensions || null;
+        // Http exception
+        if (extensions?.exception?.status) {
+          formattedError['statusCode'] = extensions.exception.status || 500;
+          delete formattedError.code;
+
+          // Class Validator Error
+        } else if (extensions?.response?.statusCode) {
+          const response = extensions.response;
+          formattedError.message = response?.message || error.message;
+          formattedError['statusCode'] = response?.statusCode || 500;
+          delete formattedError.code;
+
+          // Mongo Error
+          // 1. Duplicate document by index
+        } else if (
+          extensions?.exception?.code === 11000 ||
+          error.message.match(/E11000/)
+        ) {
+          formattedError.message = 'Duplicate document';
+          formattedError['statusCode'] = 409;
+          delete formattedError.code;
+        }
+
+        return formattedError;
       },
     };
   }

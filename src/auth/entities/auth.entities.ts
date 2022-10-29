@@ -4,6 +4,9 @@ import { IAuthenticateResponse } from '../interfaces/auth';
 export class IJwtPayload {
   @Field(() => String, { nullable: true })
   _id?: string;
+
+  @Field({ nullable: true })
+  email: string;
 }
 @ObjectType()
 export class JwtPayload implements IAuthenticateResponse {
@@ -13,3 +16,10 @@ export class JwtPayload implements IAuthenticateResponse {
   @Field()
   refreshToken: string;
 }
+
+export class RefreshPayload {
+  email: string;
+  refreshToken: string;
+}
+
+export class RefreshResponse {}

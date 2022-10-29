@@ -5,7 +5,11 @@ import { MailService } from './mail.service';
 export class MailResolver {
   constructor(private mailService: MailService) {}
   @Query(() => Boolean)
-  async confirmMail(@Args('token') token: string): Promise<boolean> {
-    return await this.mailService.confirmEmail(token);
+  confirmMail(@Args('token') token: string): Promise<boolean> {
+    try {
+      return this.mailService.confirmEmail(token);
+    } catch (error) {
+      throw error;
+    }
   }
 }

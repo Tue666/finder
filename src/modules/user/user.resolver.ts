@@ -1,19 +1,8 @@
-import { UnauthorizedException } from '@nestjs/common';
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { ValidationError } from 'apollo-server-express';
+import { Resolver } from '@nestjs/graphql';
+import { User } from './entities/user.entities';
+import { UserService } from './user.service';
 
-@Resolver()
+@Resolver(User.name)
 export class UserResolver {
-  @Query(() => String)
-  test(@Args('test', { type: () => Boolean }) test: boolean): any {
-    try {
-      if (test === true) {
-        throw new Error('123');
-      } else {
-        return 'ok';
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
+  constructor(private userService: UserService) {}
 }

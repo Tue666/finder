@@ -1,5 +1,5 @@
 import { Model, Schema } from 'mongoose';
-import { GenderEnum } from '../../../constants/enum';
+import { GenderEnum, RegisterType } from '../../../constants/enum';
 import { Tag } from '../../tag/entities/tag.entity';
 import { GeoLocation, MatchRequest, User } from '../entities/user.entities';
 
@@ -40,10 +40,17 @@ export const UserSchema = new Schema<User>(
     birthDays: { type: Date },
     images: { type: [String] },
     getLocation: { type: GeoLocationSchema },
-    lastActive: { type: Date },
-    isDeleted: { type: Boolean },
+    lastActive: { type: Date, default: Date.now() },
+    isDeleted: { type: Boolean, default: false },
+    isConfirmMail: { type: Boolean, default: false },
     matchRequest: { type: [MatchRequestSchema] },
     matched: { type: [String] },
+    resetPasswordCode: { type: String },
+    registerType: {
+      type: String,
+      enum: Object.values(RegisterType),
+      default: RegisterType.NORMAL,
+    },
     tags: [
       {
         type: Schema.Types.ObjectId,

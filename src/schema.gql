@@ -14,8 +14,9 @@ type Conversation {
 }
 
 input CreateConversationInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  lastMessage: ObjectID
+  members: [ObjectID!]
+  messagePin: ObjectID
 }
 
 input CreateMessageInput {
@@ -23,9 +24,13 @@ input CreateMessageInput {
   exampleField: Int!
 }
 
-input CreateTagInput {
+input CreateSocketInput {
   """Example field (placeholder)"""
   exampleField: Int!
+}
+
+input CreateTagInput {
+  name: String!
 }
 
 """
@@ -42,6 +47,21 @@ type GeoLocation {
   """[lng, lat]"""
   coordinates: [Float!]
   type: String
+}
+
+input GeoLocationInput {
+  coordinates: [Float!]!
+}
+
+type JwtPayload {
+  accessToken: String!
+  refreshToken: String!
+}
+
+input LoginInput {
+  email: String!
+  geoLocation: GeoLocationInput!
+  password: String!
 }
 
 type MatchRequest {
@@ -71,12 +91,17 @@ enum MessageType {
 type Mutation {
   createConversation(createConversationInput: CreateConversationInput!): Conversation!
   createMessage(createMessageInput: CreateMessageInput!): Message!
+  createSocket(createSocketInput: CreateSocketInput!): Socket!
   createTag(createTagInput: CreateTagInput!): Tag!
   removeConversation(id: Int!): Conversation!
   removeMessage(id: Int!): Message!
+  removeSocket(id: Int!): Socket!
   removeTag(id: Int!): Tag!
+  signIn(input: LoginInput!): JwtPayload!
+  signUp(input: RegisterInput!): Boolean!
   updateConversation(updateConversationInput: UpdateConversationInput!): Conversation!
   updateMessage(updateMessageInput: UpdateMessageInput!): Message!
+  updateSocket(updateSocketInput: UpdateSocketInput!): Socket!
   updateTag(updateTagInput: UpdateTagInput!): Tag!
 }
 
@@ -88,10 +113,22 @@ scalar ObjectID
 type Query {
   confirmMail(token: String!): Boolean!
   conversation(id: Int!): Conversation!
+  forgotPassword(email: String!): Boolean!
   message(id: Int!): Message!
-  providedQuery(file: Upload!, id: ObjectID!): String!
+  refreshToken(refreshToken: String!): JwtPayload!
+  socket(id: Int!): Socket!
   tag(id: Int!): Tag!
-  test(test: Boolean!): String!
+}
+
+input RegisterInput {
+  confirmPassword: String!
+  email: String!
+  password: String!
+}
+
+type Socket {
+  """Example field (placeholder)"""
+  exampleField: Int!
 }
 
 type Tag {
@@ -105,9 +142,10 @@ type Tag {
 }
 
 input UpdateConversationInput {
-  """Example field (placeholder)"""
-  exampleField: Int
   id: Int!
+  lastMessage: ObjectID
+  members: [ObjectID!]
+  messagePin: ObjectID
 }
 
 input UpdateMessageInput {
@@ -116,14 +154,16 @@ input UpdateMessageInput {
   id: Int!
 }
 
-input UpdateTagInput {
+input UpdateSocketInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
+input UpdateTagInput {
+  id: Int!
+  name: String
+}
 
 type User {
   _id: ID!

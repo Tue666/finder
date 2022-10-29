@@ -5,9 +5,23 @@ import { JwtService } from '@nestjs/jwt';
 import { RtStrategy } from './strategies/jwt-rt.strategies';
 import { AtStrategy } from './strategies/jwt-at.strategies';
 import { UserModule } from '../modules/user/user.module';
+import { MailService } from '../modules/mail/mail.service';
+import { AuthController } from './auth.controller';
+import { GoogleStrategy } from './strategies/google.strategies';
+import { FaceBookStrategy } from './strategies/facebook.stategies';
 
 @Module({
   imports: [UserModule],
-  providers: [AuthService, AuthResolver, JwtService, RtStrategy, AtStrategy],
+  controllers: [AuthController],
+  providers: [
+    AuthService,
+    AuthResolver,
+    JwtService,
+    RtStrategy,
+    AtStrategy,
+    MailService,
+    GoogleStrategy,
+    FaceBookStrategy,
+  ],
 })
 export class AuthModule {}

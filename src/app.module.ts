@@ -16,6 +16,8 @@ import { MongooseConfigService } from './configs/mongoose.config';
 import { ConversationModule } from './modules/conversation/conversation.module';
 import { TagModule } from './modules/tag/tag.module';
 import { MessageModule } from './modules/message/message.module';
+import { LoggerModule } from './modules/logger/logger.module';
+import { SocketModule } from './modules/socket/socket.module';
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
@@ -38,6 +40,8 @@ import { MessageModule } from './modules/message/message.module';
     ConversationModule,
     TagModule,
     MessageModule,
+    LoggerModule,
+    SocketModule,
   ],
   providers: [
     {

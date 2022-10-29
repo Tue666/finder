@@ -24,6 +24,6 @@ async function bootstrap() {
       maxFileSize: 10000000, // 10 MB,
     }),
   );
-  await app.listen(3000);
+  await app.listen(2000);
 }
 bootstrap();

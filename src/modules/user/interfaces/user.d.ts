@@ -1,4 +1,4 @@
-import { GenderEnum } from '../../../constants/enum';
+import { GenderEnum, RegisterType } from '../../../constants/enum';
 import { ITag } from '../../tag/interfaces/tag';
 import { User } from '../entities/user.entities';
 
@@ -17,6 +17,9 @@ export interface IUser extends IEntity {
   showMeTinder: boolean;
   getLocation: IGeoLocation;
   lastActive: Date;
+  isConfirmMail: boolean;
+  resetPasswordCode?: string;
+  registerType?: RegisterType;
   // query: Object;
 }
 
@@ -26,6 +29,6 @@ export interface IMatchRequest {
 }
 
 export interface IGeoLocation {
-  type: string;
+  type?: string;
   coordinates: number[];
 }

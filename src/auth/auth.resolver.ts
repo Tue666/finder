@@ -1,16 +1,55 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GetCurrentRefreshToken } from '../common/decorators/refresh.token.decorators';
+import { RtGuard } from '../common/guard/rt.guard';
 import { AuthService } from './auth.service';
-import Upload from 'graphql-upload/Upload.js';
-import GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
-import { ObjectIDResolver } from 'graphql-scalars';
+import { LoginInput, RegisterInput } from './dto/auth.dto';
+import { JwtPayload, RefreshPayload } from './entities/auth.entities';
 @Resolver('Auth')
 export class AuthResolver {
   constructor(private authService: AuthService) {}
-  @Query(() => String)
-  providedQuery(
-    @Args({ name: 'file', type: () => GraphQLUpload }) file: Upload,
-    @Args('id', { type: () => ObjectIDResolver }) id: string,
-  ): string {
-    return 'Hello World';
+
+  @UseGuards(RtGuard)
+  @Query(() => JwtPayload)
+  refreshToken(
+    @Args('refreshToken') refreshToken: string,
+    @GetCurrentRefreshToken() rfPayload: RefreshPayload,
+  ): Promise<JwtPayload> {
+    try {
+      return this.authService.refreshToken(refreshToken, rfPayload);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Mutation(() => JwtPayload)
+  signIn(
+    @Args('input', { type: () => LoginInput }) input: LoginInput,
+  ): Promise<JwtPayload> {
+    try {
+      return this.authService.signIn(input);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  signUp(
+    @Args('input', { type: () => RegisterInput }) input: RegisterInput,
+  ): Promise<boolean> {
+    try {
+      return this.authService.signUp(input);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Query(() => Boolean)
+  forgotPassword(@Args('email') email: string): Promise<boolean> {
+    try {
+      return this.authService.forgotPassword(email);
+    } catch (error) {
+      throw error;
+    }
   }
 }

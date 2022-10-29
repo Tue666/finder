@@ -1,5 +1,5 @@
 import { Field, Float, HideField, ID, ObjectType } from '@nestjs/graphql';
-import { GenderEnum } from '../../../constants/enum';
+import { GenderEnum, RegisterType } from '../../../constants/enum';
 import { Tag } from '../../tag/entities/tag.entity';
 import { IGeoLocation, IMatchRequest, IUser } from '../interfaces/user';
 
@@ -62,6 +62,15 @@ export class User implements IUser {
 
   @Field(() => Boolean, { nullable: true })
   isDeleted: boolean;
+
+  @HideField()
+  isConfirmMail: boolean;
+
+  @HideField()
+  registerType?: RegisterType;
+
+  @HideField()
+  resetPasswordCode?: string;
 
   @Field(() => Date, { nullable: true })
   createdAt: Date;
