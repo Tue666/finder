@@ -2,6 +2,32 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Address {
+  city: String
+  country: String
+  district: String
+}
+
+type ControlWhoSeesYou {
+  onlyPeopleIveLiked: Boolean!
+  standard: Boolean!
+}
+
+input ControlWhoSeesYouInput {
+  onlyPeopleIveLiked: Boolean
+  standard: Boolean
+}
+
+type ControlWhoYouSee {
+  balancedRecommendations: Boolean!
+  recentlyActive: Boolean!
+}
+
+input ControlWhoYouSeeInput {
+  balancedRecommendations: Boolean
+  recentlyActive: Boolean
+}
+
 type Conversation {
   _id: ID!
   createdAt: DateTime!
@@ -38,6 +64,24 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DiscoverySettings {
+  distance: Float!
+  lookingFor: LookingFor!
+  maxAge: Float!
+  minAge: Float!
+  onlyShowAgeThisRange: Boolean!
+  onlyShowDistanceThisRange: Boolean!
+}
+
+input DiscoverySettingsInput {
+  distance: Float
+  lookingFor: LookingFor
+  maxAge: Float
+  minAge: Float
+  onlyShowAgeThisRange: Boolean
+  onlyShowDistanceThisRange: Boolean
+}
+
 enum GenderEnum {
   FEMALE
   MALE
@@ -62,6 +106,12 @@ input LoginInput {
   email: String!
   geoLocation: GeoLocationInput!
   password: String!
+}
+
+enum LookingFor {
+  ALL
+  MEN
+  WOMEN
 }
 
 type MatchRequest {
@@ -89,6 +139,7 @@ enum MessageType {
 }
 
 type Mutation {
+  changeSetting(input: MySettingInput!): Boolean!
   createConversation(createConversationInput: CreateConversationInput!): Conversation!
   createMessage(createMessageInput: CreateMessageInput!): Message!
   createSocket(createSocketInput: CreateSocketInput!): Socket!
@@ -101,8 +152,21 @@ type Mutation {
   signUp(input: RegisterInput!): Boolean!
   updateConversation(updateConversationInput: UpdateConversationInput!): Conversation!
   updateMessage(updateMessageInput: UpdateMessageInput!): Message!
+  updateProfile(input: UpdateUserInput!): Boolean!
   updateSocket(updateSocketInput: UpdateSocketInput!): Socket!
   updateTag(updateTagInput: UpdateTagInput!): Tag!
+}
+
+type MySetting {
+  controlWhoSeesYou: ControlWhoSeesYou!
+  controlWhoYouSee: ControlWhoYouSee!
+  discovery: DiscoverySettings!
+}
+
+input MySettingInput {
+  controlWhoSeesYou: ControlWhoSeesYouInput
+  controlWhoYouSee: ControlWhoYouSeeInput
+  discovery: DiscoverySettingsInput
 }
 
 """
@@ -114,6 +178,7 @@ type Query {
   confirmMail(token: String!): Boolean!
   conversation(id: Int!): Conversation!
   forgotPassword(email: String!): Boolean!
+  loginGoogle: String!
   message(id: Int!): Message!
   refreshToken(refreshToken: String!): JwtPayload!
   socket(id: Int!): Socket!
@@ -129,6 +194,11 @@ input RegisterInput {
 type Socket {
   """Example field (placeholder)"""
   exampleField: Int!
+}
+
+enum StatusActive {
+  OFFLINE
+  ONLINE
 }
 
 type Tag {
@@ -165,23 +235,34 @@ input UpdateTagInput {
   name: String
 }
 
+input UpdateUserInput {
+  birthDays: DateTime
+  gender: GenderEnum
+  images: [String!]
+  phoneNumber: String
+  tags: [ObjectID!]
+  username: String
+}
+
 type User {
   _id: ID!
-  address: String
+  address: Address
   birthDays: DateTime
   createdAt: DateTime
   email: String!
   gender: GenderEnum!
-  getLocation: GeoLocation
+  geoLocation: GeoLocation
   images: [String!]
-  isDeleted: Boolean
+  isDeleted: Boolean!
   keyword: String
   lastActive: DateTime
   matchRequest: [MatchRequest!]
   matched: [String!]
+  mySetting: MySetting!
   phoneNumber: String
-  showMeTinder: Boolean
+  showMeTinder: Boolean!
   slug: String!
+  statusActive: StatusActive
   tags: [Tag!]
   updatedAt: DateTime
   username: String!

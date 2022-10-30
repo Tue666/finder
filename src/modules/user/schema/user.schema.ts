@@ -1,7 +1,21 @@
 import { Model, Schema } from 'mongoose';
-import { GenderEnum, RegisterType } from '../../../constants/enum';
+import {
+  GenderEnum,
+  LookingFor,
+  RegisterType,
+  StatusActive,
+} from '../../../constants/enum';
 import { Tag } from '../../tag/entities/tag.entity';
-import { GeoLocation, MatchRequest, User } from '../entities/user.entities';
+import {
+  Address,
+  ControlWhoSeesYou,
+  ControlWhoYouSee,
+  DiscoverySettings,
+  GeoLocation,
+  MatchRequest,
+  MySetting,
+  User,
+} from '../entities/user.entities';
 
 export const GeoLocationSchema = new Schema<GeoLocation>({
   type: {
@@ -27,6 +41,63 @@ export const MatchRequestSchema = new Schema<MatchRequest>(
   { _id: false },
 );
 
+export const DiscoverySettingsSchema = new Schema<DiscoverySettings>(
+  {
+    maxAge: { type: Number, default: 35 },
+    minAge: { type: Number, default: 18 },
+    lookingFor: {
+      type: String,
+      enum: Object.values(LookingFor),
+      default: LookingFor.ALL,
+    },
+    distance: { type: Number, default: 150 },
+  },
+  { _id: false },
+);
+
+export const ControlWhoSeesYouSchema = new Schema<ControlWhoSeesYou>(
+  {
+    standard: { type: Boolean, default: true },
+    onlyPeopleIveLiked: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
+export const ControlWhoYouSeeSchema = new Schema<ControlWhoYouSee>(
+  {
+    balancedRecommendations: { type: Boolean, default: true },
+    recentlyActive: { type: Boolean, default: false },
+  },
+  { _id: false },
+);
+
+export const AddressSchema = new Schema<Address>(
+  {
+    district: { type: String, trim: true },
+    city: { type: String, trim: true },
+    country: { type: String, trim: true },
+  },
+  { _id: false },
+);
+
+export const MySettingSchema = new Schema<MySetting>(
+  {
+    discovery: {
+      type: DiscoverySettingsSchema,
+      default: new DiscoverySettings(),
+    },
+    controlWhoSeesYou: {
+      type: ControlWhoSeesYouSchema,
+      default: new ControlWhoSeesYou(),
+    },
+    controlWhoYouSee: {
+      type: ControlWhoYouSeeSchema,
+      default: new ControlWhoYouSee(),
+    },
+  },
+  { _id: false },
+);
+
 export type UserModelType = Model<User>;
 export const UserSchema = new Schema<User>(
   {
@@ -38,14 +109,15 @@ export const UserSchema = new Schema<User>(
     gender: { type: String, enum: Object.values(GenderEnum) },
     phoneNumber: { type: String, trim: true },
     birthDays: { type: Date },
-    images: { type: [String] },
-    getLocation: { type: GeoLocationSchema },
+    images: { type: [String], default: [] },
+    geoLocation: { type: GeoLocationSchema },
     lastActive: { type: Date, default: Date.now() },
     isDeleted: { type: Boolean, default: false },
     isConfirmMail: { type: Boolean, default: false },
-    matchRequest: { type: [MatchRequestSchema] },
+    matchRequest: { type: [MatchRequestSchema], default: [] },
     matched: { type: [String] },
     resetPasswordCode: { type: String },
+    statusActive: { type: String, enum: Object.values(StatusActive) },
     registerType: {
       type: String,
       enum: Object.values(RegisterType),
@@ -58,6 +130,7 @@ export const UserSchema = new Schema<User>(
         autopopulate: { maxDepth: 1 },
       },
     ],
+    mySetting: { type: MySettingSchema, default: new MySetting() },
     slug: { type: String, trim: true },
     keyword: { type: String, trim: true },
   },

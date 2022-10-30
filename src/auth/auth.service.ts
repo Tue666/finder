@@ -86,33 +86,44 @@ export class AuthService {
     return null;
   }
 
-  async loginWithGoogle(req): Promise<JwtPayload> {
+  async loginWithOAuth2(req, registerType: RegisterType): Promise<JwtPayload> {
     try {
       const user = req.user as User;
-      const [userGoogle, userNormal] = await Promise.all([
+      const [userOAuth2, userNormal] = await Promise.all([
         this.userService.getOne({
           email: user.email,
-          registerType: RegisterType.GOOGLE,
+          registerType: registerType,
         }),
         this.userService.getOne({
           email: user.email,
           registerType: RegisterType.NORMAL,
         }),
       ]);
-      if (!userGoogle && !userNormal) {
-        user.username = req.user.firstName + ' ' + req.user.lastName;
-        user.images.push(req.user.picture);
-        user.registerType = RegisterType.GOOGLE;
-        await this.userService.createWithGoogle(user);
+      if (!userOAuth2 && !userNormal) {
+        const newUser = await this.userService.createWithOAuth2(user);
+        return await this.generateTokens(newUser);
       } else if (userNormal) {
-        throw new BadRequestException('Email has been used');
+        throw new BadRequestException('Email has been used !');
       }
-      return await this.generateTokens(user);
+      return await this.generateTokens(userOAuth2);
     } catch (error) {
       throw error;
     }
   }
-  async loginWithFacebook(req) {
-    console.log(req?.user);
+
+  async loginWithFacebook(req): Promise<JwtPayload> {
+    try {
+      return await this.loginWithOAuth2(req, RegisterType.FACEBOOK);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async loginWithGoogle(req): Promise<JwtPayload> {
+    try {
+      return await this.loginWithOAuth2(req, RegisterType.GOOGLE);
+    } catch (error) {
+      throw error;
+    }
   }
 }

@@ -39,3 +39,20 @@ export enum RegisterType {
 registerEnumType(RegisterType, {
   name: 'RegisterType',
 });
+
+export enum LookingFor {
+  MEN = 'Men',
+  WOMEN = 'Women',
+  ALL = 'All',
+}
+registerEnumType(LookingFor, {
+  name: 'LookingFor',
+});
+
+export enum StatusActive {
+  ONLINE = 'Online',
+  OFFLINE = 'Offline',
+}
+registerEnumType(StatusActive, {
+  name: 'StatusActive',
+});

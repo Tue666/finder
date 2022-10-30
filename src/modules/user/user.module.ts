@@ -16,7 +16,7 @@ import { UserService } from './user.service';
           UserSchema.pre('save', function (next) {
             this.slug = toSlug(this.username, Constants.LOCALE_COUNTRY_CODE_VN);
             this.keyword = toKeyword(this.slug);
-            this.slug += new Date().getTime().toString();
+            this.slug += '-' + new Date().getTime().toString();
             return next();
           });
           return UserSchema;

@@ -1,7 +1,21 @@
 import { Field, Float, HideField, ID, ObjectType } from '@nestjs/graphql';
-import { GenderEnum, RegisterType } from '../../../constants/enum';
+import {
+  GenderEnum,
+  LookingFor,
+  RegisterType,
+  StatusActive,
+} from '../../../constants/enum';
 import { Tag } from '../../tag/entities/tag.entity';
-import { IGeoLocation, IMatchRequest, IUser } from '../interfaces/user';
+import {
+  IAddress,
+  IControlWhoSeesYou,
+  IControlWhoYouSee,
+  IDiscoverySettings,
+  IGeoLocation,
+  IMatchRequest,
+  IMySetting,
+  IUser,
+} from '../interfaces/user';
 
 @ObjectType()
 export class GeoLocation implements IGeoLocation {
@@ -10,6 +24,69 @@ export class GeoLocation implements IGeoLocation {
 
   @Field(() => [Float], { nullable: true, description: '[lng, lat]' })
   coordinates: number[];
+}
+
+@ObjectType()
+export class DiscoverySettings implements IDiscoverySettings {
+  @Field(() => Number)
+  minAge: number;
+
+  @Field(() => Number)
+  maxAge: number;
+
+  @Field(() => Boolean)
+  onlyShowAgeThisRange: boolean;
+
+  @Field(() => Number)
+  distance: number;
+
+  @Field(() => Boolean)
+  onlyShowDistanceThisRange: boolean;
+
+  @Field(() => LookingFor)
+  lookingFor: LookingFor;
+}
+
+@ObjectType()
+export class ControlWhoSeesYou implements IControlWhoSeesYou {
+  @Field(() => Boolean)
+  standard: boolean;
+
+  @Field(() => Boolean)
+  onlyPeopleIveLiked: boolean;
+}
+
+@ObjectType()
+export class ControlWhoYouSee implements IControlWhoYouSee {
+  @Field(() => Boolean)
+  balancedRecommendations: boolean;
+
+  @Field(() => Boolean)
+  recentlyActive: boolean;
+}
+
+@ObjectType()
+export class MySetting implements IMySetting {
+  @Field(() => DiscoverySettings)
+  discovery: DiscoverySettings;
+
+  @Field(() => ControlWhoSeesYou)
+  controlWhoSeesYou: ControlWhoSeesYou;
+
+  @Field(() => ControlWhoYouSee)
+  controlWhoYouSee: ControlWhoYouSee;
+}
+
+@ObjectType()
+export class Address implements IAddress {
+  @Field({ nullable: true })
+  district: string;
+
+  @Field({ nullable: true })
+  city: string;
+
+  @Field({ nullable: true })
+  country: string;
 }
 
 @ObjectType()
@@ -32,8 +109,8 @@ export class User implements IUser {
   @HideField()
   password: string;
 
-  @Field({ nullable: true })
-  address: string;
+  @Field(() => Address, { nullable: true })
+  address: Address;
 
   @Field(() => Date, { nullable: true })
   birthDays: Date;
@@ -42,7 +119,7 @@ export class User implements IUser {
   images: string[];
 
   @Field(() => GeoLocation, { nullable: true })
-  getLocation: GeoLocation;
+  geoLocation: GeoLocation;
 
   @Field(() => [String], { nullable: true })
   matched: string[];
@@ -50,27 +127,23 @@ export class User implements IUser {
   @Field(() => [Tag], { nullable: true })
   tags: Tag[];
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean)
   showMeTinder: boolean;
 
   @Field(() => Date, { nullable: true })
   lastActive: Date;
-  // query: Object;
+
+  @Field(() => StatusActive, { nullable: true })
+  statusActive?: StatusActive;
+
+  @Field(() => MySetting)
+  mySetting: MySetting;
 
   @Field(() => [MatchRequest], { nullable: true })
   matchRequest: MatchRequest[];
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean)
   isDeleted: boolean;
-
-  @HideField()
-  isConfirmMail: boolean;
-
-  @HideField()
-  registerType?: RegisterType;
-
-  @HideField()
-  resetPasswordCode?: string;
 
   @Field(() => Date, { nullable: true })
   createdAt: Date;
@@ -83,6 +156,15 @@ export class User implements IUser {
 
   @Field({ nullable: true })
   keyword: string;
+
+  @HideField()
+  isConfirmMail: boolean;
+
+  @HideField()
+  registerType?: RegisterType;
+
+  @HideField()
+  resetPasswordCode?: string;
 }
 
 @ObjectType()

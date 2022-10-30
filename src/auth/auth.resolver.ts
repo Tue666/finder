@@ -1,5 +1,6 @@
-import { UseGuards } from '@nestjs/common';
+import { Req, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthGuard } from '@nestjs/passport';
 import { GetCurrentRefreshToken } from '../common/decorators/refresh.token.decorators';
 import { RtGuard } from '../common/guard/rt.guard';
 import { AuthService } from './auth.service';
@@ -20,6 +21,12 @@ export class AuthResolver {
     } catch (error) {
       throw error;
     }
+  }
+
+  @Query(() => String)
+  @UseGuards(AuthGuard('facebook'))
+  loginGoogle(@Req() req) {
+    return this.authService.loginWithGoogle(req);
   }
 
   @Mutation(() => JwtPayload)
