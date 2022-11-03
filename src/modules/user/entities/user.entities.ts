@@ -97,10 +97,10 @@ export class User implements IUser {
   @Field(() => String)
   email: string;
 
-  @Field()
+  @Field({ nullable: true })
   username: string;
 
-  @Field(() => GenderEnum)
+  @Field(() => GenderEnum, { nullable: true })
   gender: GenderEnum;
 
   @Field({ nullable: true })
@@ -151,7 +151,7 @@ export class User implements IUser {
   @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
-  @Field()
+  @Field({ nullable: true })
   slug?: string;
 
   @Field({ nullable: true })
@@ -170,8 +170,17 @@ export class User implements IUser {
 @ObjectType()
 export class MatchRequest implements IMatchRequest {
   @Field(() => User, { nullable: true })
-  senderId: User;
+  sender: string | User;
 
   @Field(() => Date, { nullable: true })
   createdAt: Date;
+}
+
+@ObjectType()
+export class UserResult implements IResult<User> {
+  @Field(() => [User], { nullable: true })
+  results: User[];
+
+  @Field(() => Number, { nullable: true })
+  totalCount: number;
 }

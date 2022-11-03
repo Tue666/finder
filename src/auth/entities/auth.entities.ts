@@ -18,7 +18,7 @@ export class JwtPayload implements IAuthenticateResponse {
 }
 
 export class RefreshPayload {
-  email: string;
+  _id: string;
   refreshToken: string;
 }
 

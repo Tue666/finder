@@ -55,7 +55,7 @@ export interface IControlWhoYouSee {
 }
 
 export interface IMatchRequest {
-  senderId: string | User;
+  sender: string | User;
   createdAt: Date;
 }
 

@@ -9,10 +9,11 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../modules/user/entities/user.entities';
 import { UserService } from '../modules/user/user.service';
 import { LoginInput, RegisterInput } from './dto/auth.dto';
-import { JwtPayload } from './entities/auth.entities';
+import { JwtPayload, RefreshPayload } from './entities/auth.entities';
 import { Cache } from 'cache-manager';
 import { MailService } from '../modules/mail/mail.service';
 import { RegisterType } from '../constants/enum';
+import { Constants } from '../constants/constants';
 @Injectable()
 export class AuthService {
   constructor(
@@ -22,36 +23,44 @@ export class AuthService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  async generateTokens(user: User): Promise<JwtPayload> {
+  async generateTokens(_id: string): Promise<JwtPayload> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
-        {
-          _id: user._id,
-        },
+        { _id },
         {
           secret: process.env.JWT_ACCESS_TOKEN_SECRET,
           expiresIn: parseInt(process.env.JWT_ACCESS_TOKEN_EXPIRATION_TIME),
         },
       ),
       this.jwtService.signAsync(
-        {
-          username: user.email,
-        },
+        { _id },
         {
           secret: process.env.JWT_REFRESH_TOKEN_SECRET,
           expiresIn: parseInt(process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME),
         },
       ),
     ]);
+    await this.cacheManager.set(_id, refreshToken, {
+      ttl: Constants.REFRESH_TOKEN_TTL,
+    });
     return { accessToken, refreshToken };
   }
 
   async signIn(input: LoginInput): Promise<JwtPayload> {
-    const user = await this.userService.signIn(input);
-    if (!user.isConfirmMail) {
-      throw new UnauthorizedException('Email is not confirm');
+    try {
+      const [long, lat] = [-73.856077, 40.848447];
+      const user = await this.userService.signIn(input);
+      if (!user.isConfirmMail) {
+        throw new UnauthorizedException('Email is not confirm');
+      }
+      await this.userService.findOneAndUpdate(
+        { _id: user._id },
+        { $set: { geoLocation: { coordinates: [long, lat] } } },
+      );
+      return await this.generateTokens(user._id.toString());
+    } catch (error) {
+      throw error;
     }
-    return await this.generateTokens(user);
   }
 
   async signUp(register: RegisterInput): Promise<boolean> {
@@ -77,13 +86,17 @@ export class AuthService {
     return true;
   }
 
-  async refreshToken(
-    refreshToken: string,
-    rfPayload: any,
-  ): Promise<JwtPayload> {
-    const keyRefresh = rfPayload.email + rfPayload.refreshToken;
-    const key = await this.cacheManager.get(keyRefresh);
-    return null;
+  async refreshToken(rfPayload: RefreshPayload): Promise<JwtPayload> {
+    try {
+      const refreshToken = await this.cacheManager.get(rfPayload._id);
+      if (!refreshToken) {
+        throw new UnauthorizedException('Refresh is not accepted');
+      } else {
+        return await this.generateTokens(rfPayload._id);
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
   async loginWithOAuth2(req, registerType: RegisterType): Promise<JwtPayload> {
@@ -101,11 +114,16 @@ export class AuthService {
       ]);
       if (!userOAuth2 && !userNormal) {
         const newUser = await this.userService.createWithOAuth2(user);
-        return await this.generateTokens(newUser);
+        return await this.generateTokens(newUser._id.toString());
       } else if (userNormal) {
         throw new BadRequestException('Email has been used !');
       }
-      return await this.generateTokens(userOAuth2);
+      const [long, lat] = [-73.856077, 40.848447];
+      await this.userService.findOneAndUpdate(
+        { _id: userOAuth2._id },
+        { $set: { geoLocation: { coordinates: [long, lat] } } },
+      );
+      return await this.generateTokens(userOAuth2._id.toString());
     } catch (error) {
       throw error;
     }
@@ -122,6 +140,15 @@ export class AuthService {
   async loginWithGoogle(req): Promise<JwtPayload> {
     try {
       return await this.loginWithOAuth2(req, RegisterType.GOOGLE);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async resetCache(): Promise<boolean> {
+    try {
+      await this.cacheManager.reset();
+      return true;
     } catch (error) {
       throw error;
     }

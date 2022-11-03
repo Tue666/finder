@@ -17,21 +17,24 @@ import {
   User,
 } from '../entities/user.entities';
 
-export const GeoLocationSchema = new Schema<GeoLocation>({
-  type: {
-    type: String,
-    enum: ['Point'],
-    default: 'Point',
+export const GeoLocationSchema = new Schema<GeoLocation>(
+  {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
   },
-  coordinates: {
-    type: [Number],
-    required: true,
-  },
-});
+  { _id: false },
+);
 
 export const MatchRequestSchema = new Schema<MatchRequest>(
   {
-    senderId: {
+    sender: {
       type: Schema.Types.ObjectId,
       ref: User.name,
       autopopulate: { maxDepth: 1 },
@@ -51,6 +54,8 @@ export const DiscoverySettingsSchema = new Schema<DiscoverySettings>(
       default: LookingFor.ALL,
     },
     distance: { type: Number, default: 150 },
+    onlyShowAgeThisRange: { type: Boolean, default: true },
+    onlyShowDistanceThisRange: { type: Boolean, default: true },
   },
   { _id: false },
 );

@@ -7,17 +7,33 @@ import { InjectModel } from '@nestjs/mongoose';
 import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
 import { throwIfNotExists } from '../../utils/model.utils';
 import {
+  FilterGetAllUser,
   FilterGetOneUser,
   MySettingInput,
   UpdateUserInput,
 } from './dto/create-user.dto';
-import { User } from './entities/user.entities';
+import { MatchRequest, User, UserResult } from './entities/user.entities';
 import { UserModelType } from './schema/user.schema';
 import bcrypt from 'bcrypt';
 import { FilterQuery, UpdateQuery } from 'mongoose';
+import { Constants } from '../../constants/constants';
+import { PaginationInput } from '../common/dto/common.dto';
+import { UserEmbeddedService } from '../user_embedded/user_embedded.service';
+import { includesInObject } from '../../utils/utils';
+import { LoggerService } from '../logger/logger.service';
+import { ConversationService } from '../conversation/conversation.service';
+import { UserHelper } from './helper/user.helper';
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: UserModelType) {}
+  constructor(
+    @InjectModel(User.name) private userModel: UserModelType,
+    private userEmbeddedService: UserEmbeddedService,
+    private loggerService: LoggerService,
+    private conversationService: ConversationService,
+    private userHelper: UserHelper,
+  ) {
+    this.loggerService.setContext('UserService');
+  }
   async createWithOAuth2(userGoogle: User): Promise<User> {
     try {
       const user = await this.userModel.create(userGoogle);
@@ -37,6 +53,25 @@ export class UserService {
     try {
       const user = await this.userModel.findOne(filter);
       return user ? user : undefined;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllUser(
+    pagination: PaginationInput,
+    filter: FilterGetAllUser,
+  ): Promise<UserResult> {
+    try {
+      const queryFilter = this.userHelper.buildQuery(filter);
+      const [results, totalCount] = await Promise.all([
+        this.userModel
+          .find(queryFilter)
+          .skip((pagination?.page - 1) * pagination?.size)
+          .limit(pagination?.size),
+        this.userModel.countDocuments(),
+      ]);
+      return { results, totalCount };
     } catch (error) {
       throw error;
     }
@@ -116,19 +151,66 @@ export class UserService {
   async updateProfile(
     user: User,
     input: UpdateUserInput | MySettingInput,
+    feature: string,
   ): Promise<boolean> {
     try {
-      const result = [].map((r: UpdateUserInput | MySettingInput) => {
-        if (r && typeof r !== 'number' && !Array.isArray(r)) {
-          console.log(r);
-        }
-      });
+      let updateQuery = {};
+      if (feature === Constants.CHANGE_SETTING) {
+        updateQuery[feature] = input;
+      } else {
+        updateQuery = { ...input };
+      }
       const newUser = await this.userModel.findOneAndUpdate(
         { _id: user._id },
-        { $set: { mySetting: input } },
+        { $set: updateQuery },
         { new: true },
       );
       throwIfNotExists(newUser, 'User not found to update');
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async unlikeUser(user: User, user_id: string): Promise<boolean> {
+    try {
+      await this.userEmbeddedService.findOneAndUpdate(
+        {
+          user: user._id,
+          count: { $lt: Constants.MAX_COUNT_IN_USER_EMBEDDED },
+        },
+        { $push: { unlikeUser: user_id }, $inc: { count: 1 } },
+      );
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async likeUser(user_id: string, user: User): Promise<boolean> {
+    try {
+      const requestUser = await this.userModel.findOne({ _id: user_id });
+      throwIfNotExists(requestUser, 'User not found');
+      const isContainsInRequest = includesInObject<MatchRequest>(
+        requestUser.matchRequest,
+        'sender',
+        user_id,
+      );
+      if (isContainsInRequest) {
+        this.loggerService.log('User match request with request user');
+        await this.conversationService.create({
+          members: [user_id, requestUser._id],
+        });
+      } else {
+        this.loggerService.log(
+          `Request match request to ${requestUser.username}`,
+        );
+        requestUser.matchRequest.push({
+          sender: user,
+          createdAt: new Date(),
+        });
+      }
+
       return true;
     } catch (error) {
       throw error;

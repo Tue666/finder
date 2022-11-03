@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { FilterQuery, UpdateQuery } from 'mongoose';
+import { throwIfNotExists } from '../../utils/model.utils';
 import { CreateConversationInput } from './dto/create-conversation.input';
 import { UpdateConversationInput } from './dto/update-conversation.input';
 import { Conversation } from './entities/conversation.entity';
@@ -20,15 +22,36 @@ export class ConversationService {
     return `This action returns all conversation`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} conversation`;
+  async findOne(_id: string): Promise<Conversation> {
+    try {
+      const conversation = await this.conversionModel.findOne({ _id });
+      throwIfNotExists(conversation, 'Conversation not found');
+      return conversation;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  update(id: number, updateConversationInput: UpdateConversationInput) {
-    return `This action updates a #${id} conversation`;
+  async findOneAndUpdate(
+    filter: FilterQuery<Conversation>,
+    update: UpdateQuery<Conversation>,
+  ): Promise<Conversation> {
+    try {
+      const conversation = await this.conversionModel.findOneAndUpdate(
+        filter,
+        update,
+        {
+          new: true,
+        },
+      );
+      return conversation;
+    } catch (error) {
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} conversation`;
+  remove(_id: string): Promise<boolean> {
+    // return `This action removes a #${id} conversation`;
+    return null;
   }
 }

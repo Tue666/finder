@@ -3,6 +3,7 @@ import { ConversationService } from './conversation.service';
 import { Conversation } from './entities/conversation.entity';
 import { CreateConversationInput } from './dto/create-conversation.input';
 import { UpdateConversationInput } from './dto/update-conversation.input';
+import { GraphQLObjectID } from 'graphql-scalars';
 
 @Resolver(() => Conversation)
 export class ConversationResolver {
@@ -22,23 +23,10 @@ export class ConversationResolver {
   }
 
   @Query(() => Conversation, { name: 'conversation' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.conversationService.findOne(id);
-  }
-
-  @Mutation(() => Conversation)
-  updateConversation(
-    @Args('updateConversationInput')
-    updateConversationInput: UpdateConversationInput,
+  findOne(
+    @Args('conversation_id', { type: () => GraphQLObjectID })
+    conversation_id: string,
   ) {
-    return this.conversationService.update(
-      updateConversationInput.id,
-      updateConversationInput,
-    );
-  }
-
-  @Mutation(() => Conversation)
-  removeConversation(@Args('id', { type: () => Int }) id: number) {
-    return this.conversationService.remove(id);
+    return this.conversationService.findOne(conversation_id);
   }
 }

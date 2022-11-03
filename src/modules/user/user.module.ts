@@ -2,7 +2,11 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Constants } from '../../constants/constants';
 import { toKeyword, toSlug } from '../../utils/string.utils';
+import { ConversationModule } from '../conversation/conversation.module';
+import { LoggerModule } from '../logger/logger.module';
+import { UserEmbeddedModule } from '../user_embedded/user_embedded.module';
 import { User } from './entities/user.entities';
+import { UserHelper } from './helper/user.helper';
 import { UserSchema } from './schema/user.schema';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
@@ -13,6 +17,8 @@ import { UserService } from './user.service';
       {
         name: User.name,
         useFactory: () => {
+          UserSchema.index({ showMeTinder: 1 });
+          UserSchema.index({ geoLocation: '2dsphere' });
           UserSchema.pre('save', function (next) {
             this.slug = toSlug(this.username, Constants.LOCALE_COUNTRY_CODE_VN);
             this.keyword = toKeyword(this.slug);
@@ -23,8 +29,11 @@ import { UserService } from './user.service';
         },
       },
     ]),
+    UserEmbeddedModule,
+    LoggerModule,
+    ConversationModule,
   ],
-  providers: [UserResolver, UserService],
+  providers: [UserResolver, UserService, UserHelper],
   exports: [UserService],
 })
 export class UserModule {}

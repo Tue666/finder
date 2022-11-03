@@ -6,6 +6,7 @@ import express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { LoggerService } from './modules/logger/logger.service';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.set('trust proxy', process.env.NODE_ENV !== 'production');
@@ -24,6 +25,7 @@ async function bootstrap() {
       maxFileSize: 10000000, // 10 MB,
     }),
   );
+  app.useLogger(new LoggerService());
   await app.listen(2000);
 }
 bootstrap();

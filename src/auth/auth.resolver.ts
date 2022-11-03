@@ -10,14 +10,13 @@ import { JwtPayload, RefreshPayload } from './entities/auth.entities';
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
-  @UseGuards(RtGuard)
   @Query(() => JwtPayload)
+  @UseGuards(RtGuard)
   refreshToken(
-    @Args('refreshToken') refreshToken: string,
     @GetCurrentRefreshToken() rfPayload: RefreshPayload,
   ): Promise<JwtPayload> {
     try {
-      return this.authService.refreshToken(refreshToken, rfPayload);
+      return this.authService.refreshToken(rfPayload);
     } catch (error) {
       throw error;
     }
@@ -55,6 +54,15 @@ export class AuthResolver {
   forgotPassword(@Args('email') email: string): Promise<boolean> {
     try {
       return this.authService.forgotPassword(email);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Query(() => Boolean)
+  resetCache() {
+    try {
+      return this.authService.resetCache();
     } catch (error) {
       throw error;
     }

@@ -5,10 +5,10 @@ import { IConversation } from '../interfaces/conversation';
 @InputType()
 export class CreateConversationInput implements IConversation {
   @Field(() => GraphQLObjectID, { nullable: true })
-  lastMessage: string;
+  lastMessage?: string;
 
   @Field(() => GraphQLObjectID, { nullable: true })
-  messagePin: string;
+  messagePin?: string;
 
   @Field(() => [GraphQLObjectID], { nullable: true })
   members: string[];

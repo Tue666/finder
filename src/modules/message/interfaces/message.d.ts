@@ -9,4 +9,10 @@ export interface IMessage extends IEntity {
   conversion_id: string | Conversation;
   type: MessageType;
   urlMessageImage: string;
+  cursor: number;
 }
+
+export type IMessageCreate = IEntityInput<
+  IMessage,
+  'cursor' | 'urlMessageImage'
+>;

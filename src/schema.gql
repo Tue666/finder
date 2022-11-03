@@ -45,11 +45,6 @@ input CreateConversationInput {
   messagePin: ObjectID
 }
 
-input CreateMessageInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 input CreateSocketInput {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -82,6 +77,13 @@ input DiscoverySettingsInput {
   onlyShowDistanceThisRange: Boolean
 }
 
+input FilterGetAllUser {
+  geoLocation: GeoLocationInput
+  matched: [String!]
+  mySetting: MySettingInput
+  showMeTinder: Boolean
+}
+
 enum GenderEnum {
   FEMALE
   MALE
@@ -94,6 +96,7 @@ type GeoLocation {
 }
 
 input GeoLocationInput {
+  """Position 0 is Longitude , 1 is Latitude"""
   coordinates: [Float!]!
 }
 
@@ -104,7 +107,6 @@ type JwtPayload {
 
 input LoginInput {
   email: String!
-  geoLocation: GeoLocationInput!
   password: String!
 }
 
@@ -116,13 +118,14 @@ enum LookingFor {
 
 type MatchRequest {
   createdAt: DateTime
-  senderId: User
+  sender: User
 }
 
 type Message {
   _id: ID!
   conversion_id: Conversation!
   createdAt: DateTime!
+  cursor: Float!
   isDeleted: Boolean!
   keyword: String!
   receiver: User!
@@ -141,16 +144,15 @@ enum MessageType {
 type Mutation {
   changeSetting(input: MySettingInput!): Boolean!
   createConversation(createConversationInput: CreateConversationInput!): Conversation!
-  createMessage(createMessageInput: CreateMessageInput!): Message!
   createSocket(createSocketInput: CreateSocketInput!): Socket!
-  createTag(createTagInput: CreateTagInput!): Tag!
-  removeConversation(id: Int!): Conversation!
-  removeMessage(id: Int!): Message!
+  createTag(createTagInput: CreateTagInput!): Boolean!
+  likeUser(user_id: ObjectID!): Boolean!
+  removeMessage(_id: ObjectID!): Message!
   removeSocket(id: Int!): Socket!
   removeTag(id: Int!): Tag!
   signIn(input: LoginInput!): JwtPayload!
   signUp(input: RegisterInput!): Boolean!
-  updateConversation(updateConversationInput: UpdateConversationInput!): Conversation!
+  unlikeUser(user_id: ObjectID!): Boolean!
   updateMessage(updateMessageInput: UpdateMessageInput!): Message!
   updateProfile(input: UpdateUserInput!): Boolean!
   updateSocket(updateSocketInput: UpdateSocketInput!): Socket!
@@ -174,13 +176,20 @@ A field whose value conforms with the standard mongodb object ID as described he
 """
 scalar ObjectID
 
+input PaginationInput {
+  page: Float = 0
+  size: Float = 10
+}
+
 type Query {
   confirmMail(token: String!): Boolean!
-  conversation(id: Int!): Conversation!
+  conversation(conversation_id: ObjectID!): Conversation!
   forgotPassword(email: String!): Boolean!
+  getAllUser(filter: FilterGetAllUser, pagination: PaginationInput): UserResult!
   loginGoogle: String!
   message(id: Int!): Message!
-  refreshToken(refreshToken: String!): JwtPayload!
+  refreshToken: JwtPayload!
+  resetCache: Boolean!
   socket(id: Int!): Socket!
   tag(id: Int!): Tag!
 }
@@ -211,17 +220,13 @@ type Tag {
   updatedAt: DateTime!
 }
 
-input UpdateConversationInput {
-  id: Int!
-  lastMessage: ObjectID
-  members: [ObjectID!]
-  messagePin: ObjectID
-}
-
 input UpdateMessageInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  conversion_id: ObjectID
   id: Int!
+  receiver: ObjectID
+  sender: ObjectID
+  text: String
+  type: MessageType
 }
 
 input UpdateSocketInput {
@@ -250,7 +255,7 @@ type User {
   birthDays: DateTime
   createdAt: DateTime
   email: String!
-  gender: GenderEnum!
+  gender: GenderEnum
   geoLocation: GeoLocation
   images: [String!]
   isDeleted: Boolean!
@@ -261,9 +266,14 @@ type User {
   mySetting: MySetting!
   phoneNumber: String
   showMeTinder: Boolean!
-  slug: String!
+  slug: String
   statusActive: StatusActive
   tags: [Tag!]
   updatedAt: DateTime
-  username: String!
+  username: String
+}
+
+type UserResult {
+  results: [User!]
+  totalCount: Float
 }

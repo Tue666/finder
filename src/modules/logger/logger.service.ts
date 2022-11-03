@@ -1,29 +1,29 @@
-import { Injectable, Logger, Scope } from '@nestjs/common';
+import { Injectable, ConsoleLogger, Scope } from '@nestjs/common';
 
 @Injectable({ scope: Scope.TRANSIENT })
-export class LoggerService extends Logger {
+export class LoggerService extends ConsoleLogger {
   error(message: any, trace?: string, context?: string) {
     // TO DO
     super.error(message, trace, context);
   }
 
-  warn(message: any, context?: string) {
+  warn(message: string) {
     // TO DO
-    super.warn(message, context);
+    super.warn(message);
   }
 
-  log(message: any, context?: string) {
+  log(message: string) {
     // TO DO
-    super.log(message, context);
+    super.log(message);
   }
 
-  debug(message: any, context?: string) {
+  debug(message: string) {
     // TO DO
-    super.debug(message, context);
+    super.debug(message);
   }
 
-  verbose(message: any, context?: string) {
+  verbose(message: string) {
     // TO DO
-    super.verbose(message, context);
+    super.verbose(message);
   }
 }

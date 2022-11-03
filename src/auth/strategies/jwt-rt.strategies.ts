@@ -20,7 +20,7 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
         .replace('Bearer', '')
         .trim();
       return {
-        ...payload,
+        _id: payload._id,
         refreshToken,
       };
     } catch (error) {

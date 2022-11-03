@@ -20,5 +20,6 @@ import { ConversationSchema } from './schema/conversion.schema';
     ]),
   ],
   providers: [ConversationResolver, ConversationService],
+  exports: [ConversationService],
 })
 export class ConversationModule {}

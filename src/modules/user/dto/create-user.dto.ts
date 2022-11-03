@@ -15,7 +15,9 @@ import {
 
 @InputType()
 export class GeoLocationInput implements IGeoLocation {
-  @Field(() => [Float])
+  @Field(() => [Float], {
+    description: 'Position 0 is Longitude , 1 is Latitude',
+  })
   coordinates: number[];
 }
 
@@ -80,6 +82,18 @@ export class ControlWhoYouSeeInput implements IControlWhoYouSee {
 }
 
 @InputType()
+export class MySettingInput implements IMySetting {
+  @Field(() => DiscoverySettingsInput, { nullable: true })
+  discovery: DiscoverySettingsInput;
+
+  @Field(() => ControlWhoSeesYouInput, { nullable: true })
+  controlWhoSeesYou: ControlWhoSeesYouInput;
+
+  @Field(() => ControlWhoYouSeeInput, { nullable: true })
+  controlWhoYouSee: ControlWhoYouSeeInput;
+}
+
+@InputType()
 export class FilterGetOneUser implements Partial<IUser> {
   @Field(() => GraphQLObjectID, { nullable: true })
   _id?: string;
@@ -100,13 +114,16 @@ export class FilterGetOneUser implements Partial<IUser> {
 }
 
 @InputType()
-export class MySettingInput implements IMySetting {
-  @Field(() => DiscoverySettingsInput, { nullable: true })
-  discovery: DiscoverySettingsInput;
+export class FilterGetAllUser implements Partial<IUser> {
+  @Field(() => Boolean, { nullable: true })
+  showMeTinder?: boolean;
 
-  @Field(() => ControlWhoSeesYouInput, { nullable: true })
-  controlWhoSeesYou: ControlWhoSeesYouInput;
+  @Field(() => GeoLocationInput, { nullable: true })
+  geoLocation?: GeoLocationInput;
 
-  @Field(() => ControlWhoYouSeeInput, { nullable: true })
-  controlWhoYouSee: ControlWhoYouSeeInput;
+  @Field(() => [String], { nullable: true })
+  matched?: string[];
+
+  @Field(() => MySettingInput, { nullable: true })
+  mySetting?: MySettingInput;
 }

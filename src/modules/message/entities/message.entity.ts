@@ -27,6 +27,9 @@ export class Message implements IMessage {
   @Field({ nullable: true })
   urlMessageImage: string;
 
+  @Field(() => Number)
+  cursor: number;
+
   @Field(() => Boolean)
   isDeleted: boolean;
 

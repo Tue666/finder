@@ -18,6 +18,7 @@ import { TagModule } from './modules/tag/tag.module';
 import { MessageModule } from './modules/message/message.module';
 import { LoggerModule } from './modules/logger/logger.module';
 import { SocketModule } from './modules/socket/socket.module';
+import { UserEmbeddedModule } from './modules/user_embedded/user_embedded.module';
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
@@ -42,6 +43,7 @@ import { SocketModule } from './modules/socket/socket.module';
     MessageModule,
     LoggerModule,
     SocketModule,
+    UserEmbeddedModule,
   ],
   providers: [
     {

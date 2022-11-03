@@ -9,7 +9,7 @@ import { PaginationInput } from '../common/dto/common.dto';
 export class TagResolver {
   constructor(private readonly tagService: TagService) {}
 
-  @Mutation(() => Tag)
+  @Mutation(() => Boolean)
   createTag(@Args('createTagInput') createTagInput: CreateTagInput) {
     return this.tagService.create(createTagInput);
   }

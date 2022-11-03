@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Message } from './entities/message.entity';
 import { MessageSchema } from './schema/message.schema';
 import { toKeyword, toSlug } from '../../utils/string.utils';
+import { ConversationModule } from '../conversation/conversation.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { toKeyword, toSlug } from '../../utils/string.utils';
       {
         name: Message.name,
         useFactory: () => {
+          MessageSchema.index({ cursor: 1 });
           MessageSchema.pre('save', function (next) {
             this.keyword = toKeyword(toSlug(this.text));
             return next();
@@ -20,6 +22,7 @@ import { toKeyword, toSlug } from '../../utils/string.utils';
         },
       },
     ]),
+    ConversationModule,
   ],
   providers: [MessageResolver, MessageService],
 })

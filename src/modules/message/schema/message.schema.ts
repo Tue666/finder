@@ -23,6 +23,7 @@ export const MessageSchema = new Schema<Message>(
       ref: Conversation.name,
       autopopulate: { maxDepth: false },
     },
+    cursor: { type: Number },
     urlMessageImage: { type: String, trim: true },
     type: { type: String, enum: Object.values(MessageType) },
     isDeleted: { type: Boolean },

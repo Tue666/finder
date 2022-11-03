@@ -1,17 +1,12 @@
 import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { MessageService } from './message.service';
 import { Message } from './entities/message.entity';
-import { CreateMessageInput } from './dto/create-message.input';
 import { UpdateMessageInput } from './dto/update-message.input';
+import { GraphQLObjectID } from 'graphql-scalars';
 
 @Resolver(() => Message)
 export class MessageResolver {
   constructor(private readonly messageService: MessageService) {}
-
-  @Mutation(() => Message)
-  createMessage(@Args('createMessageInput') createMessageInput: CreateMessageInput) {
-    return this.messageService.create(createMessageInput);
-  }
 
   @Query(() => [Message], { name: 'message' })
   findAll() {
@@ -24,12 +19,19 @@ export class MessageResolver {
   }
 
   @Mutation(() => Message)
-  updateMessage(@Args('updateMessageInput') updateMessageInput: UpdateMessageInput) {
-    return this.messageService.update(updateMessageInput.id, updateMessageInput);
+  updateMessage(
+    @Args('updateMessageInput') updateMessageInput: UpdateMessageInput,
+  ) {
+    return this.messageService.update(
+      updateMessageInput.id,
+      updateMessageInput,
+    );
   }
 
   @Mutation(() => Message)
-  removeMessage(@Args('id', { type: () => Int }) id: number) {
-    return this.messageService.remove(id);
+  removeMessage(
+    @Args('_id', { type: () => GraphQLObjectID }) _id: string,
+  ): Promise<boolean> {
+    return this.messageService.remove(_id);
   }
 }
