@@ -4,8 +4,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import bcrypt from 'bcrypt';
+import { FilterQuery, UpdateQuery } from 'mongoose';
 import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
+import { Constants } from '../../constants/constants';
 import { throwIfNotExists } from '../../utils/model.utils';
+import { includesInObject } from '../../utils/utils';
+import { PaginationInput } from '../common/dto/common.dto';
+import { ConversationService } from '../conversation/conversation.service';
+import { LoggerService } from '../logger/logger.service';
+import { UserEmbeddedService } from '../user_embedded/user_embedded.service';
 import {
   FilterGetAllUser,
   FilterGetOneUser,
@@ -13,16 +21,8 @@ import {
   UpdateUserInput,
 } from './dto/create-user.dto';
 import { MatchRequest, User, UserResult } from './entities/user.entities';
-import { UserModelType } from './schema/user.schema';
-import bcrypt from 'bcrypt';
-import { FilterQuery, UpdateQuery } from 'mongoose';
-import { Constants } from '../../constants/constants';
-import { PaginationInput } from '../common/dto/common.dto';
-import { UserEmbeddedService } from '../user_embedded/user_embedded.service';
-import { includesInObject } from '../../utils/utils';
-import { LoggerService } from '../logger/logger.service';
-import { ConversationService } from '../conversation/conversation.service';
 import { UserHelper } from './helper/user.helper';
+import { UserModelType } from './schema/user.schema';
 @Injectable()
 export class UserService {
   constructor(
@@ -69,9 +69,9 @@ export class UserService {
           .find(queryFilter)
           .skip((pagination?.page - 1) * pagination?.size)
           .limit(pagination?.size),
-        this.userModel.countDocuments(),
+        this.userModel.find(queryFilter),
       ]);
-      return { results, totalCount };
+      return { results, totalCount: totalCount.length };
     } catch (error) {
       throw error;
     }
@@ -81,6 +81,11 @@ export class UserService {
     try {
       const user = await this.findOne({ email: input.email });
       await this.isNotCorrectPassword(input.password, user.password);
+      this.loggerService.debug('Passed password');
+      await this.userHelper.setNewInfoAfterLogin({
+        coordinates: input.geoLocation.coordinates,
+        user,
+      });
       return user;
     } catch (error) {
       throw error;

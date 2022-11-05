@@ -14,6 +14,7 @@ import { Cache } from 'cache-manager';
 import { MailService } from '../modules/mail/mail.service';
 import { RegisterType } from '../constants/enum';
 import { Constants } from '../constants/constants';
+import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -48,15 +49,13 @@ export class AuthService {
 
   async signIn(input: LoginInput): Promise<JwtPayload> {
     try {
-      const [long, lat] = [-73.856077, 40.848447];
+      const [long, lat] = [106.6804281, 10.8292385];
+      input.geoLocation = new GeoLocationInput();
+      input.geoLocation.coordinates = [long, lat];
       const user = await this.userService.signIn(input);
       if (!user.isConfirmMail) {
         throw new UnauthorizedException('Email is not confirm');
       }
-      await this.userService.findOneAndUpdate(
-        { _id: user._id },
-        { $set: { geoLocation: { coordinates: [long, lat] } } },
-      );
       return await this.generateTokens(user._id.toString());
     } catch (error) {
       throw error;

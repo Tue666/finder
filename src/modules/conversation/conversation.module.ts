@@ -4,6 +4,7 @@ import { ConversationResolver } from './conversation.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Conversation } from './entities/conversation.entity';
 import { ConversationSchema } from './schema/conversion.schema';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ConversationSchema } from './schema/conversion.schema';
         },
       },
     ]),
+    LoggerModule,
   ],
   providers: [ConversationResolver, ConversationService],
   exports: [ConversationService],

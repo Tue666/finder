@@ -2,7 +2,7 @@ import { Field, Float, HideField, InputType } from '@nestjs/graphql';
 import { IsEmail, IsOptional } from 'class-validator';
 import { GraphQLObjectID } from 'graphql-scalars';
 import { GenderEnum, LookingFor, RegisterType } from '../../../constants/enum';
-import { ITag } from '../../tag/interfaces/tag';
+import { User } from '../entities/user.entities';
 import {
   IControlWhoSeesYou,
   IControlWhoYouSee,
@@ -126,4 +126,9 @@ export class FilterGetAllUser implements Partial<IUser> {
 
   @Field(() => MySettingInput, { nullable: true })
   mySetting?: MySettingInput;
+}
+
+export class NewInformationAfterLogin {
+  coordinates?: number[];
+  user?: User;
 }

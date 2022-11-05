@@ -1,5 +1,6 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, HideField, InputType } from '@nestjs/graphql';
 import { IsEmail } from 'class-validator';
+import { GeoLocationInput } from '../../modules/user/dto/create-user.dto';
 
 @InputType()
 export class LoginInput {
@@ -9,6 +10,9 @@ export class LoginInput {
 
   @Field()
   password: string;
+
+  @HideField()
+  geoLocation: GeoLocationInput;
 }
 
 @InputType()

@@ -5,12 +5,17 @@ export class FilterBuilder<T> {
     $and: [],
   };
 
-  public setFilterItem(key: keyof T | any, query: any, value: any) {
+  public setFilterItem(key: keyof T, query: any, value: any) {
     if (!key || !value) return this;
     const subQuery = {
       [key]: query,
     };
     this.queryFilter['$and'].push(subQuery);
+    return this;
+  }
+
+  public setFilterItemWithObject(key: string, query: any, value: any) {
+    this.setFilterItem(key as keyof T, query, value);
     return this;
   }
 

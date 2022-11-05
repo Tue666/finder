@@ -109,7 +109,7 @@ export const UserSchema = new Schema<User>(
     username: { type: String, trim: true },
     email: { type: String, trim: true },
     password: { type: String, trim: true },
-    address: { type: String, trim: true },
+    address: { type: AddressSchema, default: new Address() },
     showMeTinder: { type: Boolean, default: true },
     gender: { type: String, enum: Object.values(GenderEnum) },
     phoneNumber: { type: String, trim: true },

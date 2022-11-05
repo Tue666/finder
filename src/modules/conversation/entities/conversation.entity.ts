@@ -29,3 +29,12 @@ export class Conversation implements IConversation {
   @Field()
   keyword: string;
 }
+
+@ObjectType()
+export class ConversationResult implements IResult<Conversation> {
+  @Field(() => [Conversation], { nullable: true })
+  results: Conversation[];
+
+  @Field(() => Number, { nullable: true })
+  totalCount: number;
+}

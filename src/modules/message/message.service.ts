@@ -31,7 +31,7 @@ export class MessageService {
         ),
         message.save(),
       ]);
-      return await message.save();
+      return message;
     } catch (error) {
       throw error;
     }

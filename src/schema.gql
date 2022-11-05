@@ -39,6 +39,11 @@ type Conversation {
   updatedAt: DateTime!
 }
 
+type ConversationResult {
+  results: [Conversation!]
+  totalCount: Float
+}
+
 input CreateConversationInput {
   lastMessage: ObjectID
   members: [ObjectID!]
@@ -185,6 +190,7 @@ type Query {
   confirmMail(token: String!): Boolean!
   conversation(conversation_id: ObjectID!): Conversation!
   forgotPassword(email: String!): Boolean!
+  getAllConversation(pagination: PaginationInput): ConversationResult!
   getAllUser(filter: FilterGetAllUser, pagination: PaginationInput): UserResult!
   loginGoogle: String!
   message(id: Int!): Message!

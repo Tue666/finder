@@ -1,9 +1,16 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { ConversationService } from './conversation.service';
-import { Conversation } from './entities/conversation.entity';
-import { CreateConversationInput } from './dto/create-conversation.input';
-import { UpdateConversationInput } from './dto/update-conversation.input';
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLObjectID } from 'graphql-scalars';
+import { GetUser } from '../../common/decorators/getuser.decorators';
+import { AtGuard } from '../../common/guard/at.guard';
+import { PaginationInput } from '../common/dto/common.dto';
+import { User } from '../user/entities/user.entities';
+import { ConversationService } from './conversation.service';
+import { CreateConversationInput } from './dto/create-conversation.input';
+import {
+  Conversation,
+  ConversationResult,
+} from './entities/conversation.entity';
 
 @Resolver(() => Conversation)
 export class ConversationResolver {
@@ -17,9 +24,14 @@ export class ConversationResolver {
     return this.conversationService.create(createConversationInput);
   }
 
-  @Query(() => [Conversation], { name: 'conversation' })
-  findAll() {
-    return this.conversationService.findAll();
+  @UseGuards(AtGuard)
+  @Query(() => ConversationResult)
+  getAllConversation(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination: PaginationInput,
+    @GetUser() user: User,
+  ): Promise<ConversationResult> {
+    return this.conversationService.findAll(pagination, user);
   }
 
   @Query(() => Conversation, { name: 'conversation' })
