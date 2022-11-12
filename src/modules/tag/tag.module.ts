@@ -13,7 +13,7 @@ import { toKeyword, toSlug } from '../../utils/string.utils';
         name: Tag.name,
         useFactory: () => {
           TagSchema.pre('save', function (next) {
-            this.name = toKeyword(toSlug(this.slug));
+            // this.name = toKeyword(toSlug(this.slug));
             return next();
           });
           return TagSchema;

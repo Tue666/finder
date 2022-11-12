@@ -12,6 +12,9 @@ export class CreateTagInput implements ITagCreate {
 
   @Field(() => TagType, { nullable: true })
   parentType: TagType;
+
+  @Field({ nullable: true })
+  description: string;
 }
 
 @InputType()

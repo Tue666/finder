@@ -34,8 +34,8 @@ export class ConversationResolver {
     return this.conversationService.findAll(pagination, user);
   }
 
-  @Query(() => Conversation, { name: 'conversation' })
-  findOne(
+  @Query(() => Conversation)
+  getOneConversation(
     @Args('conversation_id', { type: () => GraphQLObjectID })
     conversation_id: string,
   ) {

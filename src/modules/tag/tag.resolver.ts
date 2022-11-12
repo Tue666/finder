@@ -23,4 +23,16 @@ export class TagResolver {
   ): Promise<TagResult> {
     return this.tagService.findAll(pagination, filter);
   }
+
+  @Query(() => Boolean)
+  async createMultiTag(): Promise<boolean> {
+    await Promise.all([
+      this.tagService.createTagDiet(),
+      this.tagService.createTagEducation(),
+      this.tagService.createTagPersonality(),
+      this.tagService.createTagPet(),
+      this.tagService.createTagSmokeQuestion(),
+    ]);
+    return true;
+  }
 }

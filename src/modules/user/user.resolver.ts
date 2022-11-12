@@ -14,7 +14,7 @@ import {
   MySettingInput,
   UpdateUserInput,
 } from './dto/create-user.dto';
-import { User, UserResult } from './entities/user.entities';
+import { Address, User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserService } from './user.service';
 
@@ -126,5 +126,20 @@ export class UserResolver {
     filter: FilterStatisticUser,
   ): Promise<UserResult> {
     return this.userHelper.statisticUser(pagination, filter);
+  }
+
+  @Query(() => Boolean)
+  createMultiUser() {
+    try {
+      return this.userService.insertManyUser();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Query(() => Address)
+  @UseGuards(AtGuard)
+  getCurrentAddress(@GetUser() user: User): Promise<Address> {
+    return this.userHelper.getCurrentAddress(user);
   }
 }

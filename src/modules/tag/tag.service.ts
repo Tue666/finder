@@ -1,5 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import {
+  mappingDataDietaryPreference,
+  mappingDataEducation,
+  mappingDataPassion,
+  mappingDataPersonalityType,
+  mappingDataPets,
+  mappingDataZodiac,
+} from '../../pattern/mapping.tinder';
 import { FilterBuilder } from '../../utils/filter.query';
 import { PaginationInput } from '../common/dto/common.dto';
 import { CreateTagInput, FilterGetAllTag } from './dto/create-tag.input';
@@ -50,11 +58,50 @@ export class TagService {
     return `This action returns a #${id} tag`;
   }
 
-  update(id: number, updateTagInput: UpdateTagInput) {
-    return `This action updates a #${id} tag`;
+  async createTagPassion(): Promise<boolean> {
+    const tags = mappingDataPassion();
+    await this.tagModel.insertMany(tags);
+    return true;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tag`;
+  async createTagZodiac(): Promise<boolean> {
+    const tags = mappingDataZodiac();
+    await this.tagModel.insertMany(tags);
+    return true;
+  }
+
+  async createTagPersonality(): Promise<boolean> {
+    const tags = mappingDataPersonalityType();
+    await this.tagModel.insertMany(tags);
+    return true;
+  }
+
+  async createTagDiet(): Promise<boolean> {
+    const tags = mappingDataDietaryPreference();
+    await this.tagModel.insertMany(tags);
+    return true;
+  }
+
+  async createTagPet(): Promise<boolean> {
+    const tags = mappingDataPets();
+    await this.tagModel.insertMany(tags);
+    return true;
+  }
+
+  async createTagEducation(): Promise<boolean> {
+    const tags = mappingDataEducation();
+    await this.tagModel.insertMany(tags);
+    return true;
+  }
+
+  async createTagSmokeQuestion(): Promise<boolean> {
+    const tags = mappingDataEducation();
+    await this.tagModel.insertMany(tags);
+    return true;
+  }
+
+  async deleteMany(): Promise<boolean> {
+    await this.tagModel.deleteMany({ parentType: 'Life style' });
+    return true;
   }
 }

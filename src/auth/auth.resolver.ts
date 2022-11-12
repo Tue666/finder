@@ -1,6 +1,5 @@
-import { Req, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../common/decorators/getuser.decorators';
 import { GetCurrentRefreshToken } from '../common/decorators/refresh.token.decorators';
 import { AtGuard } from '../common/guard/at.guard';

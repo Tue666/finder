@@ -56,6 +56,7 @@ input CreateSocketInput {
 }
 
 input CreateTagInput {
+  description: String
   name: String!
   parentType: TagType
   type: TagType!
@@ -228,13 +229,16 @@ input PaginationMessageInput {
 
 type Query {
   confirmMail(token: String!): Boolean!
-  conversation(conversation_id: ObjectID!): Conversation!
+  createMultiTag: Boolean!
+  createMultiUser: Boolean!
   forgotPassword(email: String!): Boolean!
   getAllConversation(pagination: PaginationInput): ConversationResult!
   getAllMessage(filter: FilterGetAllMessage, pagination: PaginationMessageInput): MessageResult!
   getAllReportsUser(pagination: PaginationInput): UserResult!
   getAllTag(filter: FilterGetAllTag, pagination: PaginationInput): TagResult!
   getAllUser(filter: FilterGetAllUser, pagination: PaginationInput): UserResult!
+  getCurrentAddress: Address!
+  getOneConversation(conversation_id: ObjectID!): Conversation!
   refreshToken: JwtPayload!
   resetCache: Boolean!
   signInAsAdmin(email: String!, password: String!): JwtPayload!
@@ -273,6 +277,7 @@ enum StatusActive {
 type Tag {
   _id: ID!
   createdAt: DateTime!
+  description: String
   isDeleted: Boolean!
   keyword: String!
   name: String
@@ -290,8 +295,8 @@ type TagResult {
 enum TagType {
   DIETARY_PREFERENCE
   EDUCATION
-  INTERESTED
   LIFE_STYLE
+  PASSIONS
   PERSONALITY_TYPE
   PETS
   SMOKE_QUESTION

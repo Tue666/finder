@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
 import { Constants } from '../../constants/constants';
+import { mappingData } from '../../pattern/mapping.tinder';
 import { throwIfNotExists } from '../../utils/model.utils';
 import { includesInObject } from '../../utils/utils';
 import { PaginationInput } from '../common/dto/common.dto';
@@ -314,6 +315,28 @@ export class UserService {
         { $push: { unlikeUser: userReport } },
       );
       return user && user_embedded ? true : false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async insertManyUser(): Promise<boolean> {
+    try {
+      // const users = mappingData();
+      // await this.userModel.insertMany(users);
+      // const users = await this.userModel.find();
+      // let count = 0;
+      // for (let user of users) {
+      //   console.log(user.email);
+      //   if (user.email === undefined) {
+      //     user.email = `user${count}@email.com`;
+      //     user.password = await this.hashPassword('1');
+      //     user.isConfirmMail = true;
+      //   }
+      //   await user.save();
+      //   count++;
+      // }
+      return true;
     } catch (error) {
       throw error;
     }

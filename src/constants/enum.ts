@@ -69,14 +69,14 @@ registerEnumType(StatusActive, {
 });
 
 export enum TagType {
-  INTERESTED = 'Interested',
-  LIFE_STYLE = 'Life_style',
+  PASSIONS = 'Passions',
+  LIFE_STYLE = 'Life style',
   EDUCATION = 'Education',
   PETS = 'Pets',
-  DIETARY_PREFERENCE = 'Dietary_Preference',
-  PERSONALITY_TYPE = 'Personality_Type',
+  DIETARY_PREFERENCE = 'Dietary Preference',
+  PERSONALITY_TYPE = 'Personality Type',
   ZODIAC = 'Zodiac',
-  SMOKE_QUESTION = 'Smoke_question',
+  SMOKE_QUESTION = 'Smoke question',
 }
 registerEnumType(TagType, {
   name: 'TagType',

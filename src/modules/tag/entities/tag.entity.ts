@@ -16,6 +16,9 @@ export class Tag implements ITag {
   @Field(() => TagType, { nullable: true })
   parentType: TagType;
 
+  @Field({ nullable: true })
+  description: string;
+
   @Field(() => Boolean)
   isDeleted: boolean;
 

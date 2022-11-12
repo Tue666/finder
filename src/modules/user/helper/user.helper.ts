@@ -102,6 +102,12 @@ export class UserHelper {
     return { district, city, country };
   }
 
+  async getCurrentAddress(user: User): Promise<Address> {
+    const location = await axios.get(
+      `https://location-api-mu.vercel.app/query?lat=${user.geoLocation.coordinates[1]}&lon=${user.geoLocation.coordinates[0]}`,
+    );
+    return this.handleResponseAddress(location);
+  }
   // admin
   async confirmBlockUser(_id: string): Promise<boolean> {
     try {
@@ -135,13 +141,18 @@ export class UserHelper {
         isBlocked: false,
         role: RoleEnum.USER,
       };
+      const [queryFilter, querySort] = new FilterBuilder<User>()
+        .addSubQuery(query)
+        .setSortItem('username', 'asc')
+        .buildQuery();
       const [results, totalCount] = await Promise.all([
         this.userModel
-          .find(query)
+          .find(queryFilter)
           .skip((pagination?.page - 1) * pagination?.size)
           .limit(pagination?.size)
-          .populate('reports.reportBy'),
-        this.userModel.countDocuments(query),
+          .populate('reports.reportBy')
+          .sort(querySort),
+        this.userModel.countDocuments(queryFilter),
       ]);
       return { results, totalCount };
     } catch (error) {
