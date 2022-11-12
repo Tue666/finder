@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { UserEmbeddedService } from './user_embedded.service';
-import { UserEmbeddedResolver } from './user_embedded.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserEmbedded } from './entities/user_embedded.entity';
 import { UserEmbeddedSchema } from './schema/user_embedded.schema';
@@ -14,7 +13,7 @@ import { UserEmbeddedSchema } from './schema/user_embedded.schema';
       },
     ]),
   ],
-  providers: [UserEmbeddedResolver, UserEmbeddedService],
+  providers: [UserEmbeddedService],
   exports: [UserEmbeddedService],
 })
 export class UserEmbeddedModule {}

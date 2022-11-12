@@ -1,4 +1,9 @@
-import { CACHE_MANAGER, Inject, UnauthorizedException } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  Inject,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -15,6 +20,9 @@ import { IJwtPayload } from '../../auth/entities/auth.entities';
 import { Cache } from 'cache-manager';
 import { Constants } from '../../constants/constants';
 import { LoggerService } from '../logger/logger.service';
+import { WsGuard } from '../../common/guard/ws.guard';
+import { GetUser } from '../../common/decorators/getuser.decorators';
+import { User } from '../user/entities/user.entities';
 
 @WebSocketGateway({ transport: ['websocket'], allowEIO3: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -57,12 +65,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       (socket as any).userId = user._id.toString();
       const socketKey = Constants.SOCKET + user._id.toString();
       socketIds = await this.cacheManager.get(socketKey);
-      this.loggerService.log(`Socket IDS in array: ${socketIds}`);
+      this.loggerService.debug(`Socket IDS in array: ${socketIds}`);
       if (socketIds) {
         socketIds.push(socket.id);
-        this.loggerService.log(`Socket IDS after push to array:${socketIds}`);
+        this.loggerService.debug(`Socket IDS after push to array:${socketIds}`);
       } else {
-        this.loggerService.log('Push socket id to array');
+        this.loggerService.debug('Push socket id to array');
         socketIds = [socket.id];
         await this.cacheManager.set(socketKey, socketIds, {
           ttl: Constants.SOCKET_ID_TTL,
@@ -83,8 +91,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('heartbeat')
-  handleHeartBeat(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() data: any,
-  ) {}
+  @UseGuards(WsGuard)
+  handleHeartBeat(@ConnectedSocket() socket: Socket, @MessageBody() data: any) {
+    this.loggerService.debug(socket.id);
+  }
 }

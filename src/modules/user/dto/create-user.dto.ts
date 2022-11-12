@@ -1,7 +1,15 @@
 import { Field, Float, HideField, InputType } from '@nestjs/graphql';
 import { IsEmail, IsOptional } from 'class-validator';
 import { GraphQLObjectID } from 'graphql-scalars';
-import { GenderEnum, LookingFor, RegisterType } from '../../../constants/enum';
+import {
+  FilterByDate,
+  GenderEnum,
+  LookingFor,
+  RegisterType,
+  RoleEnum,
+  SortOption,
+  StatusActive,
+} from '../../../constants/enum';
 import { User } from '../entities/user.entities';
 import {
   IControlWhoSeesYou,
@@ -40,6 +48,24 @@ export class UpdateUserInput implements IUserUpdate {
 
   @Field(() => [GraphQLObjectID], { nullable: true })
   tags: string[];
+
+  @Field({ nullable: true })
+  showMeTinder: boolean;
+
+  @Field({ nullable: true })
+  liveAt: string;
+
+  @Field({ nullable: true })
+  jobTitle: string;
+
+  @Field({ nullable: true })
+  school: string;
+
+  @Field({ nullable: true })
+  company: string;
+
+  @Field({ nullable: true })
+  aboutMe: string;
 }
 
 @InputType()
@@ -126,9 +152,30 @@ export class FilterGetAllUser implements Partial<IUser> {
 
   @Field(() => MySettingInput, { nullable: true })
   mySetting?: MySettingInput;
+
+  @Field(() => StatusActive, { nullable: true })
+  statusActive?: StatusActive;
+
+  @Field(() => Boolean, { nullable: true })
+  isSkipNotLikeUser: boolean;
+
+  @Field(() => GraphQLObjectID, { nullable: true })
+  user_id: string;
 }
 
 export class NewInformationAfterLogin {
   coordinates?: number[];
   user?: User;
+}
+
+@InputType()
+export class FilterStatisticUser {
+  @Field(() => FilterByDate, { nullable: true })
+  filterByDate: FilterByDate;
+
+  @Field({ nullable: true })
+  username: string;
+
+  @Field(() => SortOption, { nullable: true })
+  sortOption: SortOption;
 }

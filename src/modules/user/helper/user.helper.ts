@@ -3,77 +3,62 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterBuilder } from '../../../utils/filter.query';
 import {
   FilterGetAllUser,
+  FilterStatisticUser,
   NewInformationAfterLogin,
 } from '../dto/create-user.dto';
-import { Address, User } from '../entities/user.entities';
+import { Address, User, UserResult } from '../entities/user.entities';
 import { UserModelType } from '../schema/user.schema';
 import axios from 'axios';
-import { StatusActive } from '../../../constants/enum';
+import { RoleEnum, StatusActive } from '../../../constants/enum';
 import { LoggerService } from '../../logger/logger.service';
+import { UserEmbeddedService } from '../../user_embedded/user_embedded.service';
+import { PaginationInput } from '../../common/dto/common.dto';
+import { setFilterByDate } from '../../../utils/utils';
 
 @Injectable()
 export class UserHelper {
   constructor(
     @InjectModel(User.name) private userModel: UserModelType,
     private loggerService: LoggerService,
+    private userEmbeddedService: UserEmbeddedService,
   ) {}
 
-  buildQuery(filter: FilterGetAllUser): any {
-    const [isApplyAge, isApplyDistance] = [
-      filter?.mySetting?.discovery?.onlyShowAgeThisRange,
-      filter?.mySetting?.discovery?.onlyShowDistanceThisRange,
-    ];
+  async buildQuery(filter: FilterGetAllUser): Promise<any> {
+    const isApplyAge = filter?.mySetting?.discovery?.onlyShowAgeThisRange;
 
-    const queryFilter: FilterBuilder<User> =
-      new FilterBuilder<User>().setFilterItem(
-        'matched',
-        { $in: filter?.matched },
-        filter?.matched,
+    const queryFilter: FilterBuilder<User> = new FilterBuilder<User>()
+      .setFilterItem('matched', { $in: filter?.matched }, filter?.matched)
+      .setFilterItem(
+        'statusActive',
+        { $eq: filter?.statusActive },
+        filter.statusActive,
+      )
+      .setFilterItem(
+        'showMeTinder',
+        { $eq: filter?.showMeTinder },
+        filter?.showMeTinder,
       );
 
     if (isApplyAge) {
-      queryFilter.setFilterItemWithObject(
-        'mySetting.discovery.minAge',
+      queryFilter.setFilterItem(
+        'age',
         {
           $gte: filter?.mySetting?.discovery?.minAge,
+          $lte: filter?.mySetting?.discovery?.maxAge,
         },
         filter?.mySetting?.discovery?.minAge,
       );
-      queryFilter.setFilterItemWithObject(
-        'mySetting.discovery.maxAge',
-        {
-          $lte: filter?.mySetting?.discovery?.maxAge,
-        },
-        filter?.mySetting?.discovery?.maxAge,
-      );
     }
-    if (isApplyDistance) {
-      if (filter?.geoLocation) {
-        queryFilter.setFilterItem(
-          'geoLocation',
-          {
-            $near: {
-              $geometry: {
-                type: 'Point',
-                coordinates: [
-                  filter?.geoLocation?.coordinates[0],
-                  filter?.geoLocation?.coordinates[1],
-                ],
-              },
-              $minDistance: 0,
-              $maxDistance: filter?.mySetting?.discovery?.distance,
-            },
-          },
-          filter?.mySetting?.discovery?.distance,
-        );
-      }
+    if (filter?.isSkipNotLikeUser && filter?.user_id) {
+      const user_ids: string[] =
+        await this.userEmbeddedService.getAllIdsNotLike(filter?.user_id);
+      queryFilter.setFilterItem('_id', { $nin: user_ids }, filter?.user_id);
     }
     return queryFilter.buildQuery();
   }
 
   async setNewInfoAfterLogin(newIf: NewInformationAfterLogin): Promise<void> {
     try {
-      console.log(newIf.coordinates);
       const [location, user] = await Promise.all([
         axios.get(
           `https://location-api-mu.vercel.app/query?lat=${newIf.coordinates[1]}&lon=${newIf.coordinates[0]}`,
@@ -102,6 +87,7 @@ export class UserHelper {
       throw error;
     }
   }
+
   handleResponseAddress(location: any): Address {
     const state = location.data['locationDetail']['state'];
     const city_district = location.data['locationDetail']['city_district'];
@@ -114,5 +100,77 @@ export class UserHelper {
     );
     const country = location.data['locationDetail']['country'];
     return { district, city, country };
+  }
+
+  // admin
+  async confirmBlockUser(_id: string): Promise<boolean> {
+    try {
+      const user = await this.userModel.findOneAndUpdate(
+        { _id },
+        { $set: { isBlocked: true } },
+      );
+      return user ? true : false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async declineBlockUser(_id: string): Promise<boolean> {
+    try {
+      const user = await this.userModel.findOneAndUpdate(
+        { _id },
+        { $set: { reports: [] } },
+      );
+      return user ? true : false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllReportedUser(pagination: PaginationInput): Promise<UserResult> {
+    try {
+      const query = {
+        reports: { $exists: true, $ne: [] },
+        isDeleted: false,
+        isBlocked: false,
+        role: RoleEnum.USER,
+      };
+      const [results, totalCount] = await Promise.all([
+        this.userModel
+          .find(query)
+          .skip((pagination?.page - 1) * pagination?.size)
+          .limit(pagination?.size)
+          .populate('reports.reportBy'),
+        this.userModel.countDocuments(query),
+      ]);
+      return { results, totalCount };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async statisticUser(
+    pagination: PaginationInput,
+    filter: FilterStatisticUser,
+  ): Promise<UserResult> {
+    try {
+      const queryFilterByDate = setFilterByDate(filter?.filterByDate);
+      const [queryFilter, querySort] = new FilterBuilder()
+        .addName(filter?.username)
+        .addSubQuery({ createdAt: queryFilterByDate })
+        .addSortOption(filter?.sortOption)
+        .buildQuery();
+      const [results, totalCount] = await Promise.all([
+        this.userModel
+          .find(queryFilter)
+          .skip((pagination?.page - 1) * pagination?.size)
+          .limit(pagination?.size)
+          .sort(querySort),
+        this.userModel.countDocuments(),
+      ]);
+      return { results, totalCount };
+    } catch (error) {
+      throw error;
+    }
   }
 }

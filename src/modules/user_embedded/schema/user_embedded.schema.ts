@@ -5,8 +5,8 @@ import { UserEmbedded } from '../entities/user_embedded.entity';
 export type UserEmbeddedModelType = Model<UserEmbedded>;
 export const UserEmbeddedSchema = new Schema<UserEmbedded>(
   {
-    user: { type: Schema.Types.ObjectId, ref: User.name },
-    unlikeUser: [{ type: String }],
+    user: { type: Schema.Types.ObjectId, ref: User.name, autopopulate: false },
+    unlikeUser: [{ type: Schema.Types.ObjectId }],
     count: { type: Number, default: 0 },
   },
   {

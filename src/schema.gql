@@ -57,6 +57,8 @@ input CreateSocketInput {
 
 input CreateTagInput {
   name: String!
+  parentType: TagType
+  type: TagType!
 }
 
 """
@@ -82,11 +84,38 @@ input DiscoverySettingsInput {
   onlyShowDistanceThisRange: Boolean
 }
 
+enum FilterByDate {
+  LAST_YEAR
+  SEVEN_DAYS_AGO
+  THIRTY_DAYS_AGO
+  THIS_YEAR
+}
+
+input FilterGetAllMessage {
+  conversion_id: ObjectID
+  type: MessageType
+}
+
+input FilterGetAllTag {
+  name: String
+  parentType: TagType
+  type: TagType
+}
+
 input FilterGetAllUser {
   geoLocation: GeoLocationInput
+  isSkipNotLikeUser: Boolean
   matched: [String!]
   mySetting: MySettingInput
   showMeTinder: Boolean
+  statusActive: StatusActive
+  user_id: ObjectID
+}
+
+input FilterStatisticUser {
+  filterByDate: FilterByDate
+  sortOption: SortOption
+  username: String
 }
 
 enum GenderEnum {
@@ -141,27 +170,33 @@ type Message {
   urlMessageImage: String
 }
 
+type MessageResult {
+  results: [Message!]
+  totalCount: Float
+}
+
 enum MessageType {
   IMAGE
   TEXT
 }
 
 type Mutation {
+  changePassword(confirmPassword: String!, newPassword: String!, oldPassword: String!): Boolean!
   changeSetting(input: MySettingInput!): Boolean!
+  confirmBlockUser(user_id: ObjectID!): Boolean!
   createConversation(createConversationInput: CreateConversationInput!): Conversation!
   createSocket(createSocketInput: CreateSocketInput!): Socket!
   createTag(createTagInput: CreateTagInput!): Boolean!
+  declineBlockUser(user_id: ObjectID!): Boolean!
   likeUser(user_id: ObjectID!): Boolean!
-  removeMessage(_id: ObjectID!): Message!
+  removeMessage(message_id: ObjectID!): Message!
   removeSocket(id: Int!): Socket!
-  removeTag(id: Int!): Tag!
+  reportUser(reasonReport: String!, userReport: ObjectID!): Boolean!
   signIn(input: LoginInput!): JwtPayload!
   signUp(input: RegisterInput!): Boolean!
-  unlikeUser(user_id: ObjectID!): Boolean!
-  updateMessage(updateMessageInput: UpdateMessageInput!): Message!
+  skipUser(user_id: ObjectID!): Boolean!
   updateProfile(input: UpdateUserInput!): Boolean!
   updateSocket(updateSocketInput: UpdateSocketInput!): Socket!
-  updateTag(updateTagInput: UpdateTagInput!): Tag!
 }
 
 type MySetting {
@@ -186,18 +221,25 @@ input PaginationInput {
   size: Float = 10
 }
 
+input PaginationMessageInput {
+  cursor: Float
+  limit: Float
+}
+
 type Query {
   confirmMail(token: String!): Boolean!
   conversation(conversation_id: ObjectID!): Conversation!
   forgotPassword(email: String!): Boolean!
   getAllConversation(pagination: PaginationInput): ConversationResult!
+  getAllMessage(filter: FilterGetAllMessage, pagination: PaginationMessageInput): MessageResult!
+  getAllReportsUser(pagination: PaginationInput): UserResult!
+  getAllTag(filter: FilterGetAllTag, pagination: PaginationInput): TagResult!
   getAllUser(filter: FilterGetAllUser, pagination: PaginationInput): UserResult!
-  loginGoogle: String!
-  message(id: Int!): Message!
   refreshToken: JwtPayload!
   resetCache: Boolean!
+  signInAsAdmin(email: String!, password: String!): JwtPayload!
   socket(id: Int!): Socket!
-  tag(id: Int!): Tag!
+  statisticUser(filter: FilterStatisticUser, pagination: PaginationInput): UserResult!
 }
 
 input RegisterInput {
@@ -206,9 +248,21 @@ input RegisterInput {
   password: String!
 }
 
+type Reports {
+  createdAt: DateTime!
+  reasonReport: String!
+  reportBy: User!
+}
+
 type Socket {
   """Example field (placeholder)"""
   exampleField: Int!
+}
+
+enum SortOption {
+  AGE
+  AZ
+  ZA
 }
 
 enum StatusActive {
@@ -222,17 +276,26 @@ type Tag {
   isDeleted: Boolean!
   keyword: String!
   name: String
+  parentType: TagType
   slug: String!
+  type: TagType
   updatedAt: DateTime!
 }
 
-input UpdateMessageInput {
-  conversion_id: ObjectID
-  id: Int!
-  receiver: ObjectID
-  sender: ObjectID
-  text: String
-  type: MessageType
+type TagResult {
+  results: [Tag!]
+  totalCount: Float
+}
+
+enum TagType {
+  DIETARY_PREFERENCE
+  EDUCATION
+  INTERESTED
+  LIFE_STYLE
+  PERSONALITY_TYPE
+  PETS
+  SMOKE_QUESTION
+  ZODIAC
 }
 
 input UpdateSocketInput {
@@ -241,36 +304,45 @@ input UpdateSocketInput {
   id: Int!
 }
 
-input UpdateTagInput {
-  id: Int!
-  name: String
-}
-
 input UpdateUserInput {
+  aboutMe: String
   birthDays: DateTime
+  company: String
   gender: GenderEnum
   images: [String!]
+  jobTitle: String
+  liveAt: String
   phoneNumber: String
+  school: String
+  showMeTinder: Boolean
   tags: [ObjectID!]
   username: String
 }
 
 type User {
   _id: ID!
+  aboutMe: String
   address: Address
+  age: Float
   birthDays: DateTime
+  calcDistance: Float
+  company: String
   createdAt: DateTime
   email: String!
   gender: GenderEnum
   geoLocation: GeoLocation
   images: [String!]
   isDeleted: Boolean!
+  jobTitle: String
   keyword: String
   lastActive: DateTime
+  liveAt: String
   matchRequest: [MatchRequest!]
   matched: [String!]
-  mySetting: MySetting!
+  mySetting: MySetting
   phoneNumber: String
+  reports: [Reports!]
+  school: String
   showMeTinder: Boolean!
   slug: String
   statusActive: StatusActive

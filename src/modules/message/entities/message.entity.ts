@@ -42,3 +42,12 @@ export class Message implements IMessage {
   @Field()
   keyword: string;
 }
+
+@ObjectType()
+export class MessageResult implements IResult<Message> {
+  @Field(() => [Message], { nullable: true })
+  results: Message[];
+
+  @Field(() => Number, { nullable: true })
+  totalCount: number;
+}

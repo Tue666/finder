@@ -1,24 +1,27 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Tag } from '../entities/tag.entity';
-import { ITagCreate } from '../interfaces/tag';
+import { TagType } from '../../../constants/enum';
+import { ITag, ITagCreate } from '../interfaces/tag';
 
 @InputType()
 export class CreateTagInput implements ITagCreate {
   @Field()
   name: string;
+
+  @Field(() => TagType)
+  type: TagType;
+
+  @Field(() => TagType, { nullable: true })
+  parentType: TagType;
 }
 
 @InputType()
-export class FilterGetAllTag {
+export class FilterGetAllTag implements Partial<ITag> {
   @Field({ nullable: true })
   name: string;
-}
 
-@InputType()
-export class TagResult implements IResult<Tag> {
-  @Field(() => [Tag], { nullable: true })
-  results: Tag[];
+  @Field(() => TagType, { nullable: true })
+  type?: TagType;
 
-  @Field({ nullable: true })
-  totalCount: number;
+  @Field(() => TagType, { nullable: true })
+  parentType?: TagType;
 }

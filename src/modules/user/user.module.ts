@@ -22,7 +22,12 @@ import { UserService } from './user.service';
           UserSchema.pre('save', function (next) {
             this.slug = toSlug(this.username, Constants.LOCALE_COUNTRY_CODE_VN);
             this.keyword = toKeyword(this.slug);
-            this.slug += '-' + new Date().getTime().toString();
+            this.slug += '-' + this._id.toString();
+            if (this.birthDays) {
+              const currentDate = new Date();
+              this.age =
+                currentDate.getFullYear() - this.birthDays.getFullYear();
+            }
             return next();
           });
           return UserSchema;

@@ -1,6 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { GraphQLObjectID } from 'graphql-scalars';
-import { User } from '../../user/entities/user.entities';
 import { IConversation } from '../interfaces/conversation';
 
 @InputType()

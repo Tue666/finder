@@ -2,20 +2,28 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLObjectID } from 'graphql-scalars';
 import { GetUser } from '../../common/decorators/getuser.decorators';
+import { hasRoles } from '../../common/decorators/role.decorators';
 import { AtGuard } from '../../common/guard/at.guard';
+import { RolesGuard } from '../../common/guard/role.guard';
 import { Constants } from '../../constants/constants';
+import { RoleEnum } from '../../constants/enum';
 import { PaginationInput } from '../common/dto/common.dto';
 import {
   FilterGetAllUser,
+  FilterStatisticUser,
   MySettingInput,
   UpdateUserInput,
 } from './dto/create-user.dto';
 import { User, UserResult } from './entities/user.entities';
+import { UserHelper } from './helper/user.helper';
 import { UserService } from './user.service';
 
 @Resolver(User.name)
 export class UserResolver {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private userHelper: UserHelper,
+  ) {}
 
   @Query(() => UserResult)
   getAllUser(
@@ -55,11 +63,11 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AtGuard)
-  unlikeUser(
+  skipUser(
     @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
     @GetUser() user: User,
   ): Promise<boolean> {
-    return this.userService.unlikeUser(user, user_id);
+    return this.userService.skipUser(user, user_id);
   }
 
   @Mutation(() => Boolean)
@@ -69,5 +77,54 @@ export class UserResolver {
     @GetUser() user: User,
   ): Promise<boolean> {
     return this.userService.likeUser(user_id, user);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AtGuard)
+  reportUser(
+    @Args('reasonReport') reasonReport: string,
+    @Args('userReport', { type: () => GraphQLObjectID }) user_id: string,
+    @GetUser() user: User,
+  ): Promise<boolean> {
+    return this.userService.reportUser(reasonReport, user_id, user);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
+  confirmBlockUser(
+    @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
+  ): Promise<boolean> {
+    return this.userHelper.confirmBlockUser(user_id);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
+  declineBlockUser(
+    @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
+  ): Promise<boolean> {
+    return this.userHelper.declineBlockUser(user_id);
+  }
+
+  @Query(() => UserResult)
+  @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
+  getAllReportsUser(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination: PaginationInput,
+  ): Promise<UserResult> {
+    return this.userHelper.getAllReportedUser(pagination);
+  }
+
+  @Query(() => UserResult)
+  @UseGuards(AtGuard, RolesGuard)
+  statisticUser(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination: PaginationInput,
+    @Args('filter', { type: () => FilterStatisticUser, nullable: true })
+    filter: FilterStatisticUser,
+  ): Promise<UserResult> {
+    return this.userHelper.statisticUser(pagination, filter);
   }
 }

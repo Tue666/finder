@@ -3,6 +3,7 @@ import {
   GenderEnum,
   LookingFor,
   RegisterType,
+  RoleEnum,
   StatusActive,
 } from '../../../constants/enum';
 import { Tag } from '../../tag/entities/tag.entity';
@@ -14,6 +15,7 @@ import {
   IGeoLocation,
   IMatchRequest,
   IMySetting,
+  IReports,
   IUser,
 } from '../interfaces/user';
 
@@ -115,6 +117,9 @@ export class User implements IUser {
   @Field(() => Date, { nullable: true })
   birthDays: Date;
 
+  @Field(() => Number, { nullable: true })
+  age: number;
+
   @Field(() => [String], { nullable: true })
   images: string[];
 
@@ -133,14 +138,35 @@ export class User implements IUser {
   @Field(() => Date, { nullable: true })
   lastActive: Date;
 
+  @Field(() => Number, { nullable: true })
+  calcDistance: number;
+
   @Field(() => StatusActive, { nullable: true })
   statusActive?: StatusActive;
 
-  @Field(() => MySetting)
+  @Field(() => MySetting, { nullable: true })
   mySetting: MySetting;
 
   @Field(() => [MatchRequest], { nullable: true })
   matchRequest: MatchRequest[];
+
+  @Field(() => [Reports], { nullable: true })
+  reports: Reports[];
+
+  @Field({ nullable: true })
+  liveAt: string;
+
+  @Field({ nullable: true })
+  jobTitle: string;
+
+  @Field({ nullable: true })
+  school: string;
+
+  @Field({ nullable: true })
+  company: string;
+
+  @Field({ nullable: true })
+  aboutMe: string;
 
   @Field(() => Boolean)
   isDeleted: boolean;
@@ -158,6 +184,9 @@ export class User implements IUser {
   keyword: string;
 
   @HideField()
+  isBlocked?: boolean;
+
+  @HideField()
   isConfirmMail: boolean;
 
   @HideField()
@@ -165,6 +194,24 @@ export class User implements IUser {
 
   @HideField()
   resetPasswordCode?: string;
+
+  @HideField()
+  deleteAccountCode?: string;
+
+  @HideField()
+  role?: RoleEnum;
+}
+
+@ObjectType()
+export class Reports implements IReports {
+  @Field(() => User)
+  reportBy: User;
+
+  @Field(() => Date)
+  createdAt: Date;
+
+  @Field()
+  reasonReport: string;
 }
 
 @ObjectType()

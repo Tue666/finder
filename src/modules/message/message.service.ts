@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Constants } from '../../constants/constants';
+import { FilterBuilder } from '../../utils/filter.query';
 import { throwIfNotExists } from '../../utils/model.utils';
 import { ConversationService } from '../conversation/conversation.service';
-import { CreateMessageInput } from './dto/create-message.input';
+import {
+  CreateMessageInput,
+  FilterGetAllMessage,
+  PaginationMessageInput,
+} from './dto/create-message.input';
 import { UpdateMessageInput } from './dto/update-message.input';
-import { Message } from './entities/message.entity';
+import { Message, MessageResult } from './entities/message.entity';
 import { MessageModelType } from './schema/message.schema';
 
 @Injectable()
@@ -16,14 +21,11 @@ export class MessageService {
   ) {}
   async create(input: CreateMessageInput): Promise<Message> {
     try {
-      const [maxCursor, message] = await Promise.all([
-        this.messageModel
-          .find({ conversion_id: input.conversion_id })
-          .sort({ cursor: -1 })
-          .limit(1),
+      const [conversation, message] = await Promise.all([
+        this.conversationService.findOne(input.conversion_id),
         this.messageModel.create(input),
       ]);
-      message.cursor = maxCursor[0].cursor + 1;
+      message.cursor = conversation.lastMessage.cursor + 1;
       await Promise.all([
         this.conversationService.findOneAndUpdate(
           { _id: input.conversion_id },
@@ -37,16 +39,33 @@ export class MessageService {
     }
   }
 
-  findAll() {
-    return `This action returns all message`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
-  }
-
-  update(id: number, updateMessageInput: UpdateMessageInput) {
-    return `This action updates a #${id} message`;
+  async findAll(
+    filter: FilterGetAllMessage,
+    pagination: PaginationMessageInput,
+  ): Promise<MessageResult> {
+    try {
+      const [queryFilter, querySort] = new FilterBuilder<Message>()
+        .setFilterItem(
+          'conversion_id',
+          { $eq: filter?.conversion_id },
+          filter?.conversion_id,
+        )
+        .setFilterItem('type', { $eq: filter?.type }, filter?.type)
+        .setFilterItem(
+          'cursor',
+          { $gte: pagination?.cursor },
+          pagination?.cursor,
+        )
+        .setSortItem('cursor', 1)
+        .buildQuery();
+      const [results, totalCount] = await Promise.all([
+        this.messageModel.find(queryFilter).limit(pagination?.limit),
+        this.messageModel.countDocuments(queryFilter),
+      ]);
+      return { results, totalCount };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async remove(_id: string): Promise<boolean> {

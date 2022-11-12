@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { UserEmbedded } from './entities/user_embedded.entity';
 import { UserEmbeddedModelType } from './schema/user_embedded.schema';
-
 @Injectable()
 export class UserEmbeddedService {
   constructor(
@@ -20,6 +19,17 @@ export class UserEmbeddedService {
         new: true,
         upsert: true,
       });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAllIdsNotLike(user_id: string): Promise<string[]> {
+    try {
+      const user_ids: string[] = await this.userEmbeddedModel
+        .find({ user: user_id })
+        .distinct('unlikeUser');
+      return user_ids;
     } catch (error) {
       throw error;
     }

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   CACHE_MANAGER,
+  ForbiddenException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -12,7 +13,7 @@ import { LoginInput, RegisterInput } from './dto/auth.dto';
 import { JwtPayload, RefreshPayload } from './entities/auth.entities';
 import { Cache } from 'cache-manager';
 import { MailService } from '../modules/mail/mail.service';
-import { RegisterType } from '../constants/enum';
+import { RegisterType, RoleEnum } from '../constants/enum';
 import { Constants } from '../constants/constants';
 import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
 @Injectable()
@@ -47,6 +48,22 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  async changePassword(
+    oldPassword: string,
+    newPassword: string,
+    confirmPassword: string,
+    user: User,
+  ) {
+    if (newPassword != confirmPassword) {
+      throw new BadRequestException('Password not match');
+    }
+    return await this.userService.changePassword(
+      oldPassword,
+      newPassword,
+      user,
+    );
+  }
+
   async signIn(input: LoginInput): Promise<JwtPayload> {
     try {
       const [long, lat] = [106.6804281, 10.8292385];
@@ -55,6 +72,18 @@ export class AuthService {
       const user = await this.userService.signIn(input);
       if (!user.isConfirmMail) {
         throw new UnauthorizedException('Email is not confirm');
+      }
+      return await this.generateTokens(user._id.toString());
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async signInAsAdmin(email: string, password: string): Promise<JwtPayload> {
+    try {
+      const user = await this.userService.signInAsAdmin(email, password);
+      if (user.role === RoleEnum.USER) {
+        throw new ForbiddenException('Please login with admin account');
       }
       return await this.generateTokens(user._id.toString());
     } catch (error) {

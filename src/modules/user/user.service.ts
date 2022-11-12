@@ -23,6 +23,7 @@ import {
 import { MatchRequest, User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -43,10 +44,32 @@ export class UserService {
     }
   }
 
+  async changePassword(
+    oldPassword: string,
+    newPassword: string,
+    user: User,
+  ): Promise<boolean> {
+    try {
+      await this.isNotCorrectPassword(oldPassword, user.password);
+      const hashPassword = await this.hashPassword(newPassword);
+      const newUser = await this.userModel.findOneAndUpdate(
+        { _id: user._id },
+        { $set: { password: hashPassword } },
+      );
+      return newUser ? true : false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async findOne(filter: FilterGetOneUser): Promise<User> {
-    const user = await this.userModel.findOne(filter);
-    throwIfNotExists(user, 'User not found');
-    return user;
+    try {
+      const user = await this.userModel.findOne(filter);
+      throwIfNotExists(user, 'User not found');
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getOne(filter: FilterGetOneUser): Promise<User | undefined> {
@@ -63,12 +86,46 @@ export class UserService {
     filter: FilterGetAllUser,
   ): Promise<UserResult> {
     try {
-      const queryFilter = this.userHelper.buildQuery(filter);
+      let maxDistance = filter?.mySetting?.discovery?.distance;
+      const queryFilter = await this.userHelper.buildQuery(filter);
+
+      if (
+        filter?.mySetting?.discovery?.onlyShowDistanceThisRange === undefined ||
+        filter?.mySetting?.discovery?.onlyShowDistanceThisRange === false
+      ) {
+        maxDistance = Constants.DEFAULT_DISTANCE;
+        this.loggerService.debug(`MaxDistance:${maxDistance}`);
+      }
       const [results, totalCount] = await Promise.all([
-        this.userModel
-          .find(queryFilter)
-          .skip((pagination?.page - 1) * pagination?.size)
-          .limit(pagination?.size),
+        this.userModel.aggregate([
+          {
+            $geoNear: {
+              near: { type: 'Point', coordinates: [106.6804281, 10.8292385] },
+              spherical: true,
+              distanceField: 'calcDistance',
+              maxDistance: maxDistance,
+              query: queryFilter,
+            },
+          },
+          {
+            $project: {
+              mySetting: 0,
+              matchRequest: 0,
+              __v: 0,
+              geoLocation: 0,
+              reports: 0,
+            },
+          },
+          {
+            $sort: { maxDistance: 1 },
+          },
+          {
+            $skip: (pagination?.page - 1) * pagination?.size,
+          },
+          {
+            $limit: pagination?.size,
+          },
+        ]),
         this.userModel.find(queryFilter),
       ]);
       return { results, totalCount: totalCount.length };
@@ -81,11 +138,26 @@ export class UserService {
     try {
       const user = await this.findOne({ email: input.email });
       await this.isNotCorrectPassword(input.password, user.password);
+      if (!user.isConfirmMail) {
+        throw new UnauthorizedException(
+          'Your account has not been confirmed by email',
+        );
+      }
       this.loggerService.debug('Passed password');
       await this.userHelper.setNewInfoAfterLogin({
         coordinates: input.geoLocation.coordinates,
         user,
       });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async signInAsAdmin(email: string, password: string): Promise<User> {
+    try {
+      const user = await this.userModel.findOne({ email });
+      await this.isNotCorrectPassword(password, user.password);
       return user;
     } catch (error) {
       throw error;
@@ -171,20 +243,24 @@ export class UserService {
         { new: true },
       );
       throwIfNotExists(newUser, 'User not found to update');
-      return true;
+      return (await newUser.save()) ? true : false;
     } catch (error) {
       throw error;
     }
   }
 
-  async unlikeUser(user: User, user_id: string): Promise<boolean> {
+  async skipUser(user: User, user_id: string): Promise<boolean> {
     try {
       await this.userEmbeddedService.findOneAndUpdate(
         {
           user: user._id,
           count: { $lt: Constants.MAX_COUNT_IN_USER_EMBEDDED },
         },
-        { $push: { unlikeUser: user_id }, $inc: { count: 1 } },
+        {
+          $push: { unlikeUser: user_id },
+          $inc: { count: 1 },
+          $set: { user: user._id },
+        },
       );
       return true;
     } catch (error) {
@@ -214,9 +290,30 @@ export class UserService {
           sender: user,
           createdAt: new Date(),
         });
+        await requestUser.save();
       }
-
       return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async reportUser(
+    reasonReport: string,
+    userReport: string,
+    reportBy: User,
+  ): Promise<boolean> {
+    try {
+      const user = await this.userModel.findOneAndUpdate(
+        { _id: userReport },
+        { $push: { reports: { reportBy, reasonReport } } },
+      );
+      throwIfNotExists(user, 'User not found');
+      const user_embedded = await this.userEmbeddedService.findOneAndUpdate(
+        { _id: reportBy._id },
+        { $push: { unlikeUser: userReport } },
+      );
+      return user && user_embedded ? true : false;
     } catch (error) {
       throw error;
     }

@@ -1,4 +1,5 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { TagType } from '../../../constants/enum';
 import { ITag } from '../interfaces/tag';
 
 @ObjectType()
@@ -8,6 +9,12 @@ export class Tag implements ITag {
 
   @Field({ nullable: true })
   name: string;
+
+  @Field(() => TagType, { nullable: true })
+  type: TagType;
+
+  @Field(() => TagType, { nullable: true })
+  parentType: TagType;
 
   @Field(() => Boolean)
   isDeleted: boolean;
@@ -23,4 +30,13 @@ export class Tag implements ITag {
 
   @Field()
   keyword: string;
+}
+
+@ObjectType()
+export class TagResult implements IResult<Tag> {
+  @Field(() => [Tag], { nullable: true })
+  results: Tag[];
+
+  @Field({ nullable: true })
+  totalCount: number;
 }

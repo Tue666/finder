@@ -33,23 +33,24 @@ export class ConversationService {
     input: PaginationInput,
     user: User,
   ): Promise<ConversationResult> {
-    const query = new FilterBuilder<Conversation>()
+    const [queryFilter, querySort] = new FilterBuilder<Conversation>()
       .setFilterItem(
         'members',
         {
-          $in: [user._id.toString()],
+          $elemMatch: { $eq: user._id },
         },
         user._id,
       )
+      .setSortItem('updatedAt', -1)
       .buildQuery();
     const [results, totalCount] = await Promise.all([
       this.conversionModel
-        .find(query)
+        .find(queryFilter)
         .skip(input?.size)
-        .limit((input?.page - 1) * input?.size),
-      this.conversionModel.count(query),
+        .limit((input?.page - 1) * input?.size)
+        .sort(querySort),
+      this.conversionModel.count(queryFilter),
     ]);
-    console.log(results);
     this.loggerService.debug(`Conversation result :${results.length}`);
     return { results, totalCount };
   }
@@ -80,10 +81,5 @@ export class ConversationService {
     } catch (error) {
       throw error;
     }
-  }
-
-  remove(_id: string): Promise<boolean> {
-    // return `This action removes a #${id} conversation`;
-    return null;
   }
 }

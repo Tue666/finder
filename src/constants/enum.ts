@@ -14,13 +14,24 @@ export enum RoleEnum {
 registerEnumType(RoleEnum, {
   name: 'RoleEnum',
 });
-export enum PermissionEnum {
-  FULL = 'FULL',
 
-  READ_PRODUCT = 'READ_PRODUCT',
+export enum FilterByDate {
+  SEVEN_DAYS_AGO = 'SEVEN_DAYS_AGO',
+  THIRTY_DAYS_AGO = 'THIRTY_DAYS_AGO',
+  THIS_YEAR = 'THIS_YEAR',
+  LAST_YEAR = 'LAST_YEAR',
 }
-registerEnumType(PermissionEnum, {
-  name: 'PermissionEnum',
+registerEnumType(FilterByDate, {
+  name: 'FilterByDate',
+});
+
+export enum SortOption {
+  AZ = 'AZ',
+  ZA = 'ZA',
+  AGE = 'AGE',
+}
+registerEnumType(SortOption, {
+  name: 'SortOption',
 });
 
 export enum MessageType {
@@ -55,4 +66,18 @@ export enum StatusActive {
 }
 registerEnumType(StatusActive, {
   name: 'StatusActive',
+});
+
+export enum TagType {
+  INTERESTED = 'Interested',
+  LIFE_STYLE = 'Life_style',
+  EDUCATION = 'Education',
+  PETS = 'Pets',
+  DIETARY_PREFERENCE = 'Dietary_Preference',
+  PERSONALITY_TYPE = 'Personality_Type',
+  ZODIAC = 'Zodiac',
+  SMOKE_QUESTION = 'Smoke_question',
+}
+registerEnumType(TagType, {
+  name: 'TagType',
 });

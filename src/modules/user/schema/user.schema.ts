@@ -3,6 +3,7 @@ import {
   GenderEnum,
   LookingFor,
   RegisterType,
+  RoleEnum,
   StatusActive,
 } from '../../../constants/enum';
 import { Tag } from '../../tag/entities/tag.entity';
@@ -14,6 +15,7 @@ import {
   GeoLocation,
   MatchRequest,
   MySetting,
+  Reports,
   User,
 } from '../entities/user.entities';
 
@@ -103,6 +105,19 @@ export const MySettingSchema = new Schema<MySetting>(
   { _id: false },
 );
 
+export const ReportsSchema = new Schema<Reports>(
+  {
+    reportBy: {
+      type: Schema.Types.ObjectId,
+      ref: User.name,
+      autopopulate: false,
+    },
+    createdAt: { type: Date, default: new Date() },
+    reasonReport: { type: String, trim: true },
+  },
+  { _id: false },
+);
+
 export type UserModelType = Model<User>;
 export const UserSchema = new Schema<User>(
   {
@@ -111,18 +126,31 @@ export const UserSchema = new Schema<User>(
     password: { type: String, trim: true },
     address: { type: AddressSchema, default: new Address() },
     showMeTinder: { type: Boolean, default: true },
+    jobTitle: { type: String, trim: true },
+    school: { type: String, trim: true },
+    aboutMe: { type: String, trim: true },
+    company: { type: String, trim: true },
+    age: { type: Number },
     gender: { type: String, enum: Object.values(GenderEnum) },
     phoneNumber: { type: String, trim: true },
     birthDays: { type: Date },
     images: { type: [String], default: [] },
     geoLocation: { type: GeoLocationSchema },
-    lastActive: { type: Date, default: Date.now() },
+    lastActive: { type: Date, default: new Date() },
     isDeleted: { type: Boolean, default: false },
     isConfirmMail: { type: Boolean, default: false },
     matchRequest: { type: [MatchRequestSchema], default: [] },
-    matched: { type: [String] },
-    resetPasswordCode: { type: String },
+    reports: [{ type: ReportsSchema, default: [] }],
+    matched: [{ type: Schema.Types.ObjectId, user: User.name }],
+    resetPasswordCode: { type: String, trim: true },
+    deleteAccountCode: { type: String, trim: true },
     statusActive: { type: String, enum: Object.values(StatusActive) },
+    role: {
+      type: String,
+      enum: Object.values(RoleEnum),
+      default: RoleEnum.USER,
+    },
+    isBlocked: { type: Boolean, default: false },
     registerType: {
       type: String,
       enum: Object.values(RegisterType),

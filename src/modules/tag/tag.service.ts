@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { FilterBuilder } from '../../utils/filter.query';
 import { PaginationInput } from '../common/dto/common.dto';
-import {
-  CreateTagInput,
-  FilterGetAllTag,
-  TagResult,
-} from './dto/create-tag.input';
+import { CreateTagInput, FilterGetAllTag } from './dto/create-tag.input';
 import { UpdateTagInput } from './dto/update-tag.input';
-import { Tag } from './entities/tag.entity';
+import { Tag, TagResult } from './entities/tag.entity';
 import { TagModelType } from './schema/tag.schema';
 
 @Injectable()
@@ -22,12 +19,28 @@ export class TagService {
     pagination: PaginationInput,
     filter: FilterGetAllTag,
   ): Promise<TagResult> {
-    const queryFilter = {};
+    const [queryFilter, querySort] = new FilterBuilder<Tag>()
+      .setFilterItem(
+        'type',
+        {
+          $eq: filter?.type,
+        },
+        filter?.type,
+      )
+      .setFilterItem(
+        'parentType',
+        { $eq: filter?.parentType },
+        filter?.parentType,
+      )
+      .setSortItem('createdAt', 1)
+      .buildQuery();
+    console.log(querySort);
     const [results, totalCount] = await Promise.all([
       this.tagModel
         .find(queryFilter)
-        .skip((pagination.page - 1) * pagination.size)
-        .limit(pagination.size),
+        .skip((pagination?.page - 1) * pagination?.size)
+        .limit(pagination?.size)
+        .sort(querySort),
       this.tagModel.countDocuments(queryFilter),
     ]);
     return { results, totalCount };

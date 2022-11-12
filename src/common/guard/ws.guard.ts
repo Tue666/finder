@@ -3,13 +3,13 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { AuthGuard } from '@nestjs/passport';
+
 @Injectable()
-export class AtGuard extends AuthGuard('jwt') {
+export class WsGuard extends AuthGuard('ws') {
   getRequest(context: ExecutionContext) {
-    const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req;
+    const ctx = context.switchToWs().getClient().handshake;
+    return ctx;
   }
   handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
@@ -17,9 +17,6 @@ export class AtGuard extends AuthGuard('jwt') {
         throw new UnauthorizedException(err.message);
       }
       throw new UnauthorizedException(err.message);
-    }
-    if (user.isBlocked) {
-      throw new UnauthorizedException('Your account has been blocked');
     }
     return user;
   }

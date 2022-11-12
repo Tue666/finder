@@ -2,6 +2,7 @@ import {
   GenderEnum,
   LookingFor,
   RegisterType,
+  RoleEnum,
   StatusActive,
 } from '../../../constants/enum';
 import { ITag } from '../../tag/interfaces/tag';
@@ -13,7 +14,13 @@ export interface IUser extends IEntity {
   gender: GenderEnum;
   phoneNumber: string;
   password: string;
+  age: number;
   birthDays: Date;
+  liveAt: string;
+  jobTitle: string;
+  school: string;
+  company: string;
+  aboutMe: string;
   images: string[];
   matched: string[];
   matchRequest: IMatchRequest[];
@@ -22,11 +29,21 @@ export interface IUser extends IEntity {
   geoLocation: IGeoLocation;
   lastActive: Date;
   isConfirmMail: boolean;
+  role?: RoleEnum;
   resetPasswordCode?: string;
+  deleteAccountCode?: string;
   registerType?: RegisterType;
   mySetting: IMySetting;
   statusActive?: StatusActive;
   address: IAddress;
+  reports: IReports[];
+  isBlocked?: boolean;
+}
+
+export interface IReports {
+  reportBy: string | User;
+  createdAt: Date;
+  reasonReport: string;
 }
 
 export interface IMySetting {
@@ -80,8 +97,9 @@ type IUserUpdate = IEntityInput<
   | 'lastActive'
   | 'registerType'
   | 'password'
-  | 'showMeTinder'
   | 'address'
   | 'geoLocation'
   | 'mySetting'
+  | 'reports'
+  | 'age'
 >;

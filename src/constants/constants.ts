@@ -1,3 +1,5 @@
+import { SortOrder } from 'mongoose';
+
 export class Constants {
   public static LOCALE_COUNTRY_CODE_ENG = 'en';
   public static LOCALE_COUNTRY_CODE_VN = 'vi';
@@ -9,4 +11,6 @@ export class Constants {
   public static MAX_COUNT_IN_USER_EMBEDDED = 999999;
   public static BEARER_TOKEN = 'Bearer ';
   public static SOCKET = 'Socket';
+  public static DEFAULT_DISTANCE = 1000000000000;
 }
+export type SortQuery = { [key: string]: SortOrder };
