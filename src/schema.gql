@@ -50,11 +50,6 @@ input CreateConversationInput {
   messagePin: ObjectID
 }
 
-input CreateSocketInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
 input CreateTagInput {
   description: String
   name: String!
@@ -185,19 +180,19 @@ type Mutation {
   changePassword(confirmPassword: String!, newPassword: String!, oldPassword: String!): Boolean!
   changeSetting(input: MySettingInput!): Boolean!
   confirmBlockUser(user_id: ObjectID!): Boolean!
+  confirmDeleteAccount(code: Float!, email: String!): Boolean!
   createConversation(createConversationInput: CreateConversationInput!): Conversation!
-  createSocket(createSocketInput: CreateSocketInput!): Socket!
   createTag(createTagInput: CreateTagInput!): Boolean!
   declineBlockUser(user_id: ObjectID!): Boolean!
   likeUser(user_id: ObjectID!): Boolean!
   removeMessage(message_id: ObjectID!): Message!
-  removeSocket(id: Int!): Socket!
   reportUser(reasonReport: String!, userReport: ObjectID!): Boolean!
   signIn(input: LoginInput!): JwtPayload!
   signUp(input: RegisterInput!): Boolean!
   skipUser(user_id: ObjectID!): Boolean!
+  unSkipUser(user_id: ObjectID!): Boolean!
+  unlikeUser(user_id: ObjectID!): Boolean!
   updateProfile(input: UpdateUserInput!): Boolean!
-  updateSocket(updateSocketInput: UpdateSocketInput!): Socket!
 }
 
 type MySetting {
@@ -231,6 +226,7 @@ type Query {
   confirmMail(token: String!): Boolean!
   createMultiTag: Boolean!
   createMultiUser: Boolean!
+  deleteAccount: Boolean!
   forgotPassword(email: String!): Boolean!
   getAllConversation(pagination: PaginationInput): ConversationResult!
   getAllMessage(filter: FilterGetAllMessage, pagination: PaginationMessageInput): MessageResult!
@@ -242,7 +238,6 @@ type Query {
   refreshToken: JwtPayload!
   resetCache: Boolean!
   signInAsAdmin(email: String!, password: String!): JwtPayload!
-  socket(id: Int!): Socket!
   statisticUser(filter: FilterStatisticUser, pagination: PaginationInput): UserResult!
 }
 
@@ -256,11 +251,6 @@ type Reports {
   createdAt: DateTime!
   reasonReport: String!
   reportBy: User!
-}
-
-type Socket {
-  """Example field (placeholder)"""
-  exampleField: Int!
 }
 
 enum SortOption {
@@ -303,12 +293,6 @@ enum TagType {
   ZODIAC
 }
 
-input UpdateSocketInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
-}
-
 input UpdateUserInput {
   aboutMe: String
   birthDays: DateTime
@@ -343,7 +327,7 @@ type User {
   lastActive: DateTime
   liveAt: String
   matchRequest: [MatchRequest!]
-  matched: [String!]
+  matched: [User!]
   mySetting: MySetting
   phoneNumber: String
   reports: [Reports!]

@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -16,6 +17,7 @@ import { MailService } from '../modules/mail/mail.service';
 import { RegisterType, RoleEnum } from '../constants/enum';
 import { Constants } from '../constants/constants';
 import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
+import { randomCode } from '../utils/utils';
 @Injectable()
 export class AuthService {
   constructor(
@@ -55,7 +57,7 @@ export class AuthService {
     user: User,
   ) {
     if (newPassword != confirmPassword) {
-      throw new BadRequestException('Password not match');
+      throw new BadRequestException('Mật khẩu không khớp');
     }
     return await this.userService.changePassword(
       oldPassword,
@@ -70,9 +72,6 @@ export class AuthService {
       input.geoLocation = new GeoLocationInput();
       input.geoLocation.coordinates = [long, lat];
       const user = await this.userService.signIn(input);
-      if (!user.isConfirmMail) {
-        throw new UnauthorizedException('Email is not confirm');
-      }
       return await this.generateTokens(user._id.toString());
     } catch (error) {
       throw error;
@@ -97,21 +96,85 @@ export class AuthService {
       this.mailService.generateToken(register.email),
     ]);
     const urlConfirm = `${process.env.FRONT_END_URL_CONFIRM_MAIL}?token=${token}`;
-    await this.mailService.sendVerifyMail(user, urlConfirm);
+    const html = urlConfirm;
+    await this.mailService.sendMail(
+      user.email,
+      Constants.VERIFY_ACCOUNT_SUBJECT,
+      html,
+    );
     return true;
   }
 
   async forgotPassword(email: string): Promise<boolean> {
-    const user = await this.userService.getOne({ email });
-    if (!user) {
-      throw new BadRequestException('Email is not exists');
+    try {
+      const user = await this.userService.getOne({ email });
+      if (!user) {
+        throw new BadRequestException(
+          'Email không tồn tại. Vui lòng nhập lại email',
+        );
+      }
+      const [ttlResetCode, cacheKey, code] = [
+        60 * 15,
+        `reset_code_password_${user.email}`,
+        randomCode(),
+      ];
+      const html = code.toString();
+      await Promise.all([
+        this.cacheManager.set(cacheKey, randomCode, ttlResetCode),
+        this.mailService.sendMail(user.email, 'Reset mật khẩu', html),
+      ]);
+      return true;
+    } catch (error) {
+      throw error;
     }
-    const randomCode = (Math.random() * (999999 - 100000) + 100000).toFixed(0);
-    await Promise.all([
-      await this.userService.setResetCode(user, randomCode),
-      await this.mailService.sendResetPasswordMail(randomCode, user),
-    ]);
-    return true;
+  }
+
+  async deleteAccount(user: User): Promise<boolean> {
+    try {
+      const [ttlResetCode, cacheKey, code] = [
+        60 * 15,
+        `delete_account_code_${user.email}`,
+        randomCode(),
+      ];
+      const html = code.toString();
+      await Promise.all([
+        this.cacheManager.set(cacheKey, code, ttlResetCode),
+        this.mailService.sendMail(user.email, 'Xóa tài khoản', html),
+      ]);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async confirmDeleteAccount(code: number, email: string): Promise<boolean> {
+    try {
+      const [user, cacheValue] = await Promise.all([
+        this.userService.findOne({ email }),
+        this.cacheManager.get(`delete_account_code_${email}`),
+      ]);
+      if (!cacheValue) {
+        throw new NotFoundException(
+          'Code nhập vào đã hết hạn hoặc không khả dụng',
+        );
+      } else {
+        if (cacheValue != code) {
+          throw new BadRequestException('Code không đúng. Vui lòng nhập lại');
+        } else {
+          await Promise.all([
+            this.userService.findOneAndUpdate(
+              { _id: user._id },
+              { $set: { isDeleted: true } },
+            ),
+            this.cacheManager.del(`delete_account_code_${email}`),
+          ]);
+
+          return true;
+        }
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
   async refreshToken(rfPayload: RefreshPayload): Promise<JwtPayload> {

@@ -66,7 +66,7 @@ export class UserService {
   async findOne(filter: FilterGetOneUser): Promise<User> {
     try {
       const user = await this.userModel.findOne(filter);
-      throwIfNotExists(user, 'User not found');
+      throwIfNotExists(user, 'Không tìm thấy User tương ứng');
       return user;
     } catch (error) {
       throw error;
@@ -137,11 +137,22 @@ export class UserService {
 
   async signIn(input: LoginInput): Promise<User> {
     try {
-      const user = await this.findOne({ email: input.email });
+      const user = await this.getOne({ email: input.email });
+      throwIfNotExists(user, 'Tài khoản không chính xác');
+      if (!user.isConfirmMail) {
+        throw new UnauthorizedException(
+          'Email chưa được xác nhận. Vui lòng xác nhận email của bạn',
+        );
+      }
+      if (user.isBlocked) {
+        throw new UnauthorizedException(
+          'Tài khoản của bạn đã bị khóa. Vui lòng nạp tiền để mở khóa',
+        );
+      }
       await this.isNotCorrectPassword(input.password, user.password);
       if (!user.isConfirmMail) {
         throw new UnauthorizedException(
-          'Your account has not been confirmed by email',
+          'Tài khoản của bạn chưa được xác thực email. Vui lòng xác thực email để tiếp tục',
         );
       }
       this.loggerService.debug('Passed password');
@@ -168,12 +179,12 @@ export class UserService {
   async signUp(register: RegisterInput): Promise<User> {
     try {
       if (register.password != register.confirmPassword) {
-        throw new BadRequestException('Password not match');
+        throw new BadRequestException('Mật khẩu không khớp');
       }
       const { password, email } = register;
       const userExisting = await this.getOne({ email });
       if (userExisting) {
-        throw new BadRequestException('Email is existing');
+        throw new BadRequestException('Email đã tồn tại');
       }
       const [user, hashPassword] = await Promise.all([
         this.userModel.create({ email }),
@@ -202,14 +213,8 @@ export class UserService {
   ): Promise<void> {
     const correct = await bcrypt.compare(password, currentPassword);
     if (!correct) {
-      throw new UnauthorizedException('Password incorrect');
+      throw new UnauthorizedException('Mật khẩu không chính xác');
     }
-  }
-
-  async setResetCode(user: User, randomCode: string): Promise<void> {
-    const userUpdate = new this.userModel(user);
-    userUpdate.resetPasswordCode = await bcrypt.hash(randomCode, 12);
-    await userUpdate.save();
   }
 
   async findOneAndUpdate(
@@ -243,7 +248,6 @@ export class UserService {
         { $set: updateQuery },
         { new: true },
       );
-      throwIfNotExists(newUser, 'User not found to update');
       return (await newUser.save()) ? true : false;
     } catch (error) {
       throw error;
@@ -262,6 +266,25 @@ export class UserService {
           $inc: { count: 1 },
           $set: { user: user._id },
         },
+        { upsert: true, new: true },
+      );
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async unSkipUser(user: User, user_id: string): Promise<boolean> {
+    try {
+      const user_embedded = await this.userEmbeddedService.getCurrentEmbedded(
+        user._id,
+      );
+      await this.userEmbeddedService.findOneAndUpdate(
+        {
+          _id: user_embedded._id,
+        },
+        { $pull: { unlikeUser: { $eq: user_id } }, $inc: { count: -1 } },
+        { new: true },
       );
       return true;
     } catch (error) {
@@ -271,32 +294,50 @@ export class UserService {
 
   async likeUser(user_id: string, user: User): Promise<boolean> {
     try {
-      const requestUser = await this.userModel.findOne({ _id: user_id });
-      throwIfNotExists(requestUser, 'User not found');
+      const requestedUser = await this.userModel.findOne({ _id: user_id }); // user được yêu cầu
       const isContainsInRequest = includesInObject<MatchRequest>(
-        requestUser.matchRequest,
+        user.matchRequest,
         'sender',
+        '_id',
         user_id,
       );
       if (isContainsInRequest) {
         this.loggerService.log('User match request with request user');
-        await this.conversationService.create({
-          members: [user_id, requestUser._id],
-        });
+        await Promise.all([
+          this.conversationService.create({
+            members: [user._id, requestedUser._id],
+          }),
+          this.userModel.findOneAndUpdate(
+            { _id: user._id },
+            {
+              $pull: { matchRequest: { sender: user_id } },
+              $push: { matched: requestedUser },
+            },
+          ),
+          requestedUser.matched.push(user),
+        ]);
       } else {
         this.loggerService.log(
-          `Request match request to ${requestUser.username}`,
+          `Request match request to ${requestedUser.username}`,
         );
-        requestUser.matchRequest.push({
+        requestedUser.matchRequest.push({
           sender: user,
           createdAt: new Date(),
         });
-        await requestUser.save();
       }
+      await requestedUser.save();
       return true;
     } catch (error) {
       throw error;
     }
+  }
+
+  async unlikeUser(user: User, user_id: string): Promise<boolean> {
+    const userUpdated = await this.userModel.findOneAndUpdate(
+      { _id: user_id },
+      { $pull: { matchRequest: { sender: user._id } } },
+    );
+    return userUpdated ? true : false;
   }
 
   async reportUser(
@@ -309,17 +350,17 @@ export class UserService {
         { _id: userReport },
         { $push: { reports: { reportBy, reasonReport } } },
       );
-      throwIfNotExists(user, 'User not found');
+      throwIfNotExists(user, 'Tài khoản không tồn tại');
       const user_embedded = await this.userEmbeddedService.findOneAndUpdate(
         { _id: reportBy._id },
         { $push: { unlikeUser: userReport } },
+        { upsert: true, new: true },
       );
       return user && user_embedded ? true : false;
     } catch (error) {
       throw error;
     }
   }
-
   async insertManyUser(): Promise<boolean> {
     try {
       // const users = mappingData();

@@ -41,6 +41,20 @@ export class AuthResolver {
     return this.authService.signInAsAdmin(email, password);
   }
 
+  @Query(() => Boolean)
+  @UseGuards(AtGuard)
+  deleteAccount(@GetUser() user: User): Promise<boolean> {
+    return this.authService.deleteAccount(user);
+  }
+
+  @Mutation(() => Boolean)
+  confirmDeleteAccount(
+    @Args('code', { type: () => Number }) code: number,
+    @Args('email') email: string,
+  ): Promise<boolean> {
+    return this.authService.confirmDeleteAccount(code, email);
+  }
+
   @Mutation(() => JwtPayload)
   signIn(
     @Args('input', { type: () => LoginInput }) input: LoginInput,

@@ -126,8 +126,8 @@ export class User implements IUser {
   @Field(() => GeoLocation, { nullable: true })
   geoLocation: GeoLocation;
 
-  @Field(() => [String], { nullable: true })
-  matched: string[];
+  @Field(() => [User], { nullable: true })
+  matched: User[];
 
   @Field(() => [Tag], { nullable: true })
   tags: Tag[];
@@ -191,12 +191,6 @@ export class User implements IUser {
 
   @HideField()
   registerType?: RegisterType;
-
-  @HideField()
-  resetPasswordCode?: string;
-
-  @HideField()
-  deleteAccountCode?: string;
 
   @HideField()
   role?: RoleEnum;

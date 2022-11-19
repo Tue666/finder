@@ -2,11 +2,12 @@ import { FilterByDate, SortOption } from '../constants/enum';
 
 export function includesInObject<T>(
   array: Array<T>,
-  key: keyof T,
+  key1: keyof T,
+  key2: string,
   condition,
 ): boolean {
   return array.filter(item => {
-    if (item[key] === condition) {
+    if (item[key1][key2].toString() === condition) {
       return item;
     }
   }).length > 0
@@ -54,4 +55,8 @@ export function setFilterSortOption(sortOption: SortOption) {
     AGE: { property: 'age', option: 1 },
   };
   return { ...sortFilter[sortOption] };
+}
+
+export function randomCode(): number {
+  return +(Math.random() * (999999 - 100000) + 100000).toFixed(0);
 }

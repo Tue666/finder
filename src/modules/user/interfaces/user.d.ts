@@ -22,7 +22,7 @@ export interface IUser extends IEntity {
   company: string;
   aboutMe: string;
   images: string[];
-  matched: string[];
+  matched: string[] | User[];
   matchRequest: IMatchRequest[];
   tags: ITag[] | string[];
   showMeTinder: boolean;
@@ -30,8 +30,6 @@ export interface IUser extends IEntity {
   lastActive: Date;
   isConfirmMail: boolean;
   role?: RoleEnum;
-  resetPasswordCode?: string;
-  deleteAccountCode?: string;
   registerType?: RegisterType;
   mySetting: IMySetting;
   statusActive?: StatusActive;
@@ -93,7 +91,6 @@ type IUserUpdate = IEntityInput<
   | 'matched'
   | 'matchRequest'
   | 'email'
-  | 'resetPasswordCode'
   | 'lastActive'
   | 'registerType'
   | 'password'

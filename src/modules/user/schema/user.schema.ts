@@ -141,9 +141,9 @@ export const UserSchema = new Schema<User>(
     isConfirmMail: { type: Boolean, default: false },
     matchRequest: { type: [MatchRequestSchema], default: [] },
     reports: [{ type: ReportsSchema, default: [] }],
-    matched: [{ type: Schema.Types.ObjectId, user: User.name }],
-    resetPasswordCode: { type: String, trim: true },
-    deleteAccountCode: { type: String, trim: true },
+    matched: [
+      { type: Schema.Types.ObjectId, user: User.name, autopopulate: false },
+    ],
     statusActive: { type: String, enum: Object.values(StatusActive) },
     role: {
       type: String,

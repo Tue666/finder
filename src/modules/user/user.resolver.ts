@@ -25,16 +25,6 @@ export class UserResolver {
     private userHelper: UserHelper,
   ) {}
 
-  @Query(() => UserResult)
-  getAllUser(
-    @Args('pagination', { type: () => PaginationInput, nullable: true })
-    pagination: PaginationInput,
-    @Args('filter', { type: () => FilterGetAllUser, nullable: true })
-    filter: FilterGetAllUser,
-  ): Promise<UserResult> {
-    return this.userService.getAllUser(pagination, filter);
-  }
-
   @Mutation(() => Boolean)
   @UseGuards(AtGuard)
   updateProfile(
@@ -72,11 +62,29 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AtGuard)
+  unSkipUser(
+    @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
+    @GetUser() user: User,
+  ): Promise<boolean> {
+    return this.userService.unSkipUser(user, user_id);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AtGuard)
   likeUser(
     @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
     @GetUser() user: User,
   ): Promise<boolean> {
     return this.userService.likeUser(user_id, user);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AtGuard)
+  unlikeUser(
+    @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
+    @GetUser() user: User,
+  ): Promise<boolean> {
+    return this.userService.unlikeUser(user, user_id);
   }
 
   @Mutation(() => Boolean)
@@ -141,5 +149,15 @@ export class UserResolver {
   @UseGuards(AtGuard)
   getCurrentAddress(@GetUser() user: User): Promise<Address> {
     return this.userHelper.getCurrentAddress(user);
+  }
+
+  @Query(() => UserResult)
+  getAllUser(
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination: PaginationInput,
+    @Args('filter', { type: () => FilterGetAllUser, nullable: true })
+    filter: FilterGetAllUser,
+  ): Promise<UserResult> {
+    return this.userService.getAllUser(pagination, filter);
   }
 }

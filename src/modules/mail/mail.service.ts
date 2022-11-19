@@ -23,15 +23,16 @@ export class MailService {
       },
     });
   }
-  async sendVerifyMail(
-    user: User,
-    urlConfirm: string,
+  async sendMail(
+    email: string,
+    subject: string,
+    html: string,
   ): Promise<SMTPTransport.SentMessageInfo> {
     return await this.transporter().sendMail({
       from: process.env.MAIL_USERNAME,
-      to: user.email,
-      subject: `Verify Your Email ${urlConfirm}`,
-      html: 'Hello World',
+      to: email,
+      subject: subject,
+      html: html,
     });
   }
 
@@ -74,17 +75,5 @@ export class MailService {
       { $set: { isConfirmMail: true } },
     );
     return true;
-  }
-
-  async sendResetPasswordMail(
-    randomCode: string,
-    user: User,
-  ): Promise<SMTPTransport.SentMessageInfo> {
-    return await this.transporter().sendMail({
-      from: process.env.EMAIL_USERNAME,
-      to: user.email,
-      subject: 'Reset password',
-      html: `${randomCode}`,
-    });
   }
 }
