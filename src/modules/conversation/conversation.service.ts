@@ -6,7 +6,10 @@ import { throwIfNotExists } from '../../utils/model.utils';
 import { PaginationInput } from '../common/dto/common.dto';
 import { LoggerService } from '../logger/logger.service';
 import { User } from '../user/entities/user.entities';
-import { CreateConversationInput } from './dto/create-conversation.input';
+import {
+  CreateConversationInput,
+  FilterGetOnerConversation,
+} from './dto/create-conversation.input';
 import {
   Conversation,
   ConversationResult,
@@ -55,9 +58,19 @@ export class ConversationService {
     return { results, totalCount };
   }
 
-  async findOne(_id: string): Promise<Conversation> {
+  async findOne(input: FilterGetOnerConversation): Promise<Conversation> {
     try {
-      const conversation = await this.conversionModel.findOne({ _id });
+      let queryFilter = {};
+      if (input?.members) {
+        const reverseMembers = input?.members.reverse();
+        queryFilter = {
+          $or: [{ members: input.members }, { members: reverseMembers }],
+        };
+      }
+      if (input?._id) {
+        queryFilter['_id'] = input?._id;
+      }
+      const conversation = await this.conversionModel.findOne(queryFilter);
       throwIfNotExists(conversation, 'Conversation not found');
       return conversation;
     } catch (error) {

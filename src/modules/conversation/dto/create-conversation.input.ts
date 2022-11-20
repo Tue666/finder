@@ -13,3 +13,12 @@ export class CreateConversationInput implements IConversation {
   @Field(() => [GraphQLObjectID], { nullable: true })
   members: string[];
 }
+
+@InputType()
+export class FilterGetOnerConversation implements Partial<IConversation> {
+  @Field(() => GraphQLObjectID, { nullable: true })
+  _id: string;
+
+  @Field(() => [GraphQLObjectID], { nullable: true })
+  members?: string[];
+}

@@ -16,6 +16,7 @@ export const ConversationSchema = new Schema<Conversation>(
       ref: Message.name,
       autopopulate: { maxDepth: 1 },
     },
+    isDeleted: { type: Boolean, default: false },
     members: [
       {
         type: Schema.Types.ObjectId,
@@ -23,10 +24,6 @@ export const ConversationSchema = new Schema<Conversation>(
         autopopulate: { maxDepth: 1 },
       },
     ],
-    keyword: {
-      type: String,
-      trim: true,
-    },
   },
   {
     timestamps: true,

@@ -1,12 +1,14 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { GraphQLObjectID } from 'graphql-scalars';
 import { GetUser } from '../../common/decorators/getuser.decorators';
 import { AtGuard } from '../../common/guard/at.guard';
 import { PaginationInput } from '../common/dto/common.dto';
 import { User } from '../user/entities/user.entities';
 import { ConversationService } from './conversation.service';
-import { CreateConversationInput } from './dto/create-conversation.input';
+import {
+  CreateConversationInput,
+  FilterGetOnerConversation,
+} from './dto/create-conversation.input';
 import {
   Conversation,
   ConversationResult,
@@ -36,9 +38,9 @@ export class ConversationResolver {
 
   @Query(() => Conversation)
   getOneConversation(
-    @Args('conversation_id', { type: () => GraphQLObjectID })
-    conversation_id: string,
+    @Args('input', { type: () => FilterGetOnerConversation, nullable: true })
+    input: FilterGetOnerConversation,
   ) {
-    return this.conversationService.findOne(conversation_id);
+    return this.conversationService.findOne(input);
   }
 }

@@ -334,9 +334,35 @@ export class UserService {
 
   async unlikeUser(user: User, user_id: string): Promise<boolean> {
     const userUpdated = await this.userModel.findOneAndUpdate(
-      { _id: user_id },
+      { _id: user_id, matchRequest: { $elemMatch: { sender: user._id } } },
       { $pull: { matchRequest: { sender: user._id } } },
     );
+    if (!userUpdated) {
+      const members = [user._id.toString(), user_id];
+      const reverseMembers = members.reverse();
+      const query = {
+        $or: [{ members: members }, { members: reverseMembers }],
+      };
+      await Promise.all([
+        this.userModel.findOneAndUpdate(
+          { _id: user_id },
+          {
+            $pull: { matched: { $eq: user._id } },
+          },
+        ),
+        this.userModel.findOneAndUpdate(
+          { _id: user._id },
+          {
+            $pull: { matched: { $eq: user_id } },
+            $push: { matchRequest: { sender: user_id, createdAt: new Date() } },
+          },
+        ),
+        this.conversationService.findOneAndUpdate(query, {
+          $set: { isDeleted: true },
+        }),
+      ]);
+      return true;
+    }
     return userUpdated ? true : false;
   }
 

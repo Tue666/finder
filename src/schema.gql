@@ -32,7 +32,6 @@ type Conversation {
   _id: ID!
   createdAt: DateTime!
   isDeleted: Boolean!
-  keyword: String!
   lastMessage: Message
   members: [User!]!
   messagePin: Message
@@ -106,6 +105,11 @@ input FilterGetAllUser {
   showMeTinder: Boolean
   statusActive: StatusActive
   user_id: ObjectID
+}
+
+input FilterGetOnerConversation {
+  _id: ObjectID
+  members: [ObjectID!]
 }
 
 input FilterStatisticUser {
@@ -234,7 +238,7 @@ type Query {
   getAllTag(filter: FilterGetAllTag, pagination: PaginationInput): TagResult!
   getAllUser(filter: FilterGetAllUser, pagination: PaginationInput): UserResult!
   getCurrentAddress: Address!
-  getOneConversation(conversation_id: ObjectID!): Conversation!
+  getOneConversation(input: FilterGetOnerConversation): Conversation!
   refreshToken: JwtPayload!
   resetCache: Boolean!
   signInAsAdmin(email: String!, password: String!): JwtPayload!

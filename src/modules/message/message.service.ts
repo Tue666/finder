@@ -22,7 +22,7 @@ export class MessageService {
   async create(input: CreateMessageInput): Promise<Message> {
     try {
       const [conversation, message] = await Promise.all([
-        this.conversationService.findOne(input.conversion_id),
+        this.conversationService.findOne({ _id: input.conversion_id }),
         this.messageModel.create(input),
       ]);
       message.cursor = conversation.lastMessage.cursor + 1;

@@ -25,9 +25,6 @@ export class Conversation implements IConversation {
 
   @Field(() => Date)
   updatedAt: Date;
-
-  @Field()
-  keyword: string;
 }
 
 @ObjectType()
