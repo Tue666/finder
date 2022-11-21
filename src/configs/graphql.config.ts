@@ -15,7 +15,6 @@ export class GraphqlService implements GqlOptionsFactory {
       autoSchemaFile: join(process.cwd(), '../../../tmp/schema.gql'),
       subscriptions: { 'graphql-ws': true },
       sortSchema: true,
-      csrfPrevention: true,
       cache: 'bounded',
       formatError: (error: any) => {
         // Graphql Error

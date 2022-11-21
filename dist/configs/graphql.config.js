@@ -21,7 +21,6 @@ let GraphqlService = class GraphqlService {
             autoSchemaFile: (0, path_1.join)(process.cwd(), '../../../tmp/schema.gql'),
             subscriptions: { 'graphql-ws': true },
             sortSchema: true,
-            csrfPrevention: true,
             cache: 'bounded',
             formatError: (error) => {
                 var _a, _b, _c, _d;
