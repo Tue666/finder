@@ -75,13 +75,11 @@ let UserService = class UserService {
             throw error;
         }
     }
-    async getAllUser(pagination, filter) {
-        var _a, _b, _c, _d, _e, _f;
+    async getAllUser(pagination, filter, user) {
         try {
-            let maxDistance = (_b = (_a = filter === null || filter === void 0 ? void 0 : filter.mySetting) === null || _a === void 0 ? void 0 : _a.discovery) === null || _b === void 0 ? void 0 : _b.distance;
-            const queryFilter = await this.userHelper.buildQuery(filter);
-            if (((_d = (_c = filter === null || filter === void 0 ? void 0 : filter.mySetting) === null || _c === void 0 ? void 0 : _c.discovery) === null || _d === void 0 ? void 0 : _d.onlyShowDistanceThisRange) === undefined ||
-                ((_f = (_e = filter === null || filter === void 0 ? void 0 : filter.mySetting) === null || _e === void 0 ? void 0 : _e.discovery) === null || _f === void 0 ? void 0 : _f.onlyShowDistanceThisRange) === false) {
+            let maxDistance = user.mySetting.discovery.distance;
+            const queryFilter = await this.userHelper.buildQueryWithUser(user, filter);
+            if (user.mySetting.discovery.onlyShowDistanceThisRange === false) {
                 maxDistance = constants_1.Constants.DEFAULT_DISTANCE;
                 this.loggerService.debug(`MaxDistance:${maxDistance}`);
             }
@@ -256,10 +254,10 @@ let UserService = class UserService {
             const isContainsInRequest = (0, utils_1.includesInObject)(user.matchRequest, 'sender', '_id', user_id);
             if (isContainsInRequest) {
                 this.loggerService.log('User match request with request user');
+                const members = [user._id.toString(), requestedUser._id.toString()];
+                const query = this.conversationService.getQueryOrMembers(members);
                 await Promise.all([
-                    this.conversationService.create({
-                        members: [user._id, requestedUser._id],
-                    }),
+                    this.conversationService.findOneAndUpdate(query, { $set: { members: members, isDeleted: false } }, { upsert: true }),
                     this.userModel.findOneAndUpdate({ _id: user._id }, {
                         $pull: { matchRequest: { sender: user_id } },
                         $push: { matched: requestedUser },
@@ -285,10 +283,7 @@ let UserService = class UserService {
         const userUpdated = await this.userModel.findOneAndUpdate({ _id: user_id, matchRequest: { $elemMatch: { sender: user._id } } }, { $pull: { matchRequest: { sender: user._id } } });
         if (!userUpdated) {
             const members = [user._id.toString(), user_id];
-            const reverseMembers = members.reverse();
-            const query = {
-                $or: [{ members: members }, { members: reverseMembers }],
-            };
+            const query = this.conversationService.getQueryOrMembers(members);
             await Promise.all([
                 this.userModel.findOneAndUpdate({ _id: user_id }, {
                     $pull: { matched: { $eq: user._id } },

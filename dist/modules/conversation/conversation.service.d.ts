@@ -1,4 +1,4 @@
-import { FilterQuery, UpdateQuery } from 'mongoose';
+import { FilterQuery, QueryOptions, UpdateQuery } from 'mongoose';
 import { PaginationInput } from '../common/dto/common.dto';
 import { LoggerService } from '../logger/logger.service';
 import { User } from '../user/entities/user.entities';
@@ -12,5 +12,10 @@ export declare class ConversationService {
     create(input: CreateConversationInput): Promise<boolean>;
     findAll(input: PaginationInput, user: User): Promise<ConversationResult>;
     findOne(input: FilterGetOnerConversation): Promise<Conversation>;
-    findOneAndUpdate(filter: FilterQuery<Conversation>, update: UpdateQuery<Conversation>): Promise<Conversation>;
+    findOneAndUpdate(filter: FilterQuery<Conversation>, update: UpdateQuery<Conversation>, options?: QueryOptions<Conversation> | null): Promise<Conversation>;
+    getQueryOrMembers(members: string[]): {
+        $or: {
+            members: string[];
+        }[];
+    };
 }

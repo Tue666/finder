@@ -19,7 +19,7 @@ export declare class UserService {
     changePassword(oldPassword: string, newPassword: string, user: User): Promise<boolean>;
     findOne(filter: FilterGetOneUser): Promise<User>;
     getOne(filter: FilterGetOneUser): Promise<User | undefined>;
-    getAllUser(pagination: PaginationInput, filter: FilterGetAllUser): Promise<UserResult>;
+    getAllUser(pagination: PaginationInput, filter: FilterGetAllUser, user: User): Promise<UserResult>;
     signIn(input: LoginInput): Promise<User>;
     signInAsAdmin(email: string, password: string): Promise<User>;
     signUp(register: RegisterInput): Promise<User>;

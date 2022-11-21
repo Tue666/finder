@@ -98,13 +98,8 @@ input FilterGetAllTag {
 }
 
 input FilterGetAllUser {
-  geoLocation: GeoLocationInput
-  isSkipNotLikeUser: Boolean
   matched: [String!]
-  mySetting: MySettingInput
-  showMeTinder: Boolean
   statusActive: StatusActive
-  user_id: ObjectID
 }
 
 input FilterGetOnerConversation {
@@ -127,11 +122,6 @@ type GeoLocation {
   """[lng, lat]"""
   coordinates: [Float!]
   type: String
-}
-
-input GeoLocationInput {
-  """Position 0 is Longitude , 1 is Latitude"""
-  coordinates: [Float!]!
 }
 
 type JwtPayload {

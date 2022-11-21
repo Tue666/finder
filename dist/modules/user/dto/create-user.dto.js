@@ -187,33 +187,13 @@ exports.FilterGetOneUser = FilterGetOneUser;
 let FilterGetAllUser = class FilterGetAllUser {
 };
 __decorate([
-    (0, graphql_1.Field)(() => Boolean, { nullable: true }),
-    __metadata("design:type", Boolean)
-], FilterGetAllUser.prototype, "showMeTinder", void 0);
-__decorate([
-    (0, graphql_1.Field)(() => GeoLocationInput, { nullable: true }),
-    __metadata("design:type", GeoLocationInput)
-], FilterGetAllUser.prototype, "geoLocation", void 0);
-__decorate([
     (0, graphql_1.Field)(() => [String], { nullable: true }),
     __metadata("design:type", Array)
 ], FilterGetAllUser.prototype, "matched", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => MySettingInput, { nullable: true }),
-    __metadata("design:type", MySettingInput)
-], FilterGetAllUser.prototype, "mySetting", void 0);
-__decorate([
     (0, graphql_1.Field)(() => enum_1.StatusActive, { nullable: true }),
     __metadata("design:type", String)
 ], FilterGetAllUser.prototype, "statusActive", void 0);
-__decorate([
-    (0, graphql_1.Field)(() => Boolean, { nullable: true }),
-    __metadata("design:type", Boolean)
-], FilterGetAllUser.prototype, "isSkipNotLikeUser", void 0);
-__decorate([
-    (0, graphql_1.Field)(() => graphql_scalars_1.GraphQLObjectID, { nullable: true }),
-    __metadata("design:type", String)
-], FilterGetAllUser.prototype, "user_id", void 0);
 FilterGetAllUser = __decorate([
     (0, graphql_1.InputType)()
 ], FilterGetAllUser);

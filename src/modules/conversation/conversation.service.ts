@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, UpdateQuery } from 'mongoose';
+import { FilterQuery, QueryOptions, UpdateQuery } from 'mongoose';
 import { FilterBuilder } from '../../utils/filter.query';
 import { throwIfNotExists } from '../../utils/model.utils';
 import { PaginationInput } from '../common/dto/common.dto';
@@ -81,18 +81,25 @@ export class ConversationService {
   async findOneAndUpdate(
     filter: FilterQuery<Conversation>,
     update: UpdateQuery<Conversation>,
+    options?: QueryOptions<Conversation> | null,
   ): Promise<Conversation> {
     try {
       const conversation = await this.conversionModel.findOneAndUpdate(
         filter,
         update,
-        {
-          new: true,
-        },
+        options,
       );
       return conversation;
     } catch (error) {
       throw error;
     }
+  }
+
+  getQueryOrMembers(members: string[]) {
+    const reverseMembers = members.reverse();
+    const query = {
+      $or: [{ members: members }, { members: reverseMembers }],
+    };
+    return query;
   }
 }

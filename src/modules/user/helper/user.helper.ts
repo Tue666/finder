@@ -23,38 +23,39 @@ export class UserHelper {
     private userEmbeddedService: UserEmbeddedService,
   ) {}
 
-  async buildQuery(filter: FilterGetAllUser): Promise<any> {
-    const isApplyAge = filter?.mySetting?.discovery?.onlyShowAgeThisRange;
+  async buildQueryWithUser(user: User, filter: FilterGetAllUser): Promise<any> {
+    const isApplyAge = user.mySetting.discovery.onlyShowAgeThisRange;
 
     const queryFilter: FilterBuilder<User> = new FilterBuilder<User>()
       .setFilterItem('matched', { $in: filter?.matched }, filter?.matched)
       .setFilterItem(
         'statusActive',
         { $eq: filter?.statusActive },
-        filter.statusActive,
+        filter?.statusActive,
       )
       .setFilterItem(
         'showMeTinder',
-        { $eq: filter?.showMeTinder },
-        filter?.showMeTinder,
+        { $eq: user.showMeTinder },
+        user.showMeTinder,
       );
 
     if (isApplyAge) {
       queryFilter.setFilterItem(
         'age',
         {
-          $gte: filter?.mySetting?.discovery?.minAge,
-          $lte: filter?.mySetting?.discovery?.maxAge,
+          $gte: user.mySetting.discovery.minAge,
+          $lte: user.mySetting.discovery.maxAge,
         },
-        filter?.mySetting?.discovery?.minAge,
+        user.mySetting.discovery.minAge,
       );
     }
-    if (filter?.isSkipNotLikeUser && filter?.user_id) {
-      const user_ids: string[] =
-        await this.userEmbeddedService.getAllIdsNotLike(filter?.user_id);
-      queryFilter.setFilterItem('_id', { $nin: user_ids }, filter?.user_id);
-    }
-    return queryFilter.buildQuery();
+    const user_ids: string[] = await this.userEmbeddedService.getAllIdsNotLike(
+      user._id.toString(),
+    );
+    user_ids.push(user._id);
+    console.log(user_ids);
+    queryFilter.setFilterItem('_id', { $nin: user_ids }, user._id.toString());
+    return queryFilter.buildQuery()[0];
   }
 
   async setNewInfoAfterLogin(newIf: NewInformationAfterLogin): Promise<void> {
@@ -165,11 +166,11 @@ export class UserHelper {
     filter: FilterStatisticUser,
   ): Promise<UserResult> {
     try {
-      const queryFilterByDate = setFilterByDate(filter?.filterByDate);
+      const queryFilterByDate = setFilterByDate(filter.filterByDate);
       const [queryFilter, querySort] = new FilterBuilder()
-        .addName(filter?.username)
+        .addName(filter.username)
         .addSubQuery({ createdAt: queryFilterByDate })
-        .addSortOption(filter?.sortOption)
+        .addSortOption(filter.sortOption)
         .buildQuery();
       const [results, totalCount] = await Promise.all([
         this.userModel
@@ -177,7 +178,7 @@ export class UserHelper {
           .skip((pagination?.page - 1) * pagination?.size)
           .limit(pagination?.size)
           .sort(querySort),
-        this.userModel.countDocuments(),
+        this.userModel.countDocuments(queryFilter),
       ]);
       return { results, totalCount };
     } catch (error) {

@@ -31,24 +31,23 @@ let UserHelper = class UserHelper {
         this.loggerService = loggerService;
         this.userEmbeddedService = userEmbeddedService;
     }
-    async buildQuery(filter) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
-        const isApplyAge = (_b = (_a = filter === null || filter === void 0 ? void 0 : filter.mySetting) === null || _a === void 0 ? void 0 : _a.discovery) === null || _b === void 0 ? void 0 : _b.onlyShowAgeThisRange;
+    async buildQueryWithUser(user, filter) {
+        const isApplyAge = user.mySetting.discovery.onlyShowAgeThisRange;
         const queryFilter = new filter_query_1.FilterBuilder()
             .setFilterItem('matched', { $in: filter === null || filter === void 0 ? void 0 : filter.matched }, filter === null || filter === void 0 ? void 0 : filter.matched)
-            .setFilterItem('statusActive', { $eq: filter === null || filter === void 0 ? void 0 : filter.statusActive }, filter.statusActive)
-            .setFilterItem('showMeTinder', { $eq: filter === null || filter === void 0 ? void 0 : filter.showMeTinder }, filter === null || filter === void 0 ? void 0 : filter.showMeTinder);
+            .setFilterItem('statusActive', { $eq: filter === null || filter === void 0 ? void 0 : filter.statusActive }, filter === null || filter === void 0 ? void 0 : filter.statusActive)
+            .setFilterItem('showMeTinder', { $eq: user.showMeTinder }, user.showMeTinder);
         if (isApplyAge) {
             queryFilter.setFilterItem('age', {
-                $gte: (_d = (_c = filter === null || filter === void 0 ? void 0 : filter.mySetting) === null || _c === void 0 ? void 0 : _c.discovery) === null || _d === void 0 ? void 0 : _d.minAge,
-                $lte: (_f = (_e = filter === null || filter === void 0 ? void 0 : filter.mySetting) === null || _e === void 0 ? void 0 : _e.discovery) === null || _f === void 0 ? void 0 : _f.maxAge,
-            }, (_h = (_g = filter === null || filter === void 0 ? void 0 : filter.mySetting) === null || _g === void 0 ? void 0 : _g.discovery) === null || _h === void 0 ? void 0 : _h.minAge);
+                $gte: user.mySetting.discovery.minAge,
+                $lte: user.mySetting.discovery.maxAge,
+            }, user.mySetting.discovery.minAge);
         }
-        if ((filter === null || filter === void 0 ? void 0 : filter.isSkipNotLikeUser) && (filter === null || filter === void 0 ? void 0 : filter.user_id)) {
-            const user_ids = await this.userEmbeddedService.getAllIdsNotLike(filter === null || filter === void 0 ? void 0 : filter.user_id);
-            queryFilter.setFilterItem('_id', { $nin: user_ids }, filter === null || filter === void 0 ? void 0 : filter.user_id);
-        }
-        return queryFilter.buildQuery();
+        const user_ids = await this.userEmbeddedService.getAllIdsNotLike(user._id.toString());
+        user_ids.push(user._id);
+        console.log(user_ids);
+        queryFilter.setFilterItem('_id', { $nin: user_ids }, user._id.toString());
+        return queryFilter.buildQuery()[0];
     }
     async setNewInfoAfterLogin(newIf) {
         try {
@@ -138,11 +137,11 @@ let UserHelper = class UserHelper {
     }
     async statisticUser(pagination, filter) {
         try {
-            const queryFilterByDate = (0, utils_1.setFilterByDate)(filter === null || filter === void 0 ? void 0 : filter.filterByDate);
+            const queryFilterByDate = (0, utils_1.setFilterByDate)(filter.filterByDate);
             const [queryFilter, querySort] = new filter_query_1.FilterBuilder()
-                .addName(filter === null || filter === void 0 ? void 0 : filter.username)
+                .addName(filter.username)
                 .addSubQuery({ createdAt: queryFilterByDate })
-                .addSortOption(filter === null || filter === void 0 ? void 0 : filter.sortOption)
+                .addSortOption(filter.sortOption)
                 .buildQuery();
             const [results, totalCount] = await Promise.all([
                 this.userModel
@@ -150,7 +149,7 @@ let UserHelper = class UserHelper {
                     .skip(((pagination === null || pagination === void 0 ? void 0 : pagination.page) - 1) * (pagination === null || pagination === void 0 ? void 0 : pagination.size))
                     .limit(pagination === null || pagination === void 0 ? void 0 : pagination.size)
                     .sort(querySort),
-                this.userModel.countDocuments(),
+                this.userModel.countDocuments(queryFilter),
             ]);
             return { results, totalCount };
         }

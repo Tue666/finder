@@ -71,16 +71,21 @@ let ConversationService = class ConversationService {
             throw error;
         }
     }
-    async findOneAndUpdate(filter, update) {
+    async findOneAndUpdate(filter, update, options) {
         try {
-            const conversation = await this.conversionModel.findOneAndUpdate(filter, update, {
-                new: true,
-            });
+            const conversation = await this.conversionModel.findOneAndUpdate(filter, update, options);
             return conversation;
         }
         catch (error) {
             throw error;
         }
+    }
+    getQueryOrMembers(members) {
+        const reverseMembers = members.reverse();
+        const query = {
+            $or: [{ members: members }, { members: reverseMembers }],
+        };
+        return query;
     }
 };
 ConversationService = __decorate([

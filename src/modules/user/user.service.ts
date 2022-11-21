@@ -85,15 +85,15 @@ export class UserService {
   async getAllUser(
     pagination: PaginationInput,
     filter: FilterGetAllUser,
+    user: User,
   ): Promise<UserResult> {
     try {
-      let maxDistance = filter?.mySetting?.discovery?.distance;
-      const queryFilter = await this.userHelper.buildQuery(filter);
-
-      if (
-        filter?.mySetting?.discovery?.onlyShowDistanceThisRange === undefined ||
-        filter?.mySetting?.discovery?.onlyShowDistanceThisRange === false
-      ) {
+      let maxDistance = user.mySetting.discovery.distance;
+      const queryFilter = await this.userHelper.buildQueryWithUser(
+        user,
+        filter,
+      );
+      if (user.mySetting.discovery.onlyShowDistanceThisRange === false) {
         maxDistance = Constants.DEFAULT_DISTANCE;
         this.loggerService.debug(`MaxDistance:${maxDistance}`);
       }
@@ -303,10 +303,14 @@ export class UserService {
       );
       if (isContainsInRequest) {
         this.loggerService.log('User match request with request user');
+        const members = [user._id.toString(), requestedUser._id.toString()];
+        const query = this.conversationService.getQueryOrMembers(members);
         await Promise.all([
-          this.conversationService.create({
-            members: [user._id, requestedUser._id],
-          }),
+          this.conversationService.findOneAndUpdate(
+            query,
+            { $set: { members: members, isDeleted: false } },
+            { upsert: true },
+          ),
           this.userModel.findOneAndUpdate(
             { _id: user._id },
             {
@@ -339,10 +343,7 @@ export class UserService {
     );
     if (!userUpdated) {
       const members = [user._id.toString(), user_id];
-      const reverseMembers = members.reverse();
-      const query = {
-        $or: [{ members: members }, { members: reverseMembers }],
-      };
+      const query = this.conversationService.getQueryOrMembers(members);
       await Promise.all([
         this.userModel.findOneAndUpdate(
           { _id: user_id },

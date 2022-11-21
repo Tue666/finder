@@ -47,13 +47,8 @@ export declare class FilterGetOneUser implements Partial<IUser> {
     resetPasswordCode?: string;
 }
 export declare class FilterGetAllUser implements Partial<IUser> {
-    showMeTinder?: boolean;
-    geoLocation?: GeoLocationInput;
     matched?: string[];
-    mySetting?: MySettingInput;
     statusActive?: StatusActive;
-    isSkipNotLikeUser: boolean;
-    user_id: string;
 }
 export declare class NewInformationAfterLogin {
     coordinates?: number[];

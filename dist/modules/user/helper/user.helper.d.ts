@@ -9,7 +9,7 @@ export declare class UserHelper {
     private loggerService;
     private userEmbeddedService;
     constructor(userModel: UserModelType, loggerService: LoggerService, userEmbeddedService: UserEmbeddedService);
-    buildQuery(filter: FilterGetAllUser): Promise<any>;
+    buildQueryWithUser(user: User, filter: FilterGetAllUser): Promise<any>;
     setNewInfoAfterLogin(newIf: NewInformationAfterLogin): Promise<void>;
     handleResponseAddress(location: any): Address;
     getCurrentAddress(user: User): Promise<Address>;

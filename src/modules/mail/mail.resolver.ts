@@ -6,10 +6,6 @@ export class MailResolver {
   constructor(private mailService: MailService) {}
   @Query(() => Boolean)
   confirmMail(@Args('token') token: string): Promise<boolean> {
-    try {
-      return this.mailService.confirmEmail(token);
-    } catch (error) {
-      throw error;
-    }
+    return this.mailService.confirmEmail(token);
   }
 }

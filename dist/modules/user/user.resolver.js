@@ -76,8 +76,8 @@ let UserResolver = class UserResolver {
     getCurrentAddress(user) {
         return this.userHelper.getCurrentAddress(user);
     }
-    getAllUser(pagination, filter) {
-        return this.userService.getAllUser(pagination, filter);
+    getAllUser(pagination, filter, user) {
+        return this.userService.getAllUser(pagination, filter, user);
     }
 };
 __decorate([
@@ -199,11 +199,14 @@ __decorate([
 ], UserResolver.prototype, "getCurrentAddress", null);
 __decorate([
     (0, graphql_1.Query)(() => user_entities_1.UserResult),
+    (0, common_1.UseGuards)(at_guard_1.AtGuard),
     __param(0, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),
     __param(1, (0, graphql_1.Args)('filter', { type: () => create_user_dto_1.FilterGetAllUser, nullable: true })),
+    __param(2, (0, getuser_decorators_1.GetUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [common_dto_1.PaginationInput,
-        create_user_dto_1.FilterGetAllUser]),
+        create_user_dto_1.FilterGetAllUser,
+        user_entities_1.User]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "getAllUser", null);
 UserResolver = __decorate([

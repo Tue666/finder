@@ -20,12 +20,7 @@ let MailResolver = class MailResolver {
         this.mailService = mailService;
     }
     confirmMail(token) {
-        try {
-            return this.mailService.confirmEmail(token);
-        }
-        catch (error) {
-            throw error;
-        }
+        return this.mailService.confirmEmail(token);
     }
 };
 __decorate([

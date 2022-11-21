@@ -141,26 +141,11 @@ export class FilterGetOneUser implements Partial<IUser> {
 
 @InputType()
 export class FilterGetAllUser implements Partial<IUser> {
-  @Field(() => Boolean, { nullable: true })
-  showMeTinder?: boolean;
-
-  @Field(() => GeoLocationInput, { nullable: true })
-  geoLocation?: GeoLocationInput;
-
   @Field(() => [String], { nullable: true })
   matched?: string[];
 
-  @Field(() => MySettingInput, { nullable: true })
-  mySetting?: MySettingInput;
-
   @Field(() => StatusActive, { nullable: true })
   statusActive?: StatusActive;
-
-  @Field(() => Boolean, { nullable: true })
-  isSkipNotLikeUser: boolean;
-
-  @Field(() => GraphQLObjectID, { nullable: true })
-  user_id: string;
 }
 
 export class NewInformationAfterLogin {

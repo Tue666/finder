@@ -16,7 +16,7 @@ mongoose_1.default.set('debug', process.env.NODE_ENV === 'prod' ? false : true);
 let MongooseConfigService = class MongooseConfigService {
     createMongooseOptions() {
         return {
-            uri: process.env.MONGO_URI,
+            uri: process.env.MONGO_URI_PRO,
             user: process.env.MONGO_USERNAME,
             pass: process.env.MONGO_PASSWORD,
             connectionFactory: connection => {
