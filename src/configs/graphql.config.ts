@@ -1,8 +1,6 @@
 import { ApolloDriverConfig } from '@nestjs/apollo';
 import { Injectable } from '@nestjs/common';
 import { GqlOptionsFactory } from '@nestjs/graphql';
-import { ObjectIDResolver } from 'graphql-scalars';
-import GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
 import { join } from 'path';
 @Injectable()
 export class GraphqlService implements GqlOptionsFactory {
@@ -14,7 +12,7 @@ export class GraphqlService implements GqlOptionsFactory {
       },
       context: ({ req, res }) => ({ req, res }),
       debug: false,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: join(process.cwd(), './../tmp/schema.gql'),
       subscriptions: { 'graphql-ws': true },
       sortSchema: true,
       csrfPrevention: true,

@@ -18,7 +18,7 @@ let GraphqlService = class GraphqlService {
             },
             context: ({ req, res }) => ({ req, res }),
             debug: false,
-            autoSchemaFile: (0, path_1.join)(process.cwd(), 'src/schema.gql'),
+            autoSchemaFile: (0, path_1.join)(process.cwd(), './../tmp/schema.gql'),
             subscriptions: { 'graphql-ws': true },
             sortSchema: true,
             csrfPrevention: true,

@@ -11,8 +11,13 @@ const graphqlUploadExpress_js_1 = __importDefault(require("graphql-upload/graphq
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const common_1 = require("@nestjs/common");
 const logger_service_1 = require("./modules/logger/logger.service");
+const fs_1 = __importDefault(require("fs"));
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const dir = '../tmp';
+    if (!fs_1.default.existsSync(dir)) {
+        fs_1.default.mkdirSync(dir);
+    }
     app.set('trust proxy', process.env.NODE_ENV !== 'production');
     app.use((0, cookie_parser_1.default)());
     app.useGlobalPipes(new common_1.ValidationPipe());

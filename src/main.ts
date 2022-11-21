@@ -7,8 +7,14 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
 import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { LoggerService } from './modules/logger/logger.service';
+import fs from 'fs';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const dir = '../tmp';
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
   app.set('trust proxy', process.env.NODE_ENV !== 'production');
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
