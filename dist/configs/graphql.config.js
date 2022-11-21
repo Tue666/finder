@@ -22,6 +22,8 @@ let GraphqlService = class GraphqlService {
             subscriptions: { 'graphql-ws': true },
             sortSchema: true,
             cache: 'bounded',
+            playground: true,
+            introspection: true,
             formatError: (error) => {
                 var _a, _b, _c, _d;
                 const formattedError = {

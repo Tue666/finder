@@ -16,6 +16,8 @@ export class GraphqlService implements GqlOptionsFactory {
       subscriptions: { 'graphql-ws': true },
       sortSchema: true,
       cache: 'bounded',
+      playground: true,
+      introspection: true,
       formatError: (error: any) => {
         // Graphql Error
         const formattedError = {
