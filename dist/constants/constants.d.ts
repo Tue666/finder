@@ -15,6 +15,7 @@ export declare class Constants {
     static DEFAULT_DISTANCE: number;
     static VERIFY_ACCOUNT_SUBJECT: string;
     static RESET_CODE_DELETE_ACCOUNT: string;
+    static RESET_CODE_PASSWORD: string;
 }
 export declare type SortQuery = {
     [key: string]: SortOrder;

@@ -56,6 +56,16 @@ let UserService = class UserService {
             throw error;
         }
     }
+    async resetPassword(user, password) {
+        try {
+            const newUser = new this.userModel(user);
+            newUser.password = password;
+            return (await newUser.save()) ? true : false;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     async findOne(filter) {
         try {
             const user = await this.userModel.findOne(filter);

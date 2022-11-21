@@ -1,12 +1,13 @@
 import { User } from '../modules/user/entities/user.entities';
 import { AuthService } from './auth.service';
-import { LoginInput, RegisterInput } from './dto/auth.dto';
+import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
 import { JwtPayload, RefreshPayload } from './entities/auth.entities';
 export declare class AuthResolver {
     private authService;
     constructor(authService: AuthService);
     refreshToken(rfPayload: RefreshPayload): Promise<JwtPayload>;
     forgotPassword(email: string): Promise<boolean>;
+    resetPassword(input: ResetPasswordInput): Promise<boolean>;
     signInAsAdmin(email: string, password: string): Promise<JwtPayload>;
     deleteAccount(user: User): Promise<boolean>;
     confirmDeleteAccount(code: number, email: string): Promise<boolean>;

@@ -4,7 +4,7 @@ export declare class CreateConversationInput implements IConversation {
     messagePin?: string;
     members: string[];
 }
-export declare class FilterGetOnerConversation implements Partial<IConversation> {
+export declare class FilterGetOneConversation implements Partial<IConversation> {
     _id: string;
     members?: string[];
 }

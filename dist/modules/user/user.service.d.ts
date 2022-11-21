@@ -17,6 +17,7 @@ export declare class UserService {
     constructor(userModel: UserModelType, userEmbeddedService: UserEmbeddedService, loggerService: LoggerService, conversationService: ConversationService, userHelper: UserHelper);
     createWithOAuth2(userGoogle: User): Promise<User>;
     changePassword(oldPassword: string, newPassword: string, user: User): Promise<boolean>;
+    resetPassword(user: User, password: string): Promise<boolean>;
     findOne(filter: FilterGetOneUser): Promise<User>;
     getOne(filter: FilterGetOneUser): Promise<User | undefined>;
     getAllUser(pagination: PaginationInput, filter: FilterGetAllUser, user: User): Promise<UserResult>;

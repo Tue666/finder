@@ -15,7 +15,7 @@ export class CreateConversationInput implements IConversation {
 }
 
 @InputType()
-export class FilterGetOnerConversation implements Partial<IConversation> {
+export class FilterGetOneConversation implements Partial<IConversation> {
   @Field(() => GraphQLObjectID, { nullable: true })
   _id: string;
 

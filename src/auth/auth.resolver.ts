@@ -6,7 +6,7 @@ import { AtGuard } from '../common/guard/at.guard';
 import { RtGuard } from '../common/guard/rt.guard';
 import { User } from '../modules/user/entities/user.entities';
 import { AuthService } from './auth.service';
-import { LoginInput, RegisterInput } from './dto/auth.dto';
+import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
 import { JwtPayload, RefreshPayload } from './entities/auth.entities';
 @Resolver('Auth')
 export class AuthResolver {
@@ -31,6 +31,14 @@ export class AuthResolver {
     } catch (error) {
       throw error;
     }
+  }
+
+  @Mutation(() => Boolean)
+  resetPassword(
+    @Args('input', { type: () => ResetPasswordInput })
+    input: ResetPasswordInput,
+  ): Promise<boolean> {
+    return this.authService.resetPassword(input);
   }
 
   @Query(() => JwtPayload)

@@ -55,6 +55,11 @@ let ResetPasswordInput = class ResetPasswordInput {
 };
 __decorate([
     (0, graphql_1.Field)(),
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], ResetPasswordInput.prototype, "email", void 0);
+__decorate([
+    (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], ResetPasswordInput.prototype, "code", void 0);
 __decorate([

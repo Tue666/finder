@@ -63,6 +63,16 @@ export class UserService {
     }
   }
 
+  async resetPassword(user: User, password: string): Promise<boolean> {
+    try {
+      const newUser = new this.userModel(user);
+      newUser.password = password;
+      return (await newUser.save()) ? true : false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async findOne(filter: FilterGetOneUser): Promise<User> {
     try {
       const user = await this.userModel.findOne(filter);

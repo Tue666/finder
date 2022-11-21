@@ -8,7 +8,7 @@ import { LoggerService } from '../logger/logger.service';
 import { User } from '../user/entities/user.entities';
 import {
   CreateConversationInput,
-  FilterGetOnerConversation,
+  FilterGetOneConversation,
 } from './dto/create-conversation.input';
 import {
   Conversation,
@@ -58,7 +58,7 @@ export class ConversationService {
     return { results, totalCount };
   }
 
-  async findOne(input: FilterGetOnerConversation): Promise<Conversation> {
+  async findOne(input: FilterGetOneConversation): Promise<Conversation> {
     try {
       let queryFilter = {};
       if (input?.members) {

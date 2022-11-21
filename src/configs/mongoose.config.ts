@@ -11,7 +11,7 @@ export class MongooseConfigService implements MongooseOptionsFactory {
     | MongooseModuleOptions
     | Promise<MongooseModuleOptions> {
     return {
-      uri: process.env.MONGO_URI_PRO,
+      uri: process.env.MONGO_URI_PROD,
       user: process.env.MONGO_USERNAME,
       pass: process.env.MONGO_PASSWORD,
       connectionFactory: connection => {

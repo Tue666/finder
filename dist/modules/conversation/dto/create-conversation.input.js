@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FilterGetOnerConversation = exports.CreateConversationInput = void 0;
+exports.FilterGetOneConversation = exports.CreateConversationInput = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const graphql_scalars_1 = require("graphql-scalars");
 let CreateConversationInput = class CreateConversationInput {
@@ -30,18 +30,18 @@ CreateConversationInput = __decorate([
     (0, graphql_1.InputType)()
 ], CreateConversationInput);
 exports.CreateConversationInput = CreateConversationInput;
-let FilterGetOnerConversation = class FilterGetOnerConversation {
+let FilterGetOneConversation = class FilterGetOneConversation {
 };
 __decorate([
     (0, graphql_1.Field)(() => graphql_scalars_1.GraphQLObjectID, { nullable: true }),
     __metadata("design:type", String)
-], FilterGetOnerConversation.prototype, "_id", void 0);
+], FilterGetOneConversation.prototype, "_id", void 0);
 __decorate([
     (0, graphql_1.Field)(() => [graphql_scalars_1.GraphQLObjectID], { nullable: true }),
     __metadata("design:type", Array)
-], FilterGetOnerConversation.prototype, "members", void 0);
-FilterGetOnerConversation = __decorate([
+], FilterGetOneConversation.prototype, "members", void 0);
+FilterGetOneConversation = __decorate([
     (0, graphql_1.InputType)()
-], FilterGetOnerConversation);
-exports.FilterGetOnerConversation = FilterGetOnerConversation;
+], FilterGetOneConversation);
+exports.FilterGetOneConversation = FilterGetOneConversation;
 //# sourceMappingURL=create-conversation.input.js.map

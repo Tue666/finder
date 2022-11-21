@@ -26,8 +26,8 @@ let ConversationResolver = class ConversationResolver {
     constructor(conversationService) {
         this.conversationService = conversationService;
     }
-    createConversation(createConversationInput) {
-        return this.conversationService.create(createConversationInput);
+    createConversation(input) {
+        return this.conversationService.create(input);
     }
     getAllConversation(pagination, user) {
         return this.conversationService.findAll(pagination, user);
@@ -38,7 +38,7 @@ let ConversationResolver = class ConversationResolver {
 };
 __decorate([
     (0, graphql_1.Mutation)(() => conversation_entity_1.Conversation),
-    __param(0, (0, graphql_1.Args)('createConversationInput')),
+    __param(0, (0, graphql_1.Args)('input')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_conversation_input_1.CreateConversationInput]),
     __metadata("design:returntype", void 0)
@@ -55,9 +55,9 @@ __decorate([
 ], ConversationResolver.prototype, "getAllConversation", null);
 __decorate([
     (0, graphql_1.Query)(() => conversation_entity_1.Conversation),
-    __param(0, (0, graphql_1.Args)('input', { type: () => create_conversation_input_1.FilterGetOnerConversation, nullable: true })),
+    __param(0, (0, graphql_1.Args)('input', { type: () => create_conversation_input_1.FilterGetOneConversation, nullable: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_conversation_input_1.FilterGetOnerConversation]),
+    __metadata("design:paramtypes", [create_conversation_input_1.FilterGetOneConversation]),
     __metadata("design:returntype", void 0)
 ], ConversationResolver.prototype, "getOneConversation", null);
 ConversationResolver = __decorate([

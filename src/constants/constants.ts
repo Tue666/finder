@@ -16,5 +16,6 @@ export class Constants {
   public static DEFAULT_DISTANCE = 1000000000000;
   public static VERIFY_ACCOUNT_SUBJECT = 'Verify your account';
   public static RESET_CODE_DELETE_ACCOUNT = 'reset_code_delete_account';
+  public static RESET_CODE_PASSWORD = 'reset_code_password';
 }
 export type SortQuery = { [key: string]: SortOrder };

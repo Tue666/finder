@@ -19,4 +19,5 @@ Constants.SOCKET = 'Socket';
 Constants.DEFAULT_DISTANCE = 1000000000000;
 Constants.VERIFY_ACCOUNT_SUBJECT = 'Verify your account';
 Constants.RESET_CODE_DELETE_ACCOUNT = 'reset_code_delete_account';
+Constants.RESET_CODE_PASSWORD = 'reset_code_password';
 //# sourceMappingURL=constants.js.map

@@ -31,6 +31,10 @@ export class RegisterInput {
 @InputType()
 export class ResetPasswordInput {
   @Field()
+  @IsEmail()
+  email: string;
+
+  @Field()
   code: string;
 
   @Field()

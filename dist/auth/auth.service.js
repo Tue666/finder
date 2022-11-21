@@ -52,6 +52,32 @@ let AuthService = class AuthService {
         }
         return await this.userService.changePassword(oldPassword, newPassword, user);
     }
+    async resetPassword(input) {
+        try {
+            if (input.password != input.confirmPassword) {
+                throw new common_1.BadRequestException('Mật khẩu không khớp');
+            }
+            const [user, hashPassword, code] = await Promise.all([
+                this.userService.findOne({ email: input.email }),
+                this.userService.hashPassword(input.password),
+                this.cacheManager.get(`${constants_1.Constants.RESET_CODE_PASSWORD}_${input.email}`),
+            ]);
+            if (!code) {
+                throw new common_1.BadRequestException('Code hiện không còn khả dụng');
+            }
+            if (code != input.code) {
+                throw new common_1.BadRequestException('Code không chính xác. Vui lòng nhập lại !');
+            }
+            await Promise.allSettled([
+                this.userService.resetPassword(user, hashPassword),
+                this.cacheManager.del(`${constants_1.Constants.RESET_CODE_PASSWORD}_${input.email}`),
+            ]);
+            return true;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     async signIn(input) {
         try {
             const [long, lat] = [106.6804281, 10.8292385];
@@ -94,12 +120,12 @@ let AuthService = class AuthService {
             }
             const [ttlResetCode, cacheKey, code] = [
                 60 * 15,
-                `reset_code_password_${user.email}`,
+                `${constants_1.Constants.RESET_CODE_PASSWORD}_${user.email}`,
                 (0, utils_1.randomCode)(),
             ];
             const html = code.toString();
             await Promise.all([
-                this.cacheManager.set(cacheKey, utils_1.randomCode, ttlResetCode),
+                this.cacheManager.set(cacheKey, code, ttlResetCode),
                 this.mailService.sendMail(user.email, 'Reset mật khẩu', html),
             ]);
             return true;
@@ -112,7 +138,7 @@ let AuthService = class AuthService {
         try {
             const [ttlResetCode, cacheKey, code] = [
                 60 * 15,
-                `delete_account_code_${user.email}`,
+                `${constants_1.Constants.RESET_CODE_DELETE_ACCOUNT}_${user.email}`,
                 (0, utils_1.randomCode)(),
             ];
             const html = code.toString();
@@ -130,7 +156,7 @@ let AuthService = class AuthService {
         try {
             const [user, cacheValue] = await Promise.all([
                 this.userService.findOne({ email }),
-                this.cacheManager.get(`delete_account_code_${email}`),
+                this.cacheManager.get(`${constants_1.Constants.RESET_CODE_DELETE_ACCOUNT}_${email}`),
             ]);
             if (!cacheValue) {
                 throw new common_1.NotFoundException('Code nhập vào đã hết hạn hoặc không khả dụng');
@@ -140,9 +166,9 @@ let AuthService = class AuthService {
                     throw new common_1.BadRequestException('Code không đúng. Vui lòng nhập lại');
                 }
                 else {
-                    await Promise.all([
+                    await Promise.allSettled([
                         this.userService.findOneAndUpdate({ _id: user._id }, { $set: { isDeleted: true } }),
-                        this.cacheManager.del(`delete_account_code_${email}`),
+                        this.cacheManager.del(`${constants_1.Constants.RESET_CODE_DELETE_ACCOUNT}_${email}`),
                     ]);
                     return true;
                 }

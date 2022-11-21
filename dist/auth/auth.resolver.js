@@ -43,6 +43,9 @@ let AuthResolver = class AuthResolver {
             throw error;
         }
     }
+    resetPassword(input) {
+        return this.authService.resetPassword(input);
+    }
     signInAsAdmin(email, password) {
         return this.authService.signInAsAdmin(email, password);
     }
@@ -95,6 +98,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AuthResolver.prototype, "forgotPassword", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, graphql_1.Args)('input', { type: () => auth_dto_1.ResetPasswordInput })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_dto_1.ResetPasswordInput]),
+    __metadata("design:returntype", Promise)
+], AuthResolver.prototype, "resetPassword", null);
 __decorate([
     (0, graphql_1.Query)(() => auth_entities_1.JwtPayload),
     __param(0, (0, graphql_1.Args)('email')),

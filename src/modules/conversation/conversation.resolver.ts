@@ -7,7 +7,7 @@ import { User } from '../user/entities/user.entities';
 import { ConversationService } from './conversation.service';
 import {
   CreateConversationInput,
-  FilterGetOnerConversation,
+  FilterGetOneConversation,
 } from './dto/create-conversation.input';
 import {
   Conversation,
@@ -20,10 +20,10 @@ export class ConversationResolver {
 
   @Mutation(() => Conversation)
   createConversation(
-    @Args('createConversationInput')
-    createConversationInput: CreateConversationInput,
+    @Args('input')
+    input: CreateConversationInput,
   ) {
-    return this.conversationService.create(createConversationInput);
+    return this.conversationService.create(input);
   }
 
   @UseGuards(AtGuard)
@@ -38,8 +38,8 @@ export class ConversationResolver {
 
   @Query(() => Conversation)
   getOneConversation(
-    @Args('input', { type: () => FilterGetOnerConversation, nullable: true })
-    input: FilterGetOnerConversation,
+    @Args('input', { type: () => FilterGetOneConversation, nullable: true })
+    input: FilterGetOneConversation,
   ) {
     return this.conversationService.findOne(input);
   }

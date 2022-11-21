@@ -102,7 +102,7 @@ input FilterGetAllUser {
   statusActive: StatusActive
 }
 
-input FilterGetOnerConversation {
+input FilterGetOneConversation {
   _id: ObjectID
   members: [ObjectID!]
 }
@@ -175,12 +175,13 @@ type Mutation {
   changeSetting(input: MySettingInput!): Boolean!
   confirmBlockUser(user_id: ObjectID!): Boolean!
   confirmDeleteAccount(code: Float!, email: String!): Boolean!
-  createConversation(createConversationInput: CreateConversationInput!): Conversation!
+  createConversation(input: CreateConversationInput!): Conversation!
   createTag(createTagInput: CreateTagInput!): Boolean!
   declineBlockUser(user_id: ObjectID!): Boolean!
   likeUser(user_id: ObjectID!): Boolean!
   removeMessage(message_id: ObjectID!): Message!
   reportUser(reasonReport: String!, userReport: ObjectID!): Boolean!
+  resetPassword(input: ResetPasswordInput!): Boolean!
   signIn(input: LoginInput!): JwtPayload!
   signUp(input: RegisterInput!): Boolean!
   skipUser(user_id: ObjectID!): Boolean!
@@ -228,7 +229,7 @@ type Query {
   getAllTag(filter: FilterGetAllTag, pagination: PaginationInput): TagResult!
   getAllUser(filter: FilterGetAllUser, pagination: PaginationInput): UserResult!
   getCurrentAddress: Address!
-  getOneConversation(input: FilterGetOnerConversation): Conversation!
+  getOneConversation(input: FilterGetOneConversation): Conversation!
   refreshToken: JwtPayload!
   resetCache: Boolean!
   signInAsAdmin(email: String!, password: String!): JwtPayload!
@@ -245,6 +246,13 @@ type Reports {
   createdAt: DateTime!
   reasonReport: String!
   reportBy: User!
+}
+
+input ResetPasswordInput {
+  code: String!
+  confirmPassword: String!
+  email: String!
+  password: String!
 }
 
 enum SortOption {

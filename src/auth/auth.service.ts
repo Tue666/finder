@@ -10,7 +10,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../modules/user/entities/user.entities';
 import { UserService } from '../modules/user/user.service';
-import { LoginInput, RegisterInput } from './dto/auth.dto';
+import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
 import { JwtPayload, RefreshPayload } from './entities/auth.entities';
 import { Cache } from 'cache-manager';
 import { MailService } from '../modules/mail/mail.service';
@@ -66,6 +66,38 @@ export class AuthService {
     );
   }
 
+  async resetPassword(input: ResetPasswordInput): Promise<boolean> {
+    try {
+      if (input.password != input.confirmPassword) {
+        throw new BadRequestException('Mật khẩu không khớp');
+      }
+      const [user, hashPassword, code] = await Promise.all([
+        this.userService.findOne({ email: input.email }),
+        this.userService.hashPassword(input.password),
+        this.cacheManager.get(
+          `${Constants.RESET_CODE_PASSWORD}_${input.email}`,
+        ),
+      ]);
+      if (!code) {
+        throw new BadRequestException('Code hiện không còn khả dụng');
+      }
+      if (code != input.code) {
+        throw new BadRequestException(
+          'Code không chính xác. Vui lòng nhập lại !',
+        );
+      }
+      await Promise.allSettled([
+        this.userService.resetPassword(user, hashPassword),
+        this.cacheManager.del(
+          `${Constants.RESET_CODE_PASSWORD}_${input.email}`,
+        ),
+      ]);
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async signIn(input: LoginInput): Promise<JwtPayload> {
     try {
       const [long, lat] = [106.6804281, 10.8292385];
@@ -115,12 +147,12 @@ export class AuthService {
       }
       const [ttlResetCode, cacheKey, code] = [
         60 * 15,
-        `reset_code_password_${user.email}`,
+        `${Constants.RESET_CODE_PASSWORD}_${user.email}`,
         randomCode(),
       ];
       const html = code.toString();
       await Promise.all([
-        this.cacheManager.set(cacheKey, randomCode, ttlResetCode),
+        this.cacheManager.set(cacheKey, code, ttlResetCode),
         this.mailService.sendMail(user.email, 'Reset mật khẩu', html),
       ]);
       return true;
@@ -133,7 +165,7 @@ export class AuthService {
     try {
       const [ttlResetCode, cacheKey, code] = [
         60 * 15,
-        `delete_account_code_${user.email}`,
+        `${Constants.RESET_CODE_DELETE_ACCOUNT}_${user.email}`,
         randomCode(),
       ];
       const html = code.toString();
@@ -151,7 +183,9 @@ export class AuthService {
     try {
       const [user, cacheValue] = await Promise.all([
         this.userService.findOne({ email }),
-        this.cacheManager.get(`delete_account_code_${email}`),
+        this.cacheManager.get(
+          `${Constants.RESET_CODE_DELETE_ACCOUNT}_${email}`,
+        ),
       ]);
       if (!cacheValue) {
         throw new NotFoundException(
@@ -161,12 +195,14 @@ export class AuthService {
         if (cacheValue != code) {
           throw new BadRequestException('Code không đúng. Vui lòng nhập lại');
         } else {
-          await Promise.all([
+          await Promise.allSettled([
             this.userService.findOneAndUpdate(
               { _id: user._id },
               { $set: { isDeleted: true } },
             ),
-            this.cacheManager.del(`delete_account_code_${email}`),
+            this.cacheManager.del(
+              `${Constants.RESET_CODE_DELETE_ACCOUNT}_${email}`,
+            ),
           ]);
 
           return true;

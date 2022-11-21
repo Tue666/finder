@@ -10,6 +10,7 @@ export declare class RegisterInput {
     confirmPassword: string;
 }
 export declare class ResetPasswordInput {
+    email: string;
     code: string;
     password: string;
     confirmPassword: string;
