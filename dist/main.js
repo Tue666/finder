@@ -14,7 +14,7 @@ const logger_service_1 = require("./modules/logger/logger.service");
 const fs_1 = __importDefault(require("fs"));
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
-    const dir = '../tmp';
+    const dir = '../../tmp';
     if (!fs_1.default.existsSync(dir)) {
         fs_1.default.mkdirSync(dir);
     }
@@ -25,7 +25,7 @@ async function bootstrap() {
     app.use(express_1.default.urlencoded({ limit: '1mb', extended: true }));
     app.enableCors({
         credentials: true,
-        origin: ['http://localhost:2050'],
+        origin: '*',
     });
     app.use((0, graphqlUploadExpress_js_1.default)({
         maxFiles: 100,

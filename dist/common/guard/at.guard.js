@@ -18,9 +18,9 @@ let AtGuard = class AtGuard extends (0, passport_1.AuthGuard)('jwt') {
     handleRequest(err, user, info) {
         if (err || !user) {
             if (!info) {
-                throw new common_1.UnauthorizedException(err.message);
+                throw new common_1.UnauthorizedException(err);
             }
-            throw new common_1.UnauthorizedException(err.message);
+            throw new common_1.UnauthorizedException(err);
         }
         if (user.isBlocked) {
             throw new common_1.UnauthorizedException('Your account has been blocked');

@@ -12,7 +12,7 @@ export class GraphqlService implements GqlOptionsFactory {
       },
       context: ({ req, res }) => ({ req, res }),
       debug: false,
-      autoSchemaFile: join(process.cwd(), './../tmp/schema.gql'),
+      autoSchemaFile: join(process.cwd(), '../../../tmp/schema.gql'),
       subscriptions: { 'graphql-ws': true },
       sortSchema: true,
       csrfPrevention: true,

@@ -14,9 +14,9 @@ export class AtGuard extends AuthGuard('jwt') {
   handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
       if (!info) {
-        throw new UnauthorizedException(err.message);
+        throw new UnauthorizedException(err);
       }
-      throw new UnauthorizedException(err.message);
+      throw new UnauthorizedException(err);
     }
     if (user.isBlocked) {
       throw new UnauthorizedException('Your account has been blocked');

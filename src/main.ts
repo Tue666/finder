@@ -11,7 +11,7 @@ import fs from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const dir = '../tmp';
+  const dir = '../../tmp';
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
@@ -22,7 +22,7 @@ async function bootstrap() {
   app.use(express.urlencoded({ limit: '1mb', extended: true }));
   app.enableCors({
     credentials: true,
-    origin: ['http://localhost:2050'],
+    origin: '*',
   });
   // app.useGlobalFilters(new GraphQLExceptionFilter());
   app.use(
