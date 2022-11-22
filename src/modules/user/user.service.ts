@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  CACHE_MANAGER,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -24,6 +26,7 @@ import {
 import { MatchRequest, User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
@@ -33,6 +36,7 @@ export class UserService {
     private loggerService: LoggerService,
     private conversationService: ConversationService,
     private userHelper: UserHelper,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
     this.loggerService.setContext('UserService');
   }
@@ -98,6 +102,8 @@ export class UserService {
     user: User,
   ): Promise<UserResult> {
     try {
+      // await this.cacheManager.set('user_fake', user, 86400);
+      user = await this.cacheManager.get('user_fake');
       let maxDistance = user.mySetting.discovery.distance;
       const queryFilter = await this.userHelper.buildQueryWithUser(
         user,
@@ -131,10 +137,10 @@ export class UserService {
             $sort: { maxDistance: 1 },
           },
           {
-            $skip: (pagination?.page - 1) * pagination?.size,
+            $skip: (pagination?.page - 1) * pagination?.size || 0,
           },
           {
-            $limit: pagination?.size,
+            $limit: pagination?.size || 100,
           },
         ]),
         this.userModel.find(queryFilter),

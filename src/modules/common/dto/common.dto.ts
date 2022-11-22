@@ -6,6 +6,6 @@ export class PaginationInput implements IPagination {
   @Field(() => Number, { nullable: true, defaultValue: 0 })
   page: number;
 
-  @Field(() => Number, { nullable: true, defaultValue: 10 })
+  @Field(() => Number, { nullable: true, defaultValue: 100 })
   size: number;
 }

@@ -76,7 +76,11 @@ let UserResolver = class UserResolver {
     getCurrentAddress(user) {
         return this.userHelper.getCurrentAddress(user);
     }
-    getAllUser(pagination, filter, user) {
+    getCurrentUser(user) {
+        return user;
+    }
+    getAllUser(pagination, filter) {
+        const user = null;
         return this.userService.getAllUser(pagination, filter, user);
     }
 };
@@ -198,15 +202,20 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "getCurrentAddress", null);
 __decorate([
-    (0, graphql_1.Query)(() => user_entities_1.UserResult),
+    (0, graphql_1.Query)(() => user_entities_1.User),
     (0, common_1.UseGuards)(at_guard_1.AtGuard),
+    __param(0, (0, getuser_decorators_1.GetUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_entities_1.User]),
+    __metadata("design:returntype", user_entities_1.User)
+], UserResolver.prototype, "getCurrentUser", null);
+__decorate([
+    (0, graphql_1.Query)(() => user_entities_1.UserResult),
     __param(0, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),
     __param(1, (0, graphql_1.Args)('filter', { type: () => create_user_dto_1.FilterGetAllUser, nullable: true })),
-    __param(2, (0, getuser_decorators_1.GetUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [common_dto_1.PaginationInput,
-        create_user_dto_1.FilterGetAllUser,
-        user_entities_1.User]),
+        create_user_dto_1.FilterGetAllUser]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "getAllUser", null);
 UserResolver = __decorate([

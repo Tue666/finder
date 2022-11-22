@@ -8,13 +8,15 @@ import { FilterGetAllUser, FilterGetOneUser, MySettingInput, UpdateUserInput } f
 import { User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
+import { Cache } from 'cache-manager';
 export declare class UserService {
     private userModel;
     private userEmbeddedService;
     private loggerService;
     private conversationService;
     private userHelper;
-    constructor(userModel: UserModelType, userEmbeddedService: UserEmbeddedService, loggerService: LoggerService, conversationService: ConversationService, userHelper: UserHelper);
+    private cacheManager;
+    constructor(userModel: UserModelType, userEmbeddedService: UserEmbeddedService, loggerService: LoggerService, conversationService: ConversationService, userHelper: UserHelper, cacheManager: Cache);
     createWithOAuth2(userGoogle: User): Promise<User>;
     changePassword(oldPassword: string, newPassword: string, user: User): Promise<boolean>;
     resetPassword(user: User, password: string): Promise<boolean>;

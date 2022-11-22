@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
@@ -27,13 +28,15 @@ const logger_service_1 = require("../logger/logger.service");
 const user_embedded_service_1 = require("../user_embedded/user_embedded.service");
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
+const cache_manager_1 = require("cache-manager");
 let UserService = class UserService {
-    constructor(userModel, userEmbeddedService, loggerService, conversationService, userHelper) {
+    constructor(userModel, userEmbeddedService, loggerService, conversationService, userHelper, cacheManager) {
         this.userModel = userModel;
         this.userEmbeddedService = userEmbeddedService;
         this.loggerService = loggerService;
         this.conversationService = conversationService;
         this.userHelper = userHelper;
+        this.cacheManager = cacheManager;
         this.loggerService.setContext('UserService');
     }
     async createWithOAuth2(userGoogle) {
@@ -87,6 +90,7 @@ let UserService = class UserService {
     }
     async getAllUser(pagination, filter, user) {
         try {
+            user = await this.cacheManager.get('user_fake');
             let maxDistance = user.mySetting.discovery.distance;
             const queryFilter = await this.userHelper.buildQueryWithUser(user, filter);
             if (user.mySetting.discovery.onlyShowDistanceThisRange === false) {
@@ -117,10 +121,10 @@ let UserService = class UserService {
                         $sort: { maxDistance: 1 },
                     },
                     {
-                        $skip: ((pagination === null || pagination === void 0 ? void 0 : pagination.page) - 1) * (pagination === null || pagination === void 0 ? void 0 : pagination.size),
+                        $skip: ((pagination === null || pagination === void 0 ? void 0 : pagination.page) - 1) * (pagination === null || pagination === void 0 ? void 0 : pagination.size) || 0,
                     },
                     {
-                        $limit: pagination === null || pagination === void 0 ? void 0 : pagination.size,
+                        $limit: (pagination === null || pagination === void 0 ? void 0 : pagination.size) || 100,
                     },
                 ]),
                 this.userModel.find(queryFilter),
@@ -333,10 +337,11 @@ let UserService = class UserService {
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_entities_1.User.name)),
+    __param(5, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [Object, user_embedded_service_1.UserEmbeddedService,
         logger_service_1.LoggerService,
         conversation_service_1.ConversationService,
-        user_helper_1.UserHelper])
+        user_helper_1.UserHelper, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

@@ -18,6 +18,7 @@ import { RegisterType, RoleEnum } from '../constants/enum';
 import { Constants } from '../constants/constants';
 import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
 import { randomCode } from '../utils/utils';
+import axios from 'axios';
 @Injectable()
 export class AuthService {
   constructor(
@@ -279,5 +280,16 @@ export class AuthService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async verifyTokenGoogle(token: string): Promise<boolean> {
+    const response = await axios.get(
+      `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`,
+    );
+    if (!response.data.email) {
+      throw new UnauthorizedException('Token not accepted');
+    }
+    console.log(response);
+    return true;
   }
 }

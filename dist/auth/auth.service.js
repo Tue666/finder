@@ -11,6 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
@@ -23,6 +26,7 @@ const enum_1 = require("../constants/enum");
 const constants_1 = require("../constants/constants");
 const create_user_dto_1 = require("../modules/user/dto/create-user.dto");
 const utils_1 = require("../utils/utils");
+const axios_1 = __importDefault(require("axios"));
 let AuthService = class AuthService {
     constructor(jwtService, userService, mailService, cacheManager) {
         this.jwtService = jwtService;
@@ -244,6 +248,14 @@ let AuthService = class AuthService {
         catch (error) {
             throw error;
         }
+    }
+    async verifyTokenGoogle(token) {
+        const response = await axios_1.default.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`);
+        if (!response.data.email) {
+            throw new common_1.UnauthorizedException('Token not accepted');
+        }
+        console.log(response);
+        return true;
     }
 };
 AuthService = __decorate([

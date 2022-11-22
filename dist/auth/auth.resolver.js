@@ -35,6 +35,9 @@ let AuthResolver = class AuthResolver {
             throw error;
         }
     }
+    async verifyTokenGoogle(token) {
+        return this.authService.verifyTokenGoogle(token);
+    }
     forgotPassword(email) {
         try {
             return this.authService.forgotPassword(email);
@@ -91,6 +94,13 @@ __decorate([
     __metadata("design:paramtypes", [auth_entities_1.RefreshPayload]),
     __metadata("design:returntype", Promise)
 ], AuthResolver.prototype, "refreshToken", null);
+__decorate([
+    (0, graphql_1.Query)(() => Boolean),
+    __param(0, (0, graphql_1.Args)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], AuthResolver.prototype, "verifyTokenGoogle", null);
 __decorate([
     (0, graphql_1.Query)(() => Boolean),
     __param(0, (0, graphql_1.Args)('email')),

@@ -18,7 +18,7 @@ __decorate([
     __metadata("design:type", Number)
 ], PaginationInput.prototype, "page", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => Number, { nullable: true, defaultValue: 10 }),
+    (0, graphql_1.Field)(() => Number, { nullable: true, defaultValue: 100 }),
     __metadata("design:type", Number)
 ], PaginationInput.prototype, "size", void 0);
 PaginationInput = __decorate([

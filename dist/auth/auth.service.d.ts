@@ -26,4 +26,5 @@ export declare class AuthService {
     loginWithFacebook(req: any): Promise<JwtPayload>;
     loginWithGoogle(req: any): Promise<JwtPayload>;
     resetCache(): Promise<boolean>;
+    verifyTokenGoogle(token: string): Promise<boolean>;
 }

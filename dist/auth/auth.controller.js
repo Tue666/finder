@@ -16,6 +16,7 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const throttler_1 = require("@nestjs/throttler");
+const google_guard_1 = require("../common/guard/google.guard");
 const auth_service_1 = require("./auth.service");
 let AuthController = class AuthController {
     constructor(authService) {
@@ -61,7 +62,7 @@ __decorate([
 ], AuthController.prototype, "facebookAuthRedirect", null);
 __decorate([
     (0, common_1.Get)('/google/callback'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    (0, common_1.UseGuards)(google_guard_1.GoogleGuard),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

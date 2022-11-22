@@ -151,15 +151,22 @@ export class UserResolver {
     return this.userHelper.getCurrentAddress(user);
   }
 
-  @Query(() => UserResult)
+  @Query(() => User)
   @UseGuards(AtGuard)
+  getCurrentUser(@GetUser() user: User): User {
+    return user;
+  }
+
+  @Query(() => UserResult)
+  // @UseGuards(AtGuard)
   getAllUser(
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination: PaginationInput,
     @Args('filter', { type: () => FilterGetAllUser, nullable: true })
     filter: FilterGetAllUser,
-    @GetUser() user: User,
+    // @GetUser() user: User,
   ): Promise<UserResult> {
+    const user = null;
     return this.userService.getAllUser(pagination, filter, user);
   }
 }
