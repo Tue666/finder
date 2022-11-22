@@ -19,6 +19,7 @@ export class FaceBookStrategy extends PassportStrategy(Strategy, 'facebook') {
     profile: any,
     done: VerifyCallback,
   ): Promise<any> {
+    console.log(accessToken);
     const { name, photos, emails } = profile;
     const user = new User();
     user.email = emails[0].value;

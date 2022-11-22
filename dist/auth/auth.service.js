@@ -19,6 +19,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const user_entities_1 = require("../modules/user/entities/user.entities");
 const user_service_1 = require("../modules/user/user.service");
 const cache_manager_1 = require("cache-manager");
 const mail_service_1 = require("../modules/mail/mail.service");
@@ -27,6 +28,8 @@ const constants_1 = require("../constants/constants");
 const create_user_dto_1 = require("../modules/user/dto/create-user.dto");
 const utils_1 = require("../utils/utils");
 const axios_1 = __importDefault(require("axios"));
+const mail_verify_1 = require("../modules/mail/templates/mail.verify");
+const mail_reset_password_1 = require("../modules/mail/templates/mail.reset_password");
 let AuthService = class AuthService {
     constructor(jwtService, userService, mailService, cacheManager) {
         this.jwtService = jwtService;
@@ -112,7 +115,7 @@ let AuthService = class AuthService {
             this.mailService.generateToken(register.email),
         ]);
         const urlConfirm = `${process.env.FRONT_END_URL_CONFIRM_MAIL}?token=${token}`;
-        const html = urlConfirm;
+        const html = mail_verify_1.MailVerifyAccount.createHTML(urlConfirm);
         await this.mailService.sendMail(user.email, constants_1.Constants.VERIFY_ACCOUNT_SUBJECT, html);
         return true;
     }
@@ -127,7 +130,7 @@ let AuthService = class AuthService {
                 `${constants_1.Constants.RESET_CODE_PASSWORD}_${user.email}`,
                 (0, utils_1.randomCode)(),
             ];
-            const html = code.toString();
+            const html = mail_reset_password_1.MailResetPassword.createHTML(user.username || 'User', code.toString());
             await Promise.all([
                 this.cacheManager.set(cacheKey, code, ttlResetCode),
                 this.mailService.sendMail(user.email, 'Reset mật khẩu', html),
@@ -196,9 +199,8 @@ let AuthService = class AuthService {
             throw error;
         }
     }
-    async loginWithOAuth2(req, registerType) {
+    async loginWithOAuth2(user, registerType) {
         try {
-            const user = req.user;
             const [userOAuth2, userNormal] = await Promise.all([
                 this.userService.getOne({
                     email: user.email,
@@ -250,12 +252,40 @@ let AuthService = class AuthService {
         }
     }
     async verifyTokenGoogle(token) {
-        const response = await axios_1.default.get(`https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`);
-        if (!response.data.email) {
-            throw new common_1.UnauthorizedException('Token not accepted');
+        try {
+            const response = await axios_1.default.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+            if (!response.data.email) {
+                throw new common_1.UnauthorizedException('Token not accepted');
+            }
+            const user = new user_entities_1.User();
+            user.email = response.data.email;
+            user.username = response.data.name;
+            user.images = [response.data.picture];
+            user.registerType = enum_1.RegisterType.GOOGLE;
+            user.isConfirmMail = true;
+            return await this.loginWithOAuth2(user, user.registerType);
         }
-        console.log(response);
-        return true;
+        catch (error) {
+            throw error;
+        }
+    }
+    async verifyTokenFacebook(token) {
+        try {
+            const response = await axios_1.default.get(`https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`);
+            if (!response.data.id) {
+                throw new common_1.UnauthorizedException('Token not accepted');
+            }
+            const user = new user_entities_1.User();
+            user.email = response.data.email;
+            user.username = response.data.name;
+            user.images = [response.data.picture.data.url];
+            user.registerType = enum_1.RegisterType.FACEBOOK;
+            user.isConfirmMail = true;
+            return await this.loginWithOAuth2(user, user.registerType);
+        }
+        catch (error) {
+            throw error;
+        }
     }
 };
 AuthService = __decorate([

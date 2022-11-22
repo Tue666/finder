@@ -13,11 +13,9 @@ const passport_1 = require("@nestjs/passport");
 let GoogleGuard = class GoogleGuard extends (0, passport_1.AuthGuard)('google') {
     getRequest(context) {
         const ctx = graphql_1.GqlExecutionContext.create(context);
-        console.log(ctx.getContext().req);
         return ctx.getContext().req;
     }
     handleRequest(err, user, info) {
-        console.log(err);
         if (err || !user) {
             if (!info) {
                 throw new common_1.UnauthorizedException(err);

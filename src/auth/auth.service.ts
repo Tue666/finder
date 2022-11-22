@@ -19,6 +19,8 @@ import { Constants } from '../constants/constants';
 import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
 import { randomCode } from '../utils/utils';
 import axios from 'axios';
+import { MailVerifyAccount } from '../modules/mail/templates/mail.verify';
+import { MailResetPassword } from '../modules/mail/templates/mail.reset_password';
 @Injectable()
 export class AuthService {
   constructor(
@@ -129,7 +131,7 @@ export class AuthService {
       this.mailService.generateToken(register.email),
     ]);
     const urlConfirm = `${process.env.FRONT_END_URL_CONFIRM_MAIL}?token=${token}`;
-    const html = urlConfirm;
+    const html = MailVerifyAccount.createHTML(urlConfirm);
     await this.mailService.sendMail(
       user.email,
       Constants.VERIFY_ACCOUNT_SUBJECT,
@@ -151,7 +153,10 @@ export class AuthService {
         `${Constants.RESET_CODE_PASSWORD}_${user.email}`,
         randomCode(),
       ];
-      const html = code.toString();
+      const html = MailResetPassword.createHTML(
+        user.username || 'User',
+        code.toString(),
+      );
       await Promise.all([
         this.cacheManager.set(cacheKey, code, ttlResetCode),
         this.mailService.sendMail(user.email, 'Reset mật khẩu', html),
@@ -227,9 +232,11 @@ export class AuthService {
     }
   }
 
-  async loginWithOAuth2(req, registerType: RegisterType): Promise<JwtPayload> {
+  async loginWithOAuth2(
+    user: User,
+    registerType: RegisterType,
+  ): Promise<JwtPayload> {
     try {
-      const user = req.user as User;
       const [userOAuth2, userNormal] = await Promise.all([
         this.userService.getOne({
           email: user.email,
@@ -282,14 +289,43 @@ export class AuthService {
     }
   }
 
-  async verifyTokenGoogle(token: string): Promise<boolean> {
-    const response = await axios.get(
-      `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`,
-    );
-    if (!response.data.email) {
-      throw new UnauthorizedException('Token not accepted');
+  async verifyTokenGoogle(token: string): Promise<JwtPayload> {
+    try {
+      const response = await axios.get(
+        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`,
+      );
+      if (!response.data.email) {
+        throw new UnauthorizedException('Token not accepted');
+      }
+      const user = new User();
+      user.email = response.data.email;
+      user.username = response.data.name;
+      user.images = [response.data.picture];
+      user.registerType = RegisterType.GOOGLE;
+      user.isConfirmMail = true;
+      return await this.loginWithOAuth2(user, user.registerType);
+    } catch (error) {
+      throw error;
     }
-    console.log(response);
-    return true;
+  }
+
+  async verifyTokenFacebook(token: string): Promise<JwtPayload> {
+    try {
+      const response = await axios.get(
+        `https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`,
+      );
+      if (!response.data.id) {
+        throw new UnauthorizedException('Token not accepted');
+      }
+      const user = new User();
+      user.email = response.data.email;
+      user.username = response.data.name;
+      user.images = [response.data.picture.data.url];
+      user.registerType = RegisterType.FACEBOOK;
+      user.isConfirmMail = true;
+      return await this.loginWithOAuth2(user, user.registerType);
+    } catch (error) {
+      throw error;
+    }
   }
 }

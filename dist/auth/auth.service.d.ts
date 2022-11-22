@@ -22,9 +22,10 @@ export declare class AuthService {
     deleteAccount(user: User): Promise<boolean>;
     confirmDeleteAccount(code: number, email: string): Promise<boolean>;
     refreshToken(rfPayload: RefreshPayload): Promise<JwtPayload>;
-    loginWithOAuth2(req: any, registerType: RegisterType): Promise<JwtPayload>;
+    loginWithOAuth2(user: User, registerType: RegisterType): Promise<JwtPayload>;
     loginWithFacebook(req: any): Promise<JwtPayload>;
     loginWithGoogle(req: any): Promise<JwtPayload>;
     resetCache(): Promise<boolean>;
-    verifyTokenGoogle(token: string): Promise<boolean>;
+    verifyTokenGoogle(token: string): Promise<JwtPayload>;
+    verifyTokenFacebook(token: string): Promise<JwtPayload>;
 }

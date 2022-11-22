@@ -3,14 +3,11 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GetUser } from '../common/decorators/getuser.decorators';
 import { GetCurrentRefreshToken } from '../common/decorators/refresh.token.decorators';
 import { AtGuard } from '../common/guard/at.guard';
-import { GoogleGuard } from '../common/guard/google.guard';
 import { RtGuard } from '../common/guard/rt.guard';
 import { User } from '../modules/user/entities/user.entities';
 import { AuthService } from './auth.service';
 import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
 import { JwtPayload, RefreshPayload } from './entities/auth.entities';
-import { OAuth2Client } from 'google-auth-library';
-import { AuthGuard } from '@nestjs/passport';
 @Resolver('Auth')
 export class AuthResolver {
   constructor(private authService: AuthService) {}
@@ -27,9 +24,14 @@ export class AuthResolver {
     }
   }
 
-  @Query(() => Boolean)
-  async verifyTokenGoogle(@Args('token') token: string): Promise<boolean> {
+  @Query(() => JwtPayload)
+  async verifyTokenGoogle(@Args('token') token: string): Promise<JwtPayload> {
     return this.authService.verifyTokenGoogle(token);
+  }
+
+  @Query(() => JwtPayload)
+  async verifyTokenFacebook(@Args('token') token: string): Promise<JwtPayload> {
+    return this.authService.verifyTokenFacebook(token);
   }
 
   @Query(() => Boolean)

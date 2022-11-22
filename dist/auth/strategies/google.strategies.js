@@ -25,6 +25,7 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
         });
     }
     async validate(accessToken, refreshToken, profile, done) {
+        console.log(accessToken);
         const { name, emails, photos } = profile;
         const user = new user_entities_1.User();
         user.email = emails[0].value;

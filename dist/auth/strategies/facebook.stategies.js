@@ -25,6 +25,7 @@ let FaceBookStrategy = class FaceBookStrategy extends (0, passport_1.PassportStr
         });
     }
     async validate(accessToken, refreshToken, profile, done) {
+        console.log(accessToken);
         const { name, photos, emails } = profile;
         const user = new user_entities_1.User();
         user.email = emails[0].value;
