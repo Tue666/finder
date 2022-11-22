@@ -25,7 +25,7 @@ __decorate([
     __metadata("design:type", String)
 ], LoginInput.prototype, "password", void 0);
 __decorate([
-    (0, graphql_1.HideField)(),
+    (0, graphql_1.Field)(),
     __metadata("design:type", create_user_dto_1.GeoLocationInput)
 ], LoginInput.prototype, "geoLocation", void 0);
 LoginInput = __decorate([

@@ -4,6 +4,7 @@ import { GetUser } from '../common/decorators/getuser.decorators';
 import { GetCurrentRefreshToken } from '../common/decorators/refresh.token.decorators';
 import { AtGuard } from '../common/guard/at.guard';
 import { RtGuard } from '../common/guard/rt.guard';
+import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
 import { User } from '../modules/user/entities/user.entities';
 import { AuthService } from './auth.service';
 import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
@@ -25,12 +26,18 @@ export class AuthResolver {
   }
 
   @Query(() => JwtPayload)
-  async verifyTokenGoogle(@Args('token') token: string): Promise<JwtPayload> {
+  async verifyTokenGoogle(
+    @Args('token') token: string,
+    @Args('geoInput', { type: () => GeoLocationInput }) input: GeoLocationInput,
+  ): Promise<JwtPayload> {
     return this.authService.verifyTokenGoogle(token);
   }
 
   @Query(() => JwtPayload)
-  async verifyTokenFacebook(@Args('token') token: string): Promise<JwtPayload> {
+  async verifyTokenFacebook(
+    @Args('token') token: string,
+    @Args('geoInput', { type: () => GeoLocationInput }) input: GeoLocationInput,
+  ): Promise<JwtPayload> {
     return this.authService.verifyTokenFacebook(token);
   }
 

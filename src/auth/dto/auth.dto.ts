@@ -11,7 +11,7 @@ export class LoginInput {
   @Field()
   password: string;
 
-  @HideField()
+  @Field()
   geoLocation: GeoLocationInput;
 }
 

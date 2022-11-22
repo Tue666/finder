@@ -314,7 +314,7 @@ export class AuthService {
       const response = await axios.get(
         `https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`,
       );
-      if (!response.data.id) {
+      if (!response.data.email) {
         throw new UnauthorizedException('Token not accepted');
       }
       const user = new User();

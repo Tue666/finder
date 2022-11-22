@@ -272,7 +272,7 @@ let AuthService = class AuthService {
     async verifyTokenFacebook(token) {
         try {
             const response = await axios_1.default.get(`https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`);
-            if (!response.data.id) {
+            if (!response.data.email) {
                 throw new common_1.UnauthorizedException('Token not accepted');
             }
             const user = new user_entities_1.User();

@@ -1,3 +1,4 @@
+import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
 import { User } from '../modules/user/entities/user.entities';
 import { AuthService } from './auth.service';
 import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
@@ -6,8 +7,8 @@ export declare class AuthResolver {
     private authService;
     constructor(authService: AuthService);
     refreshToken(rfPayload: RefreshPayload): Promise<JwtPayload>;
-    verifyTokenGoogle(token: string): Promise<JwtPayload>;
-    verifyTokenFacebook(token: string): Promise<JwtPayload>;
+    verifyTokenGoogle(token: string, input: GeoLocationInput): Promise<JwtPayload>;
+    verifyTokenFacebook(token: string, input: GeoLocationInput): Promise<JwtPayload>;
     forgotPassword(email: string): Promise<boolean>;
     resetPassword(input: ResetPasswordInput): Promise<boolean>;
     signInAsAdmin(email: string, password: string): Promise<JwtPayload>;

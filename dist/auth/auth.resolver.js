@@ -19,6 +19,7 @@ const getuser_decorators_1 = require("../common/decorators/getuser.decorators");
 const refresh_token_decorators_1 = require("../common/decorators/refresh.token.decorators");
 const at_guard_1 = require("../common/guard/at.guard");
 const rt_guard_1 = require("../common/guard/rt.guard");
+const create_user_dto_1 = require("../modules/user/dto/create-user.dto");
 const user_entities_1 = require("../modules/user/entities/user.entities");
 const auth_service_1 = require("./auth.service");
 const auth_dto_1 = require("./dto/auth.dto");
@@ -35,10 +36,10 @@ let AuthResolver = class AuthResolver {
             throw error;
         }
     }
-    async verifyTokenGoogle(token) {
+    async verifyTokenGoogle(token, input) {
         return this.authService.verifyTokenGoogle(token);
     }
-    async verifyTokenFacebook(token) {
+    async verifyTokenFacebook(token, input) {
         return this.authService.verifyTokenFacebook(token);
     }
     forgotPassword(email) {
@@ -100,15 +101,17 @@ __decorate([
 __decorate([
     (0, graphql_1.Query)(() => auth_entities_1.JwtPayload),
     __param(0, (0, graphql_1.Args)('token')),
+    __param(1, (0, graphql_1.Args)('geoInput', { type: () => create_user_dto_1.GeoLocationInput })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, create_user_dto_1.GeoLocationInput]),
     __metadata("design:returntype", Promise)
 ], AuthResolver.prototype, "verifyTokenGoogle", null);
 __decorate([
     (0, graphql_1.Query)(() => auth_entities_1.JwtPayload),
     __param(0, (0, graphql_1.Args)('token')),
+    __param(1, (0, graphql_1.Args)('geoInput', { type: () => create_user_dto_1.GeoLocationInput })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, create_user_dto_1.GeoLocationInput]),
     __metadata("design:returntype", Promise)
 ], AuthResolver.prototype, "verifyTokenFacebook", null);
 __decorate([
