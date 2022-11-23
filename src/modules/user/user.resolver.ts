@@ -120,12 +120,11 @@ export class UserResolver {
   updateLocation(
     @GetUser() user: User,
     @Args('coordinates', {
-      type: () => Number,
+      type: () => [Float],
       description: 'Position 0 is Longitude , 1 is Latitude',
     })
     coordinates: number[],
   ): Promise<boolean> {
-    console.log(coordinates);
     return this.userHelper.setNewInfoAfterLogin(user, coordinates);
   }
 

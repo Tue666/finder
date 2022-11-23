@@ -60,7 +60,6 @@ let UserResolver = class UserResolver {
         return this.userHelper.declineBlockUser(user_id);
     }
     updateLocation(user, coordinates) {
-        console.log(coordinates);
         return this.userHelper.setNewInfoAfterLogin(user, coordinates);
     }
     getAllReportsUser(pagination) {
@@ -177,7 +176,7 @@ __decorate([
     (0, common_1.UseGuards)(at_guard_1.AtGuard),
     __param(0, (0, getuser_decorators_1.GetUser)()),
     __param(1, (0, graphql_1.Args)('coordinates', {
-        type: () => Number,
+        type: () => [graphql_1.Float],
         description: 'Position 0 is Longitude , 1 is Latitude',
     })),
     __metadata("design:type", Function),
