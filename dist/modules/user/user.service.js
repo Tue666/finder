@@ -150,10 +150,6 @@ let UserService = class UserService {
                 throw new common_1.UnauthorizedException('Tài khoản của bạn chưa được xác thực email. Vui lòng xác thực email để tiếp tục');
             }
             this.loggerService.debug('Passed password');
-            await this.userHelper.setNewInfoAfterLogin({
-                coordinates: input.geoLocation.coordinates,
-                user,
-            });
             return user;
         }
         catch (error) {
@@ -327,6 +323,17 @@ let UserService = class UserService {
     }
     async insertManyUser() {
         try {
+            const users = await this.userModel.find();
+            let count = 0;
+            for (let user of users) {
+                if (user.email === undefined) {
+                    user.email = `user${count}@gmail.com`;
+                    user.password = await this.hashPassword('1');
+                    user.isConfirmMail = true;
+                }
+                await user.save();
+                count++;
+            }
             return true;
         }
         catch (error) {

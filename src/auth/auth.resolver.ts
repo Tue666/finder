@@ -34,10 +34,7 @@ export class AuthResolver {
   }
 
   @Query(() => JwtPayload)
-  async verifyTokenFacebook(
-    @Args('token') token: string,
-    @Args('geoInput', { type: () => GeoLocationInput }) input: GeoLocationInput,
-  ): Promise<JwtPayload> {
+  async verifyTokenFacebook(@Args('token') token: string): Promise<JwtPayload> {
     return this.authService.verifyTokenFacebook(token);
   }
 

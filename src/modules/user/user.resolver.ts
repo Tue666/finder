@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Float, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLObjectID } from 'graphql-scalars';
 import { GetUser } from '../../common/decorators/getuser.decorators';
 import { hasRoles } from '../../common/decorators/role.decorators';
@@ -113,6 +113,20 @@ export class UserResolver {
     @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
   ): Promise<boolean> {
     return this.userHelper.declineBlockUser(user_id);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AtGuard)
+  updateLocation(
+    @GetUser() user: User,
+    @Args('coordinates', {
+      type: () => Number,
+      description: 'Position 0 is Longitude , 1 is Latitude',
+    })
+    coordinates: number[],
+  ): Promise<boolean> {
+    console.log(coordinates);
+    return this.userHelper.setNewInfoAfterLogin(user, coordinates);
   }
 
   @Query(() => UserResult)

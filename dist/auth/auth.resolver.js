@@ -39,7 +39,7 @@ let AuthResolver = class AuthResolver {
     async verifyTokenGoogle(token, input) {
         return this.authService.verifyTokenGoogle(token);
     }
-    async verifyTokenFacebook(token, input) {
+    async verifyTokenFacebook(token) {
         return this.authService.verifyTokenFacebook(token);
     }
     forgotPassword(email) {
@@ -109,9 +109,8 @@ __decorate([
 __decorate([
     (0, graphql_1.Query)(() => auth_entities_1.JwtPayload),
     __param(0, (0, graphql_1.Args)('token')),
-    __param(1, (0, graphql_1.Args)('geoInput', { type: () => create_user_dto_1.GeoLocationInput })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, create_user_dto_1.GeoLocationInput]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AuthResolver.prototype, "verifyTokenFacebook", null);
 __decorate([

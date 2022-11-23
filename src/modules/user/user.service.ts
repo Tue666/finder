@@ -172,10 +172,6 @@ export class UserService {
         );
       }
       this.loggerService.debug('Passed password');
-      await this.userHelper.setNewInfoAfterLogin({
-        coordinates: input.geoLocation.coordinates,
-        user,
-      });
       return user;
     } catch (error) {
       throw error;
@@ -408,18 +404,17 @@ export class UserService {
     try {
       // const users = mappingData();
       // await this.userModel.insertMany(users);
-      // const users = await this.userModel.find();
-      // let count = 0;
-      // for (let user of users) {
-      //   console.log(user.email);
-      //   if (user.email === undefined) {
-      //     user.email = `user${count}@email.com`;
-      //     user.password = await this.hashPassword('1');
-      //     user.isConfirmMail = true;
-      //   }
-      //   await user.save();
-      //   count++;
-      // }
+      const users = await this.userModel.find();
+      let count = 0;
+      for (let user of users) {
+        if (user.email === undefined) {
+          user.email = `user${count}@gmail.com`;
+          user.password = await this.hashPassword('1');
+          user.isConfirmMail = true;
+        }
+        await user.save();
+        count++;
+      }
       return true;
     } catch (error) {
       throw error;

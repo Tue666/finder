@@ -59,6 +59,10 @@ let UserResolver = class UserResolver {
     declineBlockUser(user_id) {
         return this.userHelper.declineBlockUser(user_id);
     }
+    updateLocation(user, coordinates) {
+        console.log(coordinates);
+        return this.userHelper.setNewInfoAfterLogin(user, coordinates);
+    }
     getAllReportsUser(pagination) {
         return this.userHelper.getAllReportedUser(pagination);
     }
@@ -168,6 +172,18 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "declineBlockUser", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean),
+    (0, common_1.UseGuards)(at_guard_1.AtGuard),
+    __param(0, (0, getuser_decorators_1.GetUser)()),
+    __param(1, (0, graphql_1.Args)('coordinates', {
+        type: () => Number,
+        description: 'Position 0 is Longitude , 1 is Latitude',
+    })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_entities_1.User, Array]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "updateLocation", null);
 __decorate([
     (0, graphql_1.Query)(() => user_entities_1.UserResult),
     (0, common_1.UseGuards)(at_guard_1.AtGuard, role_guard_1.RolesGuard),

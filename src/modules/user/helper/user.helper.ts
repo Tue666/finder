@@ -58,20 +58,23 @@ export class UserHelper {
     return queryFilter.buildQuery()[0];
   }
 
-  async setNewInfoAfterLogin(newIf: NewInformationAfterLogin): Promise<void> {
+  async setNewInfoAfterLogin(
+    user: User,
+    coordinates: number[],
+  ): Promise<boolean> {
     try {
-      const [location, user] = await Promise.all([
+      const [location, userUpdated] = await Promise.all([
         axios.get(
-          `https://location-api-mu.vercel.app/query?lat=${newIf.coordinates[1]}&lon=${newIf.coordinates[0]}`,
+          `https://location-api-mu.vercel.app/query?lat=${coordinates[1]}&lon=${coordinates[0]}`,
         ),
         this.userModel.findOneAndUpdate(
-          { _id: newIf.user._id },
+          { _id: user._id },
           {
             $set: {
               statusActive: StatusActive.ONLINE,
               lastActive: Date.now(),
               geoLocation: {
-                coordinates: [newIf.coordinates[0], newIf.coordinates[1]],
+                coordinates: [coordinates[0], coordinates[1]],
               },
             },
           },
@@ -79,11 +82,11 @@ export class UserHelper {
       ]);
       this.loggerService.debug(location.data);
       const { city, district, country } = this.handleResponseAddress(location);
-      user.address = new Address();
-      user.address.city = city;
-      user.address.district = district;
-      user.address.country = country;
-      await user.save();
+      userUpdated.address = new Address();
+      userUpdated.address.city = city;
+      userUpdated.address.district = district;
+      userUpdated.address.country = country;
+      return (await userUpdated.save()) ? true : false;
     } catch (error) {
       throw error;
     }

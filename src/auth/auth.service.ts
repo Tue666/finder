@@ -103,9 +103,6 @@ export class AuthService {
 
   async signIn(input: LoginInput): Promise<JwtPayload> {
     try {
-      const [long, lat] = [106.6804281, 10.8292385];
-      input.geoLocation = new GeoLocationInput();
-      input.geoLocation.coordinates = [long, lat];
       const user = await this.userService.signIn(input);
       return await this.generateTokens(user._id.toString());
     } catch (error) {

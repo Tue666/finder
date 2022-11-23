@@ -8,7 +8,7 @@ export declare class AuthResolver {
     constructor(authService: AuthService);
     refreshToken(rfPayload: RefreshPayload): Promise<JwtPayload>;
     verifyTokenGoogle(token: string, input: GeoLocationInput): Promise<JwtPayload>;
-    verifyTokenFacebook(token: string, input: GeoLocationInput): Promise<JwtPayload>;
+    verifyTokenFacebook(token: string): Promise<JwtPayload>;
     forgotPassword(email: string): Promise<boolean>;
     resetPassword(input: ResetPasswordInput): Promise<boolean>;
     signInAsAdmin(email: string, password: string): Promise<JwtPayload>;

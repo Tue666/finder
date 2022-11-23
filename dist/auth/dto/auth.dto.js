@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetPasswordInput = exports.RegisterInput = exports.LoginInput = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const class_validator_1 = require("class-validator");
-const create_user_dto_1 = require("../../modules/user/dto/create-user.dto");
 let LoginInput = class LoginInput {
 };
 __decorate([
@@ -24,10 +23,6 @@ __decorate([
     (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], LoginInput.prototype, "password", void 0);
-__decorate([
-    (0, graphql_1.Field)(),
-    __metadata("design:type", create_user_dto_1.GeoLocationInput)
-], LoginInput.prototype, "geoLocation", void 0);
 LoginInput = __decorate([
     (0, graphql_1.InputType)()
 ], LoginInput);

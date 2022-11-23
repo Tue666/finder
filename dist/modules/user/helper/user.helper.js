@@ -49,27 +49,27 @@ let UserHelper = class UserHelper {
         queryFilter.setFilterItem('_id', { $nin: user_ids }, user._id.toString());
         return queryFilter.buildQuery()[0];
     }
-    async setNewInfoAfterLogin(newIf) {
+    async setNewInfoAfterLogin(user, coordinates) {
         try {
-            const [location, user] = await Promise.all([
-                axios_1.default.get(`https://location-api-mu.vercel.app/query?lat=${newIf.coordinates[1]}&lon=${newIf.coordinates[0]}`),
-                this.userModel.findOneAndUpdate({ _id: newIf.user._id }, {
+            const [location, userUpdated] = await Promise.all([
+                axios_1.default.get(`https://location-api-mu.vercel.app/query?lat=${coordinates[1]}&lon=${coordinates[0]}`),
+                this.userModel.findOneAndUpdate({ _id: user._id }, {
                     $set: {
                         statusActive: enum_1.StatusActive.ONLINE,
                         lastActive: Date.now(),
                         geoLocation: {
-                            coordinates: [newIf.coordinates[0], newIf.coordinates[1]],
+                            coordinates: [coordinates[0], coordinates[1]],
                         },
                     },
                 }),
             ]);
             this.loggerService.debug(location.data);
             const { city, district, country } = this.handleResponseAddress(location);
-            user.address = new user_entities_1.Address();
-            user.address.city = city;
-            user.address.district = district;
-            user.address.country = country;
-            await user.save();
+            userUpdated.address = new user_entities_1.Address();
+            userUpdated.address.city = city;
+            userUpdated.address.district = district;
+            userUpdated.address.country = country;
+            return (await userUpdated.save()) ? true : false;
         }
         catch (error) {
             throw error;

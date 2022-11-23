@@ -25,7 +25,6 @@ const cache_manager_1 = require("cache-manager");
 const mail_service_1 = require("../modules/mail/mail.service");
 const enum_1 = require("../constants/enum");
 const constants_1 = require("../constants/constants");
-const create_user_dto_1 = require("../modules/user/dto/create-user.dto");
 const utils_1 = require("../utils/utils");
 const axios_1 = __importDefault(require("axios"));
 const mail_verify_1 = require("../modules/mail/templates/mail.verify");
@@ -87,9 +86,6 @@ let AuthService = class AuthService {
     }
     async signIn(input) {
         try {
-            const [long, lat] = [106.6804281, 10.8292385];
-            input.geoLocation = new create_user_dto_1.GeoLocationInput();
-            input.geoLocation.coordinates = [long, lat];
             const user = await this.userService.signIn(input);
             return await this.generateTokens(user._id.toString());
         }

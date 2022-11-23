@@ -16,6 +16,7 @@ export declare class UserResolver {
     reportUser(reasonReport: string, user_id: string, user: User): Promise<boolean>;
     confirmBlockUser(user_id: string): Promise<boolean>;
     declineBlockUser(user_id: string): Promise<boolean>;
+    updateLocation(user: User, coordinates: number[]): Promise<boolean>;
     getAllReportsUser(pagination: PaginationInput): Promise<UserResult>;
     statisticUser(pagination: PaginationInput, filter: FilterStatisticUser): Promise<UserResult>;
     createMultiUser(): Promise<boolean>;
