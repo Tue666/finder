@@ -7,7 +7,9 @@ export const UserEmbeddedSchema = new Schema<UserEmbedded>(
   {
     user: { type: Schema.Types.ObjectId, ref: User.name, autopopulate: false },
     unlikeUser: [{ type: Schema.Types.ObjectId }],
-    count: { type: Number, default: 0 },
+    like: [{ type: Schema.Types.ObjectId }],
+    countLike: { type: Number, default: 0 },
+    countUnlike: { type: Number, default: 0 },
   },
   {
     timestamps: true,

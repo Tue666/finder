@@ -49,11 +49,12 @@ export class UserHelper {
         user.mySetting.discovery.minAge,
       );
     }
-    const user_ids: string[] = await this.userEmbeddedService.getAllIdsNotLike(
-      user._id.toString(),
-    );
-    user_ids.push(user._id);
-    console.log(user_ids);
+    const [user_ids_notLike, user_ids_liked] = await Promise.all([
+      this.userEmbeddedService.getAllIdsNotLike(user._id.toString()),
+      this.userEmbeddedService.getAllIdsLiked(user._id.toString()),
+    ]);
+    user_ids_notLike.push(user._id);
+    const user_ids = user_ids_notLike.concat(user_ids_liked);
     queryFilter.setFilterItem('_id', { $nin: user_ids }, user._id.toString());
     return queryFilter.buildQuery()[0];
   }

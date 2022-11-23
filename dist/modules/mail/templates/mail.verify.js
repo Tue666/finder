@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailVerifyAccount = void 0;
 class MailVerifyAccount {
-    static createHTML(link) {
+    static createHTML(otp) {
         return `"<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
@@ -47,7 +47,7 @@ class MailVerifyAccount {
                 color: #000;
               "
             >
-              Welcome,
+              Welcome To Finder
             </h3>
             <div class="image" style="width: 260px; margin: 50px auto">
               <img
@@ -57,17 +57,17 @@ class MailVerifyAccount {
             </div>
             <p style="font-size: 14px; color: #555 !important">
             Quý khách vừa tạo thành công thông tin đăng nhập tài khoản Web Finder của chúng tôi.
-              Nhấn vào đường dẫn dưới đây để xác nhận mail
+              Đây là mã OTP của bạn
             </p>
             <div class="code" style="margin: 20px 0">
-                <a href="${link}" style="display: inline-block;
+                <p style="display: inline-block;
           font-size: 20px;
           background-color: #9BDBF6;
           padding: 4px 28px;
           border-radius: 4px;
           text-decoration: none;
           color: black;
-          ">Verify</a>
+          ">${otp}</p>
             </div>
             <p style="font-size: 10px; color: #555555">
             Dưới đây là một số lưu ý trong suốt quá trình sử dụng tài khoản giúp Quý khách đảm bảo an toàn bảo mật và tránh phát sinh rủi ro <br />

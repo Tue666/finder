@@ -46,4 +46,15 @@ export class UserEmbeddedService {
       throw error;
     }
   }
+
+  async getAllIdsLiked(user_id: string): Promise<string[]> {
+    try {
+      const user_ids: string[] = await this.userEmbeddedModel
+        .find({ user: user_id, countLike: { $gt: 0 } })
+        .distinct('like');
+      return user_ids;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

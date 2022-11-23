@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  CACHE_MANAGER,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,11 +10,15 @@ import * as nodemailer from 'nodemailer';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { Cache } from 'cache-manager';
+import { Constants } from '../../constants/constants';
+
 @Injectable()
 export class MailService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   transporter(): nodemailer.Transporter<SMTPTransport.SentMessageInfo> {
     return nodemailer.createTransport({
@@ -61,14 +67,19 @@ export class MailService {
     }
   }
 
-  async confirmEmail(token: string): Promise<boolean> {
-    const email = await this.decodeConfirmationToken(token);
-    const user = await this.userService.getOne({ email });
+  async confirmEmail(email: string, code: number): Promise<boolean> {
+    const [user, cacheValue] = await Promise.all([
+      this.userService.getOne({ email }),
+      this.cacheManager.get(`${Constants.VERIFY_ACCOUNT_CODE}_${email}`),
+    ]);
     if (!user) {
       throw new UnauthorizedException("This token can't use with email");
     }
     if (user.isConfirmMail) {
-      throw new BadRequestException('Email is confirmed');
+      throw new BadRequestException('Email đã được xác thực');
+    }
+    if (cacheValue !== code) {
+      throw new BadRequestException('Code hiện tại không còn khả dụng !');
     }
     await this.userService.findOneAndUpdate(
       { email },

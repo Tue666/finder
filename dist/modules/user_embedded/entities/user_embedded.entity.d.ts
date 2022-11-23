@@ -3,8 +3,10 @@ import { IUserEmbedded } from '../interfaces/user_embedded';
 export declare class UserEmbedded implements IUserEmbedded {
     _id?: string;
     user: User;
-    count: number;
+    countUnlike: number;
     unlikeUser: string[];
+    countLike: number;
+    like: string[];
     createdAt?: Date;
     updatedAt?: Date;
 }

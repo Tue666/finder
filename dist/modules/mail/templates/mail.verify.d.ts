@@ -1,3 +1,3 @@
 export declare class MailVerifyAccount {
-    static createHTML(link: string): string;
+    static createHTML(otp: string): string;
 }

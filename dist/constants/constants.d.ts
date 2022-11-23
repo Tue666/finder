@@ -14,6 +14,7 @@ export declare class Constants {
     static SOCKET: string;
     static DEFAULT_DISTANCE: number;
     static VERIFY_ACCOUNT_SUBJECT: string;
+    static VERIFY_ACCOUNT_CODE: string;
     static RESET_CODE_DELETE_ACCOUNT: string;
     static RESET_CODE_PASSWORD: string;
 }

@@ -1,3 +1,4 @@
+import { Cache } from 'cache-manager';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
 import { PaginationInput } from '../common/dto/common.dto';
@@ -8,7 +9,6 @@ import { FilterGetAllUser, FilterGetOneUser, MySettingInput, UpdateUserInput } f
 import { User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
-import { Cache } from 'cache-manager';
 export declare class UserService {
     private userModel;
     private userEmbeddedService;

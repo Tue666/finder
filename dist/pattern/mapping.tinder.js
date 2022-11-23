@@ -5619,7 +5619,7 @@ function mappingData() {
                 return;
             }
             user.birthDays = new Date(item.user.birth_date);
-            item.user.photos[0].processedFiles.forEach(image => {
+            item.user.photos.forEach(image => {
                 user.images.push(image.url);
             });
             user.username = item.user.name;

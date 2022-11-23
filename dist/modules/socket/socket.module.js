@@ -17,6 +17,7 @@ const ws_strategies_1 = require("../../auth/strategies/ws.strategies");
 let SocketModule = class SocketModule {
 };
 SocketModule = __decorate([
+    (0, common_1.Global)(),
     (0, common_1.Module)({
         imports: [user_module_1.UserModule, logger_module_1.LoggerModule],
         providers: [socket_service_1.SocketService, chat_gateway_1.ChatGateway, jwt_1.JwtService, ws_strategies_1.WsStrategy],

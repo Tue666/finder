@@ -24,13 +24,21 @@ __decorate([
     __metadata("design:type", user_entities_1.User)
 ], UserEmbedded.prototype, "user", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => Number, { nullable: true }),
+    (0, graphql_1.Field)(() => Number),
     __metadata("design:type", Number)
-], UserEmbedded.prototype, "count", void 0);
+], UserEmbedded.prototype, "countUnlike", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => graphql_scalars_1.GraphQLObjectID, { nullable: true }),
+    (0, graphql_1.Field)(() => [graphql_scalars_1.GraphQLObjectID], { nullable: true }),
     __metadata("design:type", Array)
 ], UserEmbedded.prototype, "unlikeUser", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => Number),
+    __metadata("design:type", Number)
+], UserEmbedded.prototype, "countLike", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => [graphql_scalars_1.GraphQLObjectID], { nullable: true }),
+    __metadata("design:type", Array)
+], UserEmbedded.prototype, "like", void 0);
 __decorate([
     (0, graphql_1.Field)(() => Date),
     __metadata("design:type", Date)

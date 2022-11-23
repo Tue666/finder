@@ -47,6 +47,17 @@ let UserEmbeddedService = class UserEmbeddedService {
             throw error;
         }
     }
+    async getAllIdsLiked(user_id) {
+        try {
+            const user_ids = await this.userEmbeddedModel
+                .find({ user: user_id, countLike: { $gt: 0 } })
+                .distinct('like');
+            return user_ids;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 };
 UserEmbeddedService = __decorate([
     (0, common_1.Injectable)(),

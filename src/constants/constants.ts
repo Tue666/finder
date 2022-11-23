@@ -15,6 +15,7 @@ export class Constants {
   public static SOCKET = 'Socket';
   public static DEFAULT_DISTANCE = 1000000000000;
   public static VERIFY_ACCOUNT_SUBJECT = 'Verify your account';
+  public static VERIFY_ACCOUNT_CODE = 'Verify_your_code';
   public static RESET_CODE_DELETE_ACCOUNT = 'reset_code_delete_account';
   public static RESET_CODE_PASSWORD = 'reset_code_password';
 }

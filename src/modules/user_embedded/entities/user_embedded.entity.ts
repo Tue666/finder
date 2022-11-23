@@ -11,11 +11,16 @@ export class UserEmbedded implements IUserEmbedded {
   @Field(() => User)
   user: User;
 
-  @Field(() => Number, { nullable: true })
-  count: number;
-
-  @Field(() => GraphQLObjectID, { nullable: true })
+  @Field(() => Number)
+  countUnlike: number;
+  @Field(() => [GraphQLObjectID], { nullable: true })
   unlikeUser: string[];
+
+  @Field(() => Number)
+  countLike: number;
+
+  @Field(() => [GraphQLObjectID], { nullable: true })
+  like: string[];
 
   @Field(() => Date)
   createdAt?: Date;

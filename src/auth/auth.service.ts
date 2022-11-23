@@ -123,13 +123,18 @@ export class AuthService {
   }
 
   async signUp(register: RegisterInput): Promise<boolean> {
-    const [user, token] = await Promise.all([
+    const code = randomCode();
+    const [user] = await Promise.all([
       this.userService.signUp(register),
-      this.mailService.generateToken(register.email),
+      this.cacheManager.set(
+        `${Constants.VERIFY_ACCOUNT_CODE}_${register.email}`,
+        code,
+        60 * 15,
+      ),
     ]);
-    const urlConfirm = `${process.env.FRONT_END_URL_CONFIRM_MAIL}?token=${token}`;
-    const html = MailVerifyAccount.createHTML(urlConfirm);
-    await this.mailService.sendMail(
+    const html = MailVerifyAccount.createHTML(code.toString());
+    await Promise.all([]);
+    this.mailService.sendMail(
       user.email,
       Constants.VERIFY_ACCOUNT_SUBJECT,
       html,
@@ -311,11 +316,16 @@ export class AuthService {
       const response = await axios.get(
         `https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`,
       );
+      console.log(response);
       if (!response.data.email) {
         throw new UnauthorizedException('Token not accepted');
       }
       const user = new User();
-      user.email = response.data.email;
+      if (response.data.email) {
+        user.email = response.data.email;
+      } else {
+        user.email = `${response.data.id}@gmail.com`;
+      }
       user.username = response.data.name;
       user.images = [response.data.picture.data.url];
       user.registerType = RegisterType.FACEBOOK;

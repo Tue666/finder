@@ -106,13 +106,14 @@ let AuthService = class AuthService {
         }
     }
     async signUp(register) {
-        const [user, token] = await Promise.all([
+        const code = (0, utils_1.randomCode)();
+        const [user] = await Promise.all([
             this.userService.signUp(register),
-            this.mailService.generateToken(register.email),
+            this.cacheManager.set(`${constants_1.Constants.VERIFY_ACCOUNT_CODE}_${register.email}`, code, 60 * 15),
         ]);
-        const urlConfirm = `${process.env.FRONT_END_URL_CONFIRM_MAIL}?token=${token}`;
-        const html = mail_verify_1.MailVerifyAccount.createHTML(urlConfirm);
-        await this.mailService.sendMail(user.email, constants_1.Constants.VERIFY_ACCOUNT_SUBJECT, html);
+        const html = mail_verify_1.MailVerifyAccount.createHTML(code.toString());
+        await Promise.all([]);
+        this.mailService.sendMail(user.email, constants_1.Constants.VERIFY_ACCOUNT_SUBJECT, html);
         return true;
     }
     async forgotPassword(email) {
@@ -268,11 +269,17 @@ let AuthService = class AuthService {
     async verifyTokenFacebook(token) {
         try {
             const response = await axios_1.default.get(`https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`);
+            console.log(response);
             if (!response.data.email) {
                 throw new common_1.UnauthorizedException('Token not accepted');
             }
             const user = new user_entities_1.User();
-            user.email = response.data.email;
+            if (response.data.email) {
+                user.email = response.data.email;
+            }
+            else {
+                user.email = `${response.data.id}@gmail.com`;
+            }
             user.username = response.data.name;
             user.images = [response.data.picture.data.url];
             user.registerType = enum_1.RegisterType.FACEBOOK;

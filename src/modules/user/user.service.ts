@@ -7,10 +7,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import bcrypt from 'bcrypt';
+import { Cache } from 'cache-manager';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
 import { Constants } from '../../constants/constants';
-import { mappingData } from '../../pattern/mapping.tinder';
 import { throwIfNotExists } from '../../utils/model.utils';
 import { includesInObject } from '../../utils/utils';
 import { PaginationInput } from '../common/dto/common.dto';
@@ -26,7 +26,6 @@ import {
 import { MatchRequest, User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
@@ -104,7 +103,7 @@ export class UserService {
     try {
       // await this.cacheManager.set('user_fake', user, 86400);
       user = await this.cacheManager.get('user_fake');
-      let maxDistance = user.mySetting.discovery.distance;
+      let maxDistance = user.mySetting.discovery.distance * 1000;
       const queryFilter = await this.userHelper.buildQueryWithUser(
         user,
         filter,
@@ -275,7 +274,7 @@ export class UserService {
         },
         {
           $push: { unlikeUser: user_id },
-          $inc: { count: 1 },
+          $inc: { countUnlike: 1 },
           $set: { user: user._id },
         },
         { upsert: true, new: true },
@@ -340,6 +339,18 @@ export class UserService {
           sender: user,
           createdAt: new Date(),
         });
+        await this.userEmbeddedService.findOneAndUpdate(
+          {
+            user: user._id,
+            countLike: { $lt: Constants.MAX_COUNT_IN_USER_EMBEDDED },
+          },
+          {
+            $push: { like: user._id },
+            $inc: { countLike: 1 },
+            $set: { user: user._id },
+          },
+          { upsert: true, new: true },
+        );
       }
       await requestedUser.save();
       return true;

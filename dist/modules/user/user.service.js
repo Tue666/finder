@@ -20,6 +20,7 @@ exports.UserService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const cache_manager_1 = require("cache-manager");
 const constants_1 = require("../../constants/constants");
 const model_utils_1 = require("../../utils/model.utils");
 const utils_1 = require("../../utils/utils");
@@ -28,7 +29,6 @@ const logger_service_1 = require("../logger/logger.service");
 const user_embedded_service_1 = require("../user_embedded/user_embedded.service");
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
-const cache_manager_1 = require("cache-manager");
 let UserService = class UserService {
     constructor(userModel, userEmbeddedService, loggerService, conversationService, userHelper, cacheManager) {
         this.userModel = userModel;
@@ -91,7 +91,7 @@ let UserService = class UserService {
     async getAllUser(pagination, filter, user) {
         try {
             user = await this.cacheManager.get('user_fake');
-            let maxDistance = user.mySetting.discovery.distance;
+            let maxDistance = user.mySetting.discovery.distance * 1000;
             const queryFilter = await this.userHelper.buildQueryWithUser(user, filter);
             if (user.mySetting.discovery.onlyShowDistanceThisRange === false) {
                 maxDistance = constants_1.Constants.DEFAULT_DISTANCE;
@@ -237,7 +237,7 @@ let UserService = class UserService {
                 count: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
             }, {
                 $push: { unlikeUser: user_id },
-                $inc: { count: 1 },
+                $inc: { countUnlike: 1 },
                 $set: { user: user._id },
             }, { upsert: true, new: true });
             return true;
@@ -281,6 +281,14 @@ let UserService = class UserService {
                     sender: user,
                     createdAt: new Date(),
                 });
+                await this.userEmbeddedService.findOneAndUpdate({
+                    user: user._id,
+                    countLike: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
+                }, {
+                    $push: { like: user._id },
+                    $inc: { countLike: 1 },
+                    $set: { user: user._id },
+                }, { upsert: true, new: true });
             }
             await requestedUser.save();
             return true;

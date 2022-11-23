@@ -2,6 +2,8 @@ import { User } from '../../user/entities/user.entities';
 
 export interface IUserEmbedded extends IEntity {
   user: string | User;
-  count: number;
+  countUnlike: number;
   unlikeUser: string[];
+  countLike: number;
+  like: string[];
 }
