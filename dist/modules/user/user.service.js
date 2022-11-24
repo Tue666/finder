@@ -294,7 +294,7 @@ let UserService = class UserService {
                     user: user._id,
                     countLike: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
                 }, {
-                    $push: { like: user._id },
+                    $push: { like: user_id },
                     $inc: { countLike: 1 },
                     $set: { user: user._id },
                 }, { upsert: true, new: true });

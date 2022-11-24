@@ -22,7 +22,6 @@ export class UserHelper {
 
   async buildQueryWithUser(user: User, filter: FilterGetAllUser): Promise<any> {
     const isApplyAge = user.mySetting.discovery.onlyShowAgeThisRange;
-
     const queryFilter: FilterBuilder<User> = new FilterBuilder<User>()
       .setFilterItem('matched', { $in: filter?.matched }, filter?.matched)
       .setFilterItem(
