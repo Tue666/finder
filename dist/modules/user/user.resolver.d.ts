@@ -1,4 +1,5 @@
 import { PaginationInput } from '../common/dto/common.dto';
+import Upload from 'graphql-upload/Upload.js';
 import { FilterGetAllUser, FilterStatisticUser, MySettingInput, UpdateUserInput } from './dto/create-user.dto';
 import { Address, User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
@@ -17,6 +18,7 @@ export declare class UserResolver {
     confirmBlockUser(user_id: string): Promise<boolean>;
     declineBlockUser(user_id: string): Promise<boolean>;
     updateLocation(user: User, coordinates: number[]): Promise<boolean>;
+    uploadFile(file: Upload): Promise<any>;
     getAllReportsUser(pagination: PaginationInput): Promise<UserResult>;
     statisticUser(pagination: PaginationInput, filter: FilterStatisticUser): Promise<UserResult>;
     createMultiUser(): Promise<boolean>;

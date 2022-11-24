@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -13,16 +14,13 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { UserService } from '../user/user.service';
-import { JwtService } from '@nestjs/jwt';
-import { IJwtPayload } from '../../auth/entities/auth.entities';
 import { Cache } from 'cache-manager';
+import { Server, Socket } from 'socket.io';
+import { IJwtPayload } from '../../auth/entities/auth.entities';
+import { WsGuard } from '../../common/guard/ws.guard';
 import { Constants } from '../../constants/constants';
 import { LoggerService } from '../logger/logger.service';
-import { WsGuard } from '../../common/guard/ws.guard';
-import { GetUser } from '../../common/decorators/getuser.decorators';
-import { User } from '../user/entities/user.entities';
+import { UserService } from '../user/user.service';
 
 @WebSocketGateway({ transport: ['websocket'], allowEIO3: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {

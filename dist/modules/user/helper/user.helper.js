@@ -18,18 +18,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserHelper = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
-const filter_query_1 = require("../../../utils/filter.query");
-const user_entities_1 = require("../entities/user.entities");
 const axios_1 = __importDefault(require("axios"));
+const cloudinary_1 = require("cloudinary");
+const constants_1 = require("../../../constants/constants");
 const enum_1 = require("../../../constants/enum");
+const filter_query_1 = require("../../../utils/filter.query");
+const utils_1 = require("../../../utils/utils");
 const logger_service_1 = require("../../logger/logger.service");
 const user_embedded_service_1 = require("../../user_embedded/user_embedded.service");
-const utils_1 = require("../../../utils/utils");
+const user_entities_1 = require("../entities/user.entities");
 let UserHelper = class UserHelper {
     constructor(userModel, loggerService, userEmbeddedService) {
         this.userModel = userModel;
         this.loggerService = loggerService;
         this.userEmbeddedService = userEmbeddedService;
+        this.CloudinaryProvider = {
+            provide: constants_1.Constants.CLOUDINARY,
+            useFactory: () => {
+                return cloudinary_1.v2.config({
+                    cloud_name: process.env.CLOUD_NAME,
+                    api_key: process.env.API_KEY_CLOUD,
+                    api_secret: process.env.API_SECRET_CLOUD,
+                });
+            },
+        };
     }
     async buildQueryWithUser(user, filter) {
         const isApplyAge = user.mySetting.discovery.onlyShowAgeThisRange;
@@ -158,6 +170,25 @@ let UserHelper = class UserHelper {
         }
         catch (error) {
             throw error;
+        }
+    }
+    async uploadImage({ stream }) {
+        try {
+            await new Promise((resolve, reject) => {
+                const streamLoad = cloudinary_1.v2.uploader.upload_stream(function (error, result) {
+                    if (result) {
+                        const resultUrl = result.secure_url;
+                        resolve(resultUrl);
+                    }
+                    else {
+                        reject(error);
+                    }
+                });
+                stream.pipe(streamLoad);
+            });
+        }
+        catch (err) {
+            throw new common_1.BadRequestException(`Failed to upload profile picture ! Err:${err.message}`);
         }
     }
 };

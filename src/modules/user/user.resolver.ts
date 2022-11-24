@@ -8,6 +8,9 @@ import { RolesGuard } from '../../common/guard/role.guard';
 import { Constants } from '../../constants/constants';
 import { RoleEnum } from '../../constants/enum';
 import { PaginationInput } from '../common/dto/common.dto';
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+import Upload from 'graphql-upload/Upload.js';
+
 import {
   FilterGetAllUser,
   FilterStatisticUser,
@@ -126,6 +129,16 @@ export class UserResolver {
     coordinates: number[],
   ): Promise<boolean> {
     return this.userHelper.setNewInfoAfterLogin(user, coordinates);
+  }
+
+  @Mutation(() => String)
+  async uploadFile(
+    @Args({ name: 'file', type: () => GraphQLUpload }) file: Upload,
+  ): Promise<any> {
+    const { createReadStream } = await file;
+    const stream = createReadStream();
+    const url = await this.userHelper.uploadImage({ stream });
+    return url;
   }
 
   @Query(() => UserResult)

@@ -1,9 +1,9 @@
-import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
-import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
+import { OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
 import { Cache } from 'cache-manager';
+import { Socket } from 'socket.io';
 import { LoggerService } from '../logger/logger.service';
+import { UserService } from '../user/user.service';
 export declare class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private userService;
     private cacheManager;

@@ -132,6 +132,26 @@ export class UserService {
               reports: 0,
             },
           },
+          { $unwind: '$tags' },
+          {
+            $lookup: {
+              from: 'tags',
+              localField: 'tags',
+              foreignField: '_id',
+              as: 'tags',
+            },
+          },
+          {
+            $set: {
+              'users.tags': '$tags',
+            },
+          },
+          {
+            $group: {
+              _id: '$_id',
+              tags: { $push: '$tags' },
+            },
+          },
           {
             $sort: { maxDistance: 1 },
           },

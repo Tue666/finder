@@ -11,6 +11,8 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const constants_1 = require("../../constants/constants");
 const string_utils_1 = require("../../utils/string.utils");
+const cloudinary_provider_1 = require("../common/cloudinary/cloudinary.provider");
+const cloudinary_service_1 = require("../common/cloudinary/cloudinary.service");
 const conversation_module_1 = require("../conversation/conversation.module");
 const logger_module_1 = require("../logger/logger.module");
 const user_embedded_module_1 = require("../user_embedded/user_embedded.module");
@@ -49,7 +51,13 @@ UserModule = __decorate([
             logger_module_1.LoggerModule,
             conversation_module_1.ConversationModule,
         ],
-        providers: [user_resolver_1.UserResolver, user_service_1.UserService, user_helper_1.UserHelper],
+        providers: [
+            user_resolver_1.UserResolver,
+            user_service_1.UserService,
+            user_helper_1.UserHelper,
+            cloudinary_service_1.CloudinaryService,
+            cloudinary_provider_1.CloudinaryProvider,
+        ],
         exports: [user_service_1.UserService],
     })
 ], UserModule);

@@ -29,6 +29,7 @@ export interface IUser extends IEntity {
   geoLocation: IGeoLocation;
   lastActive: Date;
   isConfirmMail: boolean;
+  isFirstLogin: boolean;
   role?: RoleEnum;
   registerType?: RegisterType;
   mySetting: IMySetting;

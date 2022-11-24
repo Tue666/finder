@@ -90,6 +90,7 @@ exports.UserSchema = new mongoose_1.Schema({
     geoLocation: { type: exports.GeoLocationSchema },
     lastActive: { type: Date, default: new Date() },
     isDeleted: { type: Boolean, default: false },
+    isFirstLogin: { type: Boolean, default: false },
     isConfirmMail: { type: Boolean, default: false },
     matchRequest: { type: [exports.MatchRequestSchema], default: [] },
     reports: [{ type: exports.ReportsSchema, default: [] }],

@@ -17,6 +17,7 @@ export declare class Constants {
     static VERIFY_ACCOUNT_CODE: string;
     static RESET_CODE_DELETE_ACCOUNT: string;
     static RESET_CODE_PASSWORD: string;
+    static CLOUDINARY: string;
 }
 export declare type SortQuery = {
     [key: string]: SortOrder;

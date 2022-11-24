@@ -1,20 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterBuilder } from '../../../utils/filter.query';
-import {
-  FilterGetAllUser,
-  FilterStatisticUser,
-  NewInformationAfterLogin,
-} from '../dto/create-user.dto';
-import { Address, User, UserResult } from '../entities/user.entities';
-import { UserModelType } from '../schema/user.schema';
 import axios from 'axios';
+import { v2 } from 'cloudinary';
+import { Constants } from '../../../constants/constants';
 import { RoleEnum, StatusActive } from '../../../constants/enum';
+import { FilterBuilder } from '../../../utils/filter.query';
+import { setFilterByDate } from '../../../utils/utils';
+import { PaginationInput } from '../../common/dto/common.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { UserEmbeddedService } from '../../user_embedded/user_embedded.service';
-import { PaginationInput } from '../../common/dto/common.dto';
-import { setFilterByDate } from '../../../utils/utils';
-
+import { FilterGetAllUser, FilterStatisticUser } from '../dto/create-user.dto';
+import { Address, User, UserResult } from '../entities/user.entities';
+import { UserModelType } from '../schema/user.schema';
 @Injectable()
 export class UserHelper {
   constructor(
@@ -189,4 +186,35 @@ export class UserHelper {
       throw error;
     }
   }
+
+  async uploadImage({ stream }): Promise<any> {
+    try {
+      await new Promise((resolve, reject) => {
+        const streamLoad = v2.uploader.upload_stream(function (error, result) {
+          if (result) {
+            const resultUrl = result.secure_url;
+            resolve(resultUrl);
+          } else {
+            reject(error);
+          }
+        });
+        stream.pipe(streamLoad);
+      });
+    } catch (err) {
+      throw new BadRequestException(
+        `Failed to upload profile picture ! Err:${err.message}`,
+      );
+    }
+  }
+
+  CloudinaryProvider = {
+    provide: Constants.CLOUDINARY,
+    useFactory: (): any => {
+      return v2.config({
+        cloud_name: process.env.CLOUD_NAME,
+        api_key: process.env.API_KEY_CLOUD,
+        api_secret: process.env.API_SECRET_CLOUD,
+      });
+    },
+  };
 }

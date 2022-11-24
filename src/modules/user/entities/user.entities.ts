@@ -171,6 +171,9 @@ export class User implements IUser {
   @Field(() => Boolean)
   isDeleted: boolean;
 
+  @Field(() => Boolean)
+  isFirstLogin: boolean;
+
   @Field(() => Date, { nullable: true })
   createdAt: Date;
 

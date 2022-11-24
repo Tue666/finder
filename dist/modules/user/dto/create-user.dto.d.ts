@@ -17,6 +17,7 @@ export declare class UpdateUserInput implements IUserUpdate {
     school: string;
     company: string;
     aboutMe: string;
+    isFirstLogin: boolean;
 }
 export declare class DiscoverySettingsInput implements IDiscoverySettings {
     minAge: number;

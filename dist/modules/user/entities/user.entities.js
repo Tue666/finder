@@ -229,6 +229,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], User.prototype, "isDeleted", void 0);
 __decorate([
+    (0, graphql_1.Field)(() => Boolean),
+    __metadata("design:type", Boolean)
+], User.prototype, "isFirstLogin", void 0);
+__decorate([
     (0, graphql_1.Field)(() => Date, { nullable: true }),
     __metadata("design:type", Date)
 ], User.prototype, "createdAt", void 0);

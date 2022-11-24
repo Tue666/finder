@@ -15,14 +15,14 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatGateway = void 0;
 const common_1 = require("@nestjs/common");
-const websockets_1 = require("@nestjs/websockets");
-const socket_io_1 = require("socket.io");
-const user_service_1 = require("../user/user.service");
 const jwt_1 = require("@nestjs/jwt");
+const websockets_1 = require("@nestjs/websockets");
 const cache_manager_1 = require("cache-manager");
+const socket_io_1 = require("socket.io");
+const ws_guard_1 = require("../../common/guard/ws.guard");
 const constants_1 = require("../../constants/constants");
 const logger_service_1 = require("../logger/logger.service");
-const ws_guard_1 = require("../../common/guard/ws.guard");
+const user_service_1 = require("../user/user.service");
 let ChatGateway = class ChatGateway {
     constructor(userService, cacheManager, jwtService, loggerService) {
         this.userService = userService;

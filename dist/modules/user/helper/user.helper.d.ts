@@ -1,9 +1,9 @@
+import { PaginationInput } from '../../common/dto/common.dto';
+import { LoggerService } from '../../logger/logger.service';
+import { UserEmbeddedService } from '../../user_embedded/user_embedded.service';
 import { FilterGetAllUser, FilterStatisticUser } from '../dto/create-user.dto';
 import { Address, User, UserResult } from '../entities/user.entities';
 import { UserModelType } from '../schema/user.schema';
-import { LoggerService } from '../../logger/logger.service';
-import { UserEmbeddedService } from '../../user_embedded/user_embedded.service';
-import { PaginationInput } from '../../common/dto/common.dto';
 export declare class UserHelper {
     private userModel;
     private loggerService;
@@ -17,4 +17,11 @@ export declare class UserHelper {
     declineBlockUser(_id: string): Promise<boolean>;
     getAllReportedUser(pagination: PaginationInput): Promise<UserResult>;
     statisticUser(pagination: PaginationInput, filter: FilterStatisticUser): Promise<UserResult>;
+    uploadImage({ stream }: {
+        stream: any;
+    }): Promise<any>;
+    CloudinaryProvider: {
+        provide: string;
+        useFactory: () => any;
+    };
 }

@@ -76,6 +76,10 @@ __decorate([
     (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], UpdateUserInput.prototype, "aboutMe", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => Boolean, { nullable: true }),
+    __metadata("design:type", Boolean)
+], UpdateUserInput.prototype, "isFirstLogin", void 0);
 UpdateUserInput = __decorate([
     (0, graphql_1.InputType)()
 ], UpdateUserInput);

@@ -18,5 +18,6 @@ export class Constants {
   public static VERIFY_ACCOUNT_CODE = 'Verify_your_code';
   public static RESET_CODE_DELETE_ACCOUNT = 'reset_code_delete_account';
   public static RESET_CODE_PASSWORD = 'reset_code_password';
+  public static CLOUDINARY = 'Cloudinary';
 }
 export type SortQuery = { [key: string]: SortOrder };

@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Constants } from '../../constants/constants';
 import { toKeyword, toSlug } from '../../utils/string.utils';
+import { CloudinaryProvider } from '../common/cloudinary/cloudinary.provider';
+import { CloudinaryService } from '../common/cloudinary/cloudinary.service';
 import { ConversationModule } from '../conversation/conversation.module';
 import { LoggerModule } from '../logger/logger.module';
 import { UserEmbeddedModule } from '../user_embedded/user_embedded.module';
@@ -38,7 +40,13 @@ import { UserService } from './user.service';
     LoggerModule,
     ConversationModule,
   ],
-  providers: [UserResolver, UserService, UserHelper],
+  providers: [
+    UserResolver,
+    UserService,
+    UserHelper,
+    CloudinaryService,
+    CloudinaryProvider,
+  ],
   exports: [UserService],
 })
 export class UserModule {}

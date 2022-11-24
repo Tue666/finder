@@ -66,6 +66,9 @@ export class UpdateUserInput implements IUserUpdate {
 
   @Field({ nullable: true })
   aboutMe: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isFirstLogin: boolean;
 }
 
 @InputType()

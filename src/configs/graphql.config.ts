@@ -2,6 +2,8 @@ import { ApolloDriverConfig } from '@nestjs/apollo';
 import { Injectable } from '@nestjs/common';
 import { GqlOptionsFactory } from '@nestjs/graphql';
 import { join } from 'path';
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.js';
+
 @Injectable()
 export class GraphqlService implements GqlOptionsFactory {
   async createGqlOptions(): Promise<ApolloDriverConfig> {
@@ -16,6 +18,9 @@ export class GraphqlService implements GqlOptionsFactory {
       subscriptions: { 'graphql-ws': true },
       sortSchema: true,
       cache: 'bounded',
+      resolvers: {
+        Upload: GraphQLUpload,
+      },
       playground: true,
       introspection: true,
       formatError: (error: any) => {

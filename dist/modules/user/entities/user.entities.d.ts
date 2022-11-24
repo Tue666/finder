@@ -58,6 +58,7 @@ export declare class User implements IUser {
     company: string;
     aboutMe: string;
     isDeleted: boolean;
+    isFirstLogin: boolean;
     createdAt: Date;
     updatedAt: Date;
     slug?: string;

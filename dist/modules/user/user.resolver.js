@@ -11,6 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserResolver = void 0;
 const common_1 = require("@nestjs/common");
@@ -23,6 +27,8 @@ const role_guard_1 = require("../../common/guard/role.guard");
 const constants_1 = require("../../constants/constants");
 const enum_1 = require("../../constants/enum");
 const common_dto_1 = require("../common/dto/common.dto");
+const GraphQLUpload_js_1 = __importDefault(require("graphql-upload/GraphQLUpload.js"));
+const Upload_js_1 = __importDefault(require("graphql-upload/Upload.js"));
 const create_user_dto_1 = require("./dto/create-user.dto");
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
@@ -61,6 +67,12 @@ let UserResolver = class UserResolver {
     }
     updateLocation(user, coordinates) {
         return this.userHelper.setNewInfoAfterLogin(user, coordinates);
+    }
+    async uploadFile(file) {
+        const { createReadStream } = await file;
+        const stream = createReadStream();
+        const url = await this.userHelper.uploadImage({ stream });
+        return url;
     }
     getAllReportsUser(pagination) {
         return this.userHelper.getAllReportedUser(pagination);
@@ -183,6 +195,13 @@ __decorate([
     __metadata("design:paramtypes", [user_entities_1.User, Array]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "updateLocation", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => String),
+    __param(0, (0, graphql_1.Args)({ name: 'file', type: () => GraphQLUpload_js_1.default })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_a = typeof Upload_js_1.default !== "undefined" && Upload_js_1.default) === "function" ? _a : Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "uploadFile", null);
 __decorate([
     (0, graphql_1.Query)(() => user_entities_1.UserResult),
     (0, common_1.UseGuards)(at_guard_1.AtGuard, role_guard_1.RolesGuard),
