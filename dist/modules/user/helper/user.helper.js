@@ -48,6 +48,7 @@ let UserHelper = class UserHelper {
         const queryFilter = new filter_query_1.FilterBuilder()
             .setFilterItem('matched', { $in: filter === null || filter === void 0 ? void 0 : filter.matched }, filter === null || filter === void 0 ? void 0 : filter.matched)
             .setFilterItem('statusActive', { $eq: filter === null || filter === void 0 ? void 0 : filter.statusActive }, filter === null || filter === void 0 ? void 0 : filter.statusActive)
+            .setFilterItem('isFirstLogin', { $eq: false }, 'true')
             .setFilterItem('showMeTinder', { $eq: user.showMeTinder }, user.showMeTinder);
         if (isApplyAge) {
             queryFilter.setFilterItem('age', {

@@ -116,26 +116,6 @@ let UserService = class UserService {
                             reports: 0,
                         },
                     },
-                    { $unwind: '$tags' },
-                    {
-                        $lookup: {
-                            from: 'tags',
-                            localField: 'tags',
-                            foreignField: '_id',
-                            as: 'tags',
-                        },
-                    },
-                    {
-                        $set: {
-                            'users.tags': '$tags',
-                        },
-                    },
-                    {
-                        $group: {
-                            _id: '$_id',
-                            tags: { $push: '$tags' },
-                        },
-                    },
                     {
                         $sort: { maxDistance: 1 },
                     },
@@ -146,7 +126,17 @@ let UserService = class UserService {
                         $limit: (pagination === null || pagination === void 0 ? void 0 : pagination.size) || 100,
                     },
                 ]),
-                this.userModel.find(queryFilter),
+                this.userModel.aggregate([
+                    {
+                        $geoNear: {
+                            near: { type: 'Point', coordinates: [106.6510748, 10.7715686] },
+                            spherical: true,
+                            distanceField: 'calcDistance',
+                            maxDistance: maxDistance,
+                            query: queryFilter,
+                        },
+                    },
+                ]),
             ]);
             return { results, totalCount: totalCount.length };
         }
@@ -353,11 +343,7 @@ let UserService = class UserService {
             const users = await this.userModel.find();
             let count = 0;
             for (let user of users) {
-                if (user.email === undefined) {
-                    user.email = `user${count}@gmail.com`;
-                    user.password = await this.hashPassword('1');
-                    user.isConfirmMail = true;
-                }
+                user.isFirstLogin = false;
                 await user.save();
                 count++;
             }

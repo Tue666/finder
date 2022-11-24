@@ -81,10 +81,13 @@ export class MailService {
     if (cacheValue !== code) {
       throw new BadRequestException('Code hiện tại không còn khả dụng !');
     }
-    await this.userService.findOneAndUpdate(
-      { email },
-      { $set: { isConfirmMail: true } },
-    );
+    await Promise.all([
+      this.userService.findOneAndUpdate(
+        { email },
+        { $set: { isConfirmMail: true } },
+      ),
+      this.cacheManager.del(`${Constants.VERIFY_ACCOUNT_CODE}_${email}`),
+    ]);
     return true;
   }
 }

@@ -101,8 +101,6 @@ export class UserService {
     user: User,
   ): Promise<UserResult> {
     try {
-      // await this.cacheManager.set('user_fake', user, 86400);
-      // user = await this.cacheManager.get('user_fake');
       let maxDistance = user.mySetting.discovery.distance * 1000;
       const queryFilter = await this.userHelper.buildQueryWithUser(
         user,
@@ -132,26 +130,6 @@ export class UserService {
               reports: 0,
             },
           },
-          { $unwind: '$tags' },
-          {
-            $lookup: {
-              from: 'tags',
-              localField: 'tags',
-              foreignField: '_id',
-              as: 'tags',
-            },
-          },
-          {
-            $set: {
-              'users.tags': '$tags',
-            },
-          },
-          {
-            $group: {
-              _id: '$_id',
-              tags: { $push: '$tags' },
-            },
-          },
           {
             $sort: { maxDistance: 1 },
           },
@@ -162,7 +140,17 @@ export class UserService {
             $limit: pagination?.size || 100,
           },
         ]),
-        this.userModel.find(queryFilter),
+        this.userModel.aggregate([
+          {
+            $geoNear: {
+              near: { type: 'Point', coordinates: [106.6510748, 10.7715686] },
+              spherical: true,
+              distanceField: 'calcDistance',
+              maxDistance: maxDistance,
+              query: queryFilter,
+            },
+          },
+        ]),
       ]);
       return { results, totalCount: totalCount.length };
     } catch (error) {
@@ -438,11 +426,12 @@ export class UserService {
       const users = await this.userModel.find();
       let count = 0;
       for (let user of users) {
-        if (user.email === undefined) {
-          user.email = `user${count}@gmail.com`;
-          user.password = await this.hashPassword('1');
-          user.isConfirmMail = true;
-        }
+        // if (user.email === undefined) {
+        //   user.email = `user${count}@gmail.com`;
+        //   user.password = await this.hashPassword('1');
+        //   user.isConfirmMail = true;
+        // }
+        user.isFirstLogin = false;
         await user.save();
         count++;
       }

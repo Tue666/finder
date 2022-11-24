@@ -30,6 +30,7 @@ export class UserHelper {
         { $eq: filter?.statusActive },
         filter?.statusActive,
       )
+      .setFilterItem('isFirstLogin', { $eq: false }, 'true')
       .setFilterItem(
         'showMeTinder',
         { $eq: user.showMeTinder },
