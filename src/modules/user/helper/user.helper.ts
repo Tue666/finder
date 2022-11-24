@@ -189,7 +189,7 @@ export class UserHelper {
 
   async uploadImage({ stream }): Promise<any> {
     try {
-      await new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         const streamLoad = v2.uploader.upload_stream(function (error, result) {
           if (result) {
             const resultUrl = result.secure_url;

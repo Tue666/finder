@@ -184,15 +184,14 @@ export class UserResolver {
   }
 
   @Query(() => UserResult)
-  // @UseGuards(AtGuard)
+  @UseGuards(AtGuard)
   getAllUser(
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination: PaginationInput,
     @Args('filter', { type: () => FilterGetAllUser, nullable: true })
     filter: FilterGetAllUser,
-    // @GetUser() user: User,
+    @GetUser() user: User,
   ): Promise<UserResult> {
-    const user = null;
     return this.userService.getAllUser(pagination, filter, user);
   }
 }

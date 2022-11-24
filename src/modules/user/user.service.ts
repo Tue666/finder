@@ -102,7 +102,7 @@ export class UserService {
   ): Promise<UserResult> {
     try {
       // await this.cacheManager.set('user_fake', user, 86400);
-      user = await this.cacheManager.get('user_fake');
+      // user = await this.cacheManager.get('user_fake');
       let maxDistance = user.mySetting.discovery.distance * 1000;
       const queryFilter = await this.userHelper.buildQueryWithUser(
         user,

@@ -90,7 +90,6 @@ let UserService = class UserService {
     }
     async getAllUser(pagination, filter, user) {
         try {
-            user = await this.cacheManager.get('user_fake');
             let maxDistance = user.mySetting.discovery.distance * 1000;
             const queryFilter = await this.userHelper.buildQueryWithUser(user, filter);
             if (user.mySetting.discovery.onlyShowDistanceThisRange === false) {
