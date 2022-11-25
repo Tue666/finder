@@ -9,7 +9,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { LoggerService } from './modules/logger/logger.service';
 import fs from 'fs';
 import { configure as serverlessExpress } from '@vendia/serverless-express';
-import serverless from 'serverless-http';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -33,21 +32,6 @@ async function bootstrap() {
       maxFileSize: 10000000, // 10 MB,
     }),
   );
-  app.useLogger(new LoggerService());
-  return app;
+  await app.listen(2000);
 }
-export const bootstrapServerless = async () => {
-  const app = await bootstrap();
-  const globalPrefix = '.netlify/functions/main';
-  app.setGlobalPrefix(globalPrefix);
-
-  await app.init();
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverless(expressApp);
-};
-
-let server;
-export const handler = async (event, context, callback) => {
-  server = server ?? (await bootstrapServerless());
-  return server(event, context, callback);
-};
+bootstrap();
