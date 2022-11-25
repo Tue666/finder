@@ -46,6 +46,7 @@ let TagService = class TagService {
         return { results, totalCount };
     }
     findOne(id) {
+        console.log('a');
         return `This action returns a #${id} tag`;
     }
     async createTagPassion() {

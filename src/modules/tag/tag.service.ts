@@ -55,6 +55,7 @@ export class TagService {
   }
 
   findOne(id: number) {
+    console.log('a');
     return `This action returns a #${id} tag`;
   }
 
