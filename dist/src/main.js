@@ -13,7 +13,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const common_1 = require("@nestjs/common");
 const logger_service_1 = require("./modules/logger/logger.service");
 const fs_1 = __importDefault(require("fs"));
-const serverless_express_1 = require("@vendia/serverless-express");
+const serverless_http_1 = __importDefault(require("serverless-http"));
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const dir = '../../tmp';
@@ -40,11 +40,9 @@ const bootstrapServerless = async () => {
     const app = await bootstrap();
     const globalPrefix = '.netlify/functions/main';
     app.setGlobalPrefix(globalPrefix);
-    console.log('Run');
     await app.init();
     const expressApp = app.getHttpAdapter().getInstance();
-    console.log(app);
-    return (0, serverless_express_1.configure)({ app: expressApp });
+    return (0, serverless_http_1.default)(expressApp);
 };
 exports.bootstrapServerless = bootstrapServerless;
 async function startServer() {
