@@ -9,6 +9,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { LoggerService } from './modules/logger/logger.service';
 import fs from 'fs';
 import { configure as serverlessExpress } from '@vendia/serverless-express';
+import serverless from 'serverless-http';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,12 +43,11 @@ export const bootstrapServerless = async () => {
 
   await app.init();
   const expressApp = app.getHttpAdapter().getInstance();
-  return serverlessExpress({ app: expressApp });
+  return serverless(expressApp);
 };
 
-async function startServer() {
-  const app = await bootstrap();
-  await app.listen(2000);
-}
-
-startServer();
+let server;
+export const handler = async (event, context, callback) => {
+  server = server ?? (await bootstrapServerless());
+  return server(event, context, callback);
+};
