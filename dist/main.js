@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.bootstrapServerless = void 0;
 require("dotenv/config");
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
@@ -12,6 +13,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const common_1 = require("@nestjs/common");
 const logger_service_1 = require("./modules/logger/logger.service");
 const fs_1 = __importDefault(require("fs"));
+const serverless_express_1 = require("@vendia/serverless-express");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const dir = '../../tmp';
@@ -32,7 +34,20 @@ async function bootstrap() {
         maxFileSize: 10000000,
     }));
     app.useLogger(new logger_service_1.LoggerService());
-    await app.listen(process.env.PORT || 2000);
+    return app;
 }
-bootstrap();
+const bootstrapServerless = async () => {
+    const app = await bootstrap();
+    const globalPrefix = '.netlify/functions/main';
+    app.setGlobalPrefix(globalPrefix);
+    await app.init();
+    const expressApp = app.getHttpAdapter().getInstance();
+    return (0, serverless_express_1.configure)({ app: expressApp });
+};
+exports.bootstrapServerless = bootstrapServerless;
+async function startServer() {
+    const app = await bootstrap();
+    await app.listen(2000);
+}
+startServer();
 //# sourceMappingURL=main.js.map

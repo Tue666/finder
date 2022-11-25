@@ -8107,6 +8107,8 @@ function mappingDataDietaryPreference() {
         'Chỉ ăn thịt',
         'Không ăn kiêng',
     ];
+    console.log('a');
+    console.log('b');
     const tags = [];
     diets.forEach(item => {
         const tag = new tag_entity_1.Tag();
