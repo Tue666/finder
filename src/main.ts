@@ -39,7 +39,7 @@ export const bootstrapServerless = async () => {
   const app = await bootstrap();
   const globalPrefix = '.netlify/functions/main';
   app.setGlobalPrefix(globalPrefix);
-
+  console.log('Run');
   await app.init();
   const expressApp = app.getHttpAdapter().getInstance();
   console.log(app);
