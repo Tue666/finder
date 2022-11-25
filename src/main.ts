@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { LoggerService } from './modules/logger/logger.service';
 import fs from 'fs';
-import serverless from 'serverless-http';
+// import serverless from 'serverless-http';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -33,16 +33,17 @@ async function bootstrap() {
     }),
   );
   app.useLogger(new LoggerService());
-  return app;
+  await app.listen(process.env.PORT || 2000);
 }
-export const bootstrapServerless = async () => {
-  const app = await bootstrap();
-  const globalPrefix = '.netlify/functions/main';
-  app.setGlobalPrefix(globalPrefix);
-  await app.init();
-  const expressApp = app.getHttpAdapter().getInstance();
-  return serverless(expressApp);
-};
+bootstrap();
+// export const bootstrapServerless = async () => {
+//   const app = await bootstrap();
+//   const globalPrefix = '.netlify/functions/main';
+//   app.setGlobalPrefix(globalPrefix);
+//   await app.init();
+//   const expressApp = app.getHttpAdapter().getInstance();
+//   return serverless(expressApp);
+// };
 
 // async function startServer() {
 //   const app = await bootstrap();

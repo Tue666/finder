@@ -1,1 +1,0 @@
-{"version":3,"file":"throttler.config.js","sourceRoot":"","sources":["../../../src/configs/throttler.config.ts"],"names":[],"mappings":";;;AAKA,MAAa,sBAAsB;IACjC,sBAAsB;QAGpB,OAAO;YACL,GAAG,EAAE,CAAC,OAAO,CAAC,GAAG,CAAC,aAAa;YAC/B,KAAK,EAAE,CAAC,OAAO,CAAC,GAAG,CAAC,eAAe;YACnC,gBAAgB,EAAE;gBAChB,aAAa;gBACb,WAAW;gBACX,eAAe;gBACf,WAAW;aACZ;SACF,CAAC;IACJ,CAAC;CACF;AAfD,wDAeC"}
