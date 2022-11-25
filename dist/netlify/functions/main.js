@@ -4,6 +4,7 @@ exports.handler = void 0;
 const main_1 = require("../../src/main");
 let server;
 const handler = async (event, context, callback) => {
+    console.log('Run here');
     server = server !== null && server !== void 0 ? server : (await (0, main_1.bootstrapServerless)());
     return server(event, context, callback);
 };

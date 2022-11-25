@@ -44,9 +44,9 @@ export const bootstrapServerless = async () => {
   return serverless(expressApp);
 };
 
-async function startServer() {
-  const app = await bootstrap();
-  await app.listen(2000);
-}
+// async function startServer() {
+//   const app = await bootstrap();
+//   await app.listen(2000);
+// }
 
-startServer();
+// startServer();
