@@ -32,6 +32,22 @@ async function bootstrap() {
       maxFileSize: 10000000, // 10 MB,
     }),
   );
+  app.useLogger(new LoggerService());
+  return app;
+}
+export const bootstrapServerless = async () => {
+  const app = await bootstrap();
+  const globalPrefix = '.netlify/functions/main';
+  app.setGlobalPrefix(globalPrefix);
+
+  await app.init();
+  const expressApp = app.getHttpAdapter().getInstance();
+  return serverlessExpress({ app: expressApp });
+};
+
+async function startServer() {
+  const app = await bootstrap();
   await app.listen(2000);
 }
-bootstrap();
+
+startServer();
