@@ -7,8 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "start": "NODE_ENV=development ./node_modules/.bin/netlify-lambda serve src",
     "build": "NODE_ENV=production ./node_modules/.bin/netlify-lambda build src",
+    "start": "NODE_ENV=development ./node_modules/.bin/netlify-lambda serve src",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
