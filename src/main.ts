@@ -8,7 +8,7 @@ import cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { LoggerService } from './modules/logger/logger.service';
 import fs from 'fs';
-import { configure as serverlessExpress } from '@vendia/serverless-express';
+import serverless from 'serverless-http';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -39,11 +39,9 @@ export const bootstrapServerless = async () => {
   const app = await bootstrap();
   const globalPrefix = '.netlify/functions/main';
   app.setGlobalPrefix(globalPrefix);
-  console.log('Run');
   await app.init();
   const expressApp = app.getHttpAdapter().getInstance();
-  console.log(app);
-  return serverlessExpress({ app: expressApp });
+  return serverless(expressApp);
 };
 
 async function startServer() {
