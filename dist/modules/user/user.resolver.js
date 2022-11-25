@@ -74,6 +74,9 @@ let UserResolver = class UserResolver {
         const url = await this.userHelper.uploadImage({ stream });
         return url;
     }
+    deleteFile(fileName) {
+        return this.userHelper.removeUpload(fileName);
+    }
     getAllReportsUser(pagination) {
         return this.userHelper.getAllReportedUser(pagination);
     }
@@ -201,6 +204,13 @@ __decorate([
     __metadata("design:paramtypes", [typeof (_a = typeof Upload_js_1.default !== "undefined" && Upload_js_1.default) === "function" ? _a : Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "uploadFile", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, graphql_1.Args)('fileUrl')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "deleteFile", null);
 __decorate([
     (0, graphql_1.Query)(() => user_entities_1.UserResult),
     (0, common_1.UseGuards)(at_guard_1.AtGuard, role_guard_1.RolesGuard),

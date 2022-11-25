@@ -20,6 +20,7 @@ export declare class UserHelper {
     uploadImage({ stream }: {
         stream: any;
     }): Promise<any>;
+    removeUpload(imageUrl: string): Promise<boolean>;
     CloudinaryProvider: {
         provide: string;
         useFactory: () => any;

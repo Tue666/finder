@@ -19,6 +19,7 @@ export declare class UserResolver {
     declineBlockUser(user_id: string): Promise<boolean>;
     updateLocation(user: User, coordinates: number[]): Promise<boolean>;
     uploadFile(file: Upload): Promise<any>;
+    deleteFile(fileName: string): Promise<boolean>;
     getAllReportsUser(pagination: PaginationInput): Promise<UserResult>;
     statisticUser(pagination: PaginationInput, filter: FilterStatisticUser): Promise<UserResult>;
     createMultiUser(): Promise<boolean>;

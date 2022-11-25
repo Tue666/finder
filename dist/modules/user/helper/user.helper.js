@@ -192,6 +192,27 @@ let UserHelper = class UserHelper {
             throw new common_1.BadRequestException(`Failed to upload profile picture ! Err:${err.message}`);
         }
     }
+    async removeUpload(imageUrl) {
+        try {
+            const imageName = imageUrl.split('/');
+            console.log(imageName[imageName.length - 1].split('.')[0]);
+            const result = await cloudinary_1.v2.uploader.destroy(imageName[imageName.length - 1].split('.')[0], function (error, result) {
+                if (result) {
+                    return result;
+                }
+                else {
+                    throw error;
+                }
+            });
+            if (result['result'] === 'not found') {
+                throw new common_1.BadRequestException('Xóa file thất bại');
+            }
+            return result ? true : false;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 };
 UserHelper = __decorate([
     (0, common_1.Injectable)(),

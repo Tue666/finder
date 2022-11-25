@@ -207,6 +207,28 @@ export class UserHelper {
     }
   }
 
+  async removeUpload(imageUrl: string): Promise<boolean> {
+    try {
+      const imageName = imageUrl.split('/');
+      const result = await v2.uploader.destroy(
+        imageName[imageName.length - 1].split('.')[0],
+        function (error, result) {
+          if (result) {
+            return result;
+          } else {
+            throw error;
+          }
+        },
+      );
+      if (result['result'] === 'not found') {
+        throw new BadRequestException('Xóa file thất bại');
+      }
+      return result ? true : false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   CloudinaryProvider = {
     provide: Constants.CLOUDINARY,
     useFactory: (): any => {

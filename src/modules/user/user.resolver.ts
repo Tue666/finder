@@ -141,6 +141,11 @@ export class UserResolver {
     return url;
   }
 
+  @Mutation(() => Boolean)
+  deleteFile(@Args('fileUrl') fileName: string): Promise<boolean> {
+    return this.userHelper.removeUpload(fileName);
+  }
+
   @Query(() => UserResult)
   @UseGuards(AtGuard, RolesGuard)
   @hasRoles(RoleEnum.ADMIN)
