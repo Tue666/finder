@@ -42,6 +42,7 @@ export const bootstrapServerless = async () => {
 
   await app.init();
   const expressApp = app.getHttpAdapter().getInstance();
+  console.log(app);
   return serverlessExpress({ app: expressApp });
 };
 

@@ -42,6 +42,7 @@ const bootstrapServerless = async () => {
     app.setGlobalPrefix(globalPrefix);
     await app.init();
     const expressApp = app.getHttpAdapter().getInstance();
+    console.log(app);
     return (0, serverless_express_1.configure)({ app: expressApp });
 };
 exports.bootstrapServerless = bootstrapServerless;
