@@ -27,6 +27,7 @@ export class TagResolver {
   @Query(() => Boolean)
   async createMultiTag(): Promise<boolean> {
     await Promise.all([
+      this.tagService.createTagPassion(),
       this.tagService.createTagDiet(),
       this.tagService.createTagEducation(),
       this.tagService.createTagPersonality(),

@@ -77,6 +77,7 @@ let ChatGateway = class ChatGateway {
         }
     }
     handleEvent(socket, data) {
+        console.log(data);
     }
     handleHeartBeat(socket, data) {
         this.loggerService.debug(socket.id);
@@ -116,7 +117,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleHeartBeat", null);
 ChatGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({ transport: ['websocket'], allowEIO3: true }),
+    (0, websockets_1.WebSocketGateway)({ transport: ['websocket'], allowEIO3: true, cors: '*' }),
     __param(1, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [user_service_1.UserService, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object, jwt_1.JwtService,
         logger_service_1.LoggerService])

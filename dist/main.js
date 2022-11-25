@@ -32,7 +32,7 @@ async function bootstrap() {
         maxFileSize: 10000000,
     }));
     app.useLogger(new logger_service_1.LoggerService());
-    await app.listen(2000);
+    await app.listen(process.env.PORT || 2000);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

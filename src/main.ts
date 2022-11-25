@@ -32,6 +32,6 @@ async function bootstrap() {
     }),
   );
   app.useLogger(new LoggerService());
-  await app.listen(2000);
+  await app.listen(process.env.PORT || 2000);
 }
 bootstrap();

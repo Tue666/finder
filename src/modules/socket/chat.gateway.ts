@@ -22,7 +22,7 @@ import { Constants } from '../../constants/constants';
 import { LoggerService } from '../logger/logger.service';
 import { UserService } from '../user/user.service';
 
-@WebSocketGateway({ transport: ['websocket'], allowEIO3: true })
+@WebSocketGateway({ transport: ['websocket'], allowEIO3: true, cors: '*' })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private userService: UserService,
@@ -84,7 +84,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() socket: Socket,
     @MessageBody() data: unknown,
   ): any {
-    // console.log(socket.userId);
+    console.log(data);
     // return { event, data };
   }
 

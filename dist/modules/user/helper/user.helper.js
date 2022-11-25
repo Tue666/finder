@@ -195,7 +195,6 @@ let UserHelper = class UserHelper {
     async removeUpload(imageUrl) {
         try {
             const imageName = imageUrl.split('/');
-            console.log(imageName[imageName.length - 1].split('.')[0]);
             const result = await cloudinary_1.v2.uploader.destroy(imageName[imageName.length - 1].split('.')[0], function (error, result) {
                 if (result) {
                     return result;

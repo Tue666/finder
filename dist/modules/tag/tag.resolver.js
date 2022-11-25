@@ -30,6 +30,7 @@ let TagResolver = class TagResolver {
     }
     async createMultiTag() {
         await Promise.all([
+            this.tagService.createTagPassion(),
             this.tagService.createTagDiet(),
             this.tagService.createTagEducation(),
             this.tagService.createTagPersonality(),
