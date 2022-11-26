@@ -243,7 +243,7 @@ let UserService = class UserService {
         try {
             await this.userEmbeddedService.findOneAndUpdate({
                 user: user._id,
-                count: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
+                countUnlike: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
             }, {
                 $push: { unlikeUser: user_id },
                 $inc: { countUnlike: 1 },
@@ -260,7 +260,7 @@ let UserService = class UserService {
             const user_embedded = await this.userEmbeddedService.getCurrentEmbedded(user._id);
             await this.userEmbeddedService.findOneAndUpdate({
                 _id: user_embedded._id,
-            }, { $pull: { unlikeUser: { $eq: user_id } }, $inc: { count: -1 } }, { new: true });
+            }, { $pull: { unlikeUser: { $eq: user_id } }, $inc: { countUnlike: -1 } }, { new: true });
             return true;
         }
         catch (error) {
