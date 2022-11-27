@@ -94,10 +94,16 @@ export class UserResolver {
   @UseGuards(AtGuard)
   reportUser(
     @Args('reasonReport') reasonReport: string,
+    @Args('reasonReport') descriptionReport: string,
     @Args('userReport', { type: () => GraphQLObjectID }) user_id: string,
     @GetUser() user: User,
   ): Promise<boolean> {
-    return this.userService.reportUser(reasonReport, user_id, user);
+    return this.userService.reportUser(
+      reasonReport,
+      descriptionReport,
+      user_id,
+      user,
+    );
   }
 
   @Mutation(() => Boolean)

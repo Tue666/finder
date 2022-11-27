@@ -327,9 +327,9 @@ let UserService = class UserService {
         }
         return userUpdated ? true : false;
     }
-    async reportUser(reasonReport, userReport, reportBy) {
+    async reportUser(reasonReport, descriptionReport, userReport, reportBy) {
         try {
-            const user = await this.userModel.findOneAndUpdate({ _id: userReport }, { $push: { reports: { reportBy, reasonReport } } });
+            const user = await this.userModel.findOneAndUpdate({ _id: userReport }, { $push: { reports: { reportBy, reasonReport, descriptionReport } } });
             (0, model_utils_1.throwIfNotExists)(user, 'Tài khoản không tồn tại');
             const user_embedded = await this.userEmbeddedService.findOneAndUpdate({ _id: reportBy._id }, { $push: { unlikeUser: userReport } }, { upsert: true, new: true });
             return user && user_embedded ? true : false;

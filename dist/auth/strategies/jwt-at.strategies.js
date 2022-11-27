@@ -29,7 +29,6 @@ let AtStrategy = class AtStrategy extends (0, passport_1.PassportStrategy)(passp
             if (!user) {
                 throw new common_1.UnauthorizedException('jwt not accepted');
             }
-            await this.userService.findOneAndUpdate({ _id: payload._id }, { $set: { lastActive: Date.now() } });
             return user;
         }
         catch (error) {

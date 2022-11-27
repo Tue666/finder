@@ -7,6 +7,7 @@ export declare class ConversationResolver {
     private readonly conversationService;
     constructor(conversationService: ConversationService);
     createConversation(input: CreateConversationInput): Promise<boolean>;
-    getAllConversation(pagination: PaginationInput, user: User, isMessaged: boolean): Promise<ConversationResult>;
+    getAllConversation(pagination: PaginationInput, user: User): Promise<ConversationResult>;
+    getAllUserMatched(user: User, pagination: PaginationInput, isMessaged: boolean): Promise<ConversationResult>;
     getOneConversation(input: FilterGetOneConversation): Promise<Conversation>;
 }

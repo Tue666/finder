@@ -17,6 +17,9 @@ export class Conversation implements IConversation {
   @Field(() => [User])
   members: User[];
 
+  @Field(() => User)
+  user: User;
+
   @Field(() => Boolean)
   isDeleted: boolean;
 

@@ -33,7 +33,25 @@ let ConversationService = class ConversationService {
             throw error;
         }
     }
-    async findAll(input, user, isMessaged) {
+    async findAll(input, user) {
+        const [queryFilter, querySort] = new filter_query_1.FilterBuilder()
+            .setFilterItem('members', {
+            $elemMatch: { $eq: user._id },
+        }, user._id)
+            .setSortItem('updatedAt', -1)
+            .buildQuery();
+        const [results, totalCount] = await Promise.all([
+            this.conversionModel
+                .find(queryFilter)
+                .skip(input === null || input === void 0 ? void 0 : input.size)
+                .limit(((input === null || input === void 0 ? void 0 : input.page) - 1) * (input === null || input === void 0 ? void 0 : input.size))
+                .sort(querySort),
+            this.conversionModel.count(queryFilter),
+        ]);
+        this.loggerService.debug(`Conversation result :${results.length}`);
+        return { results, totalCount };
+    }
+    async getAllUserMatched(input, user, isMessaged) {
         let subQuery = {};
         if (isMessaged === true) {
             subQuery = { $ne: null };
@@ -48,7 +66,7 @@ let ConversationService = class ConversationService {
             .setFilterItem('lastMessage', subQuery, subQuery)
             .setSortItem('updatedAt', -1)
             .buildQuery();
-        const [results, totalCount] = await Promise.all([
+        let [results, totalCount] = await Promise.all([
             this.conversionModel
                 .find(queryFilter)
                 .skip(input === null || input === void 0 ? void 0 : input.size)
@@ -56,8 +74,18 @@ let ConversationService = class ConversationService {
                 .sort(querySort),
             this.conversionModel.count(queryFilter),
         ]);
+        results = this.filterByLastMessaged(results, user._id.toString());
         this.loggerService.debug(`Conversation result :${results.length}`);
         return { results, totalCount };
+    }
+    filterByLastMessaged(conversations, user_id) {
+        return conversations.filter(item => {
+            item.user =
+                item.members[0]._id.toString() === user_id
+                    ? item.members[0]
+                    : item.members[1];
+            return item;
+        });
     }
     async findOne(input) {
         try {

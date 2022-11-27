@@ -43,6 +43,7 @@ export interface IReports {
   reportBy: string | User;
   createdAt: Date;
   reasonReport: string;
+  descriptionReport: string;
 }
 
 export interface IMySetting {

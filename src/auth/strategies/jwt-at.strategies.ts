@@ -20,15 +20,10 @@ export class AtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
   async validate(payload: IJwtPayload): Promise<User> {
     try {
-      // const input: FilterGetOneUser = payload;
       const user = await this.userService.findOne({ _id: payload._id });
       if (!user) {
         throw new UnauthorizedException('jwt not accepted');
       }
-      await this.userService.findOneAndUpdate(
-        { _id: payload._id },
-        { $set: { lastActive: Date.now() } },
-      );
       return user;
     } catch (error) {
       throw error;

@@ -209,6 +209,9 @@ export class Reports implements IReports {
 
   @Field()
   reasonReport: string;
+
+  @Field()
+  descriptionReport: string;
 }
 
 @ObjectType()

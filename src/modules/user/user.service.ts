@@ -400,13 +400,14 @@ export class UserService {
 
   async reportUser(
     reasonReport: string,
+    descriptionReport: string,
     userReport: string,
     reportBy: User,
   ): Promise<boolean> {
     try {
       const user = await this.userModel.findOneAndUpdate(
         { _id: userReport },
-        { $push: { reports: { reportBy, reasonReport } } },
+        { $push: { reports: { reportBy, reasonReport, descriptionReport } } },
       );
       throwIfNotExists(user, 'Tài khoản không tồn tại');
       const user_embedded = await this.userEmbeddedService.findOneAndUpdate(

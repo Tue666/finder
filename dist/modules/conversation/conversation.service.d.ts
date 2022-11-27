@@ -10,7 +10,9 @@ export declare class ConversationService {
     private loggerService;
     constructor(conversionModel: ConversationModelType, loggerService: LoggerService);
     create(input: CreateConversationInput): Promise<boolean>;
-    findAll(input: PaginationInput, user: User, isMessaged: boolean): Promise<ConversationResult>;
+    findAll(input: PaginationInput, user: User): Promise<ConversationResult>;
+    getAllUserMatched(input: PaginationInput, user: User, isMessaged: boolean): Promise<ConversationResult>;
+    filterByLastMessaged(conversations: Conversation[], user_id: string): any;
     findOne(input: FilterGetOneConversation): Promise<Conversation>;
     findOneAndUpdate(filter: FilterQuery<Conversation>, update: UpdateQuery<Conversation>, options?: QueryOptions<Conversation> | null): Promise<Conversation>;
     getQueryOrMembers(members: string[]): {

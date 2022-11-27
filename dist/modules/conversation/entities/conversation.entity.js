@@ -32,6 +32,10 @@ __decorate([
     __metadata("design:type", Array)
 ], Conversation.prototype, "members", void 0);
 __decorate([
+    (0, graphql_1.Field)(() => user_entities_1.User),
+    __metadata("design:type", user_entities_1.User)
+], Conversation.prototype, "user", void 0);
+__decorate([
     (0, graphql_1.Field)(() => Boolean),
     __metadata("design:type", Boolean)
 ], Conversation.prototype, "isDeleted", void 0);

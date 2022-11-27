@@ -35,6 +35,32 @@ export class ConversationService {
   async findAll(
     input: PaginationInput,
     user: User,
+  ): Promise<ConversationResult> {
+    const [queryFilter, querySort] = new FilterBuilder<Conversation>()
+      .setFilterItem(
+        'members',
+        {
+          $elemMatch: { $eq: user._id },
+        },
+        user._id,
+      )
+      .setSortItem('updatedAt', -1)
+      .buildQuery();
+    const [results, totalCount] = await Promise.all([
+      this.conversionModel
+        .find(queryFilter)
+        .skip(input?.size)
+        .limit((input?.page - 1) * input?.size)
+        .sort(querySort),
+      this.conversionModel.count(queryFilter),
+    ]);
+    this.loggerService.debug(`Conversation result :${results.length}`);
+    return { results, totalCount };
+  }
+
+  async getAllUserMatched(
+    input: PaginationInput,
+    user: User,
     isMessaged: boolean,
   ): Promise<ConversationResult> {
     let subQuery = {};
@@ -54,7 +80,7 @@ export class ConversationService {
       .setFilterItem('lastMessage', subQuery, subQuery)
       .setSortItem('updatedAt', -1)
       .buildQuery();
-    const [results, totalCount] = await Promise.all([
+    let [results, totalCount] = await Promise.all([
       this.conversionModel
         .find(queryFilter)
         .skip(input?.size)
@@ -62,8 +88,19 @@ export class ConversationService {
         .sort(querySort),
       this.conversionModel.count(queryFilter),
     ]);
+    results = this.filterByLastMessaged(results, user._id.toString());
     this.loggerService.debug(`Conversation result :${results.length}`);
     return { results, totalCount };
+  }
+
+  filterByLastMessaged(conversations: Conversation[], user_id: string): any {
+    return conversations.filter(item => {
+      item.user =
+        item.members[0]._id.toString() === user_id
+          ? item.members[0]
+          : item.members[1];
+      return item;
+    });
   }
 
   async findOne(input: FilterGetOneConversation): Promise<Conversation> {

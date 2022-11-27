@@ -282,6 +282,10 @@ __decorate([
     (0, graphql_1.Field)(),
     __metadata("design:type", String)
 ], Reports.prototype, "reasonReport", void 0);
+__decorate([
+    (0, graphql_1.Field)(),
+    __metadata("design:type", String)
+], Reports.prototype, "descriptionReport", void 0);
 Reports = __decorate([
     (0, graphql_1.ObjectType)()
 ], Reports);

@@ -71,6 +71,7 @@ exports.ReportsSchema = new mongoose_1.Schema({
     },
     createdAt: { type: Date, default: new Date() },
     reasonReport: { type: String, trim: true },
+    descriptionReport: { type: String, trim: true },
 }, { _id: false });
 exports.UserSchema = new mongoose_1.Schema({
     username: { type: String, trim: true },

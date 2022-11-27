@@ -56,8 +56,8 @@ let UserResolver = class UserResolver {
     unlikeUser(user_id, user) {
         return this.userService.unlikeUser(user, user_id);
     }
-    reportUser(reasonReport, user_id, user) {
-        return this.userService.reportUser(reasonReport, user_id, user);
+    reportUser(reasonReport, descriptionReport, user_id, user) {
+        return this.userService.reportUser(reasonReport, descriptionReport, user_id, user);
     }
     confirmBlockUser(user_id) {
         return this.userHelper.confirmBlockUser(user_id);
@@ -161,10 +161,11 @@ __decorate([
     (0, graphql_1.Mutation)(() => Boolean),
     (0, common_1.UseGuards)(at_guard_1.AtGuard),
     __param(0, (0, graphql_1.Args)('reasonReport')),
-    __param(1, (0, graphql_1.Args)('userReport', { type: () => graphql_scalars_1.GraphQLObjectID })),
-    __param(2, (0, getuser_decorators_1.GetUser)()),
+    __param(1, (0, graphql_1.Args)('reasonReport')),
+    __param(2, (0, graphql_1.Args)('userReport', { type: () => graphql_scalars_1.GraphQLObjectID })),
+    __param(3, (0, getuser_decorators_1.GetUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, user_entities_1.User]),
+    __metadata("design:paramtypes", [String, String, String, user_entities_1.User]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "reportUser", null);
 __decorate([

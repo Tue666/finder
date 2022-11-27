@@ -114,6 +114,7 @@ export const ReportsSchema = new Schema<Reports>(
     },
     createdAt: { type: Date, default: new Date() },
     reasonReport: { type: String, trim: true },
+    descriptionReport: { type: String, trim: true },
   },
   { _id: false },
 );

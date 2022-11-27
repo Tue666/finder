@@ -72,6 +72,7 @@ export declare class Reports implements IReports {
     reportBy: User;
     createdAt: Date;
     reasonReport: string;
+    descriptionReport: string;
 }
 export declare class MatchRequest implements IMatchRequest {
     sender: string | User;

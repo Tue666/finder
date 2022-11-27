@@ -6,6 +6,7 @@ export declare class Conversation implements IConversation {
     lastMessage: Message;
     messagePin: Message;
     members: User[];
+    user: User;
     isDeleted: boolean;
     createdAt: Date;
     updatedAt: Date;

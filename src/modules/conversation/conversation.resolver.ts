@@ -32,9 +32,23 @@ export class ConversationResolver {
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination: PaginationInput,
     @GetUser() user: User,
+  ): Promise<ConversationResult> {
+    return this.conversationService.findAll(pagination, user);
+  }
+
+  @UseGuards(AtGuard)
+  @Query(() => ConversationResult)
+  getAllUserMatched(
+    @GetUser() user: User,
+    @Args('pagination', { type: () => PaginationInput, nullable: true })
+    pagination: PaginationInput,
     @Args('isMessaged', { type: () => Boolean }) isMessaged: boolean,
   ): Promise<ConversationResult> {
-    return this.conversationService.findAll(pagination, user, isMessaged);
+    return this.conversationService.getAllUserMatched(
+      pagination,
+      user,
+      isMessaged,
+    );
   }
 
   @Query(() => Conversation)
