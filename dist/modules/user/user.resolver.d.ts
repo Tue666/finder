@@ -24,6 +24,6 @@ export declare class UserResolver {
     statisticUser(pagination: PaginationInput, filter: FilterStatisticUser): Promise<UserResult>;
     createMultiUser(): Promise<boolean>;
     getCurrentAddress(user: User): Promise<Address>;
-    getCurrentUser(user: User): User;
+    getCurrentUser(user: User): Promise<User>;
     getAllUser(pagination: PaginationInput, filter: FilterGetAllUser, user: User): Promise<UserResult>;
 }

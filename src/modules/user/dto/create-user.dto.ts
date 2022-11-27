@@ -6,7 +6,6 @@ import {
   GenderEnum,
   LookingFor,
   RegisterType,
-  RoleEnum,
   SortOption,
   StatusActive,
 } from '../../../constants/enum';

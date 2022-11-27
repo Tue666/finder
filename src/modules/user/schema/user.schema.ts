@@ -143,7 +143,7 @@ export const UserSchema = new Schema<User>(
     matchRequest: { type: [MatchRequestSchema], default: [] },
     reports: [{ type: ReportsSchema, default: [] }],
     matched: [
-      { type: Schema.Types.ObjectId, user: User.name, autopopulate: false },
+      { type: Schema.Types.ObjectId, ref: User.name, autopopulate: false },
     ],
     statusActive: { type: String, enum: Object.values(StatusActive) },
     role: {

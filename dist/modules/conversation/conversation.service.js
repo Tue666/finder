@@ -33,11 +33,19 @@ let ConversationService = class ConversationService {
             throw error;
         }
     }
-    async findAll(input, user) {
+    async findAll(input, user, isMessaged) {
+        let subQuery = {};
+        if (isMessaged === true) {
+            subQuery = { $ne: null };
+        }
+        else if (isMessaged === false) {
+            subQuery = { $eq: null };
+        }
         const [queryFilter, querySort] = new filter_query_1.FilterBuilder()
             .setFilterItem('members', {
             $elemMatch: { $eq: user._id },
         }, user._id)
+            .setFilterItem('lastMessage', subQuery, subQuery)
             .setSortItem('updatedAt', -1)
             .buildQuery();
         const [results, totalCount] = await Promise.all([

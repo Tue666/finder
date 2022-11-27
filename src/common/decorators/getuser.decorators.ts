@@ -8,3 +8,10 @@ export const GetUser = createParamDecorator(
     return request.user;
   },
 );
+
+export const GetUserWS = createParamDecorator(
+  (data: string, context: ExecutionContext) => {
+    const user = context.switchToWs().getClient().handshake.user;
+    return user;
+  },
+);

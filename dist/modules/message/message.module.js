@@ -36,6 +36,7 @@ MessageModule = __decorate([
             conversation_module_1.ConversationModule,
         ],
         providers: [message_resolver_1.MessageResolver, message_service_1.MessageService],
+        exports: [message_service_1.MessageService],
     })
 ], MessageModule);
 exports.MessageModule = MessageModule;

@@ -353,6 +353,17 @@ let UserService = class UserService {
             throw error;
         }
     }
+    async getCurrentUser(user) {
+        try {
+            const currentUser = await this.userModel
+                .findOne({ _id: user._id })
+                .populate('matched');
+            return currentUser;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),

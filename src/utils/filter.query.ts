@@ -6,7 +6,7 @@ import { setFilterSortOption } from './utils';
 
 export class FilterBuilder<T> {
   public queryFilter: any = {
-    $and: [],
+    $and: [{ isDeleted: false }],
   };
 
   public querySort: SortQuery = {};

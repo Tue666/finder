@@ -25,5 +25,6 @@ import { ConversationModule } from '../conversation/conversation.module';
     ConversationModule,
   ],
   providers: [MessageResolver, MessageService],
+  exports: [MessageService],
 })
 export class MessageModule {}

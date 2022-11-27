@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { MessageService } from 'modules/message/message.service';
 import { CreateSocketInput } from './dto/create-socket.input';
 import { UpdateSocketInput } from './dto/update-socket.input';
 
 @Injectable()
 export class SocketService {
+  constructor(private messageService: MessageService) {}
   create(createSocketInput: CreateSocketInput) {
     return 'This action adds a new socket';
   }

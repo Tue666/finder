@@ -32,8 +32,9 @@ export class ConversationResolver {
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination: PaginationInput,
     @GetUser() user: User,
+    @Args('isMessaged', { type: () => Boolean }) isMessaged: boolean,
   ): Promise<ConversationResult> {
-    return this.conversationService.findAll(pagination, user);
+    return this.conversationService.findAll(pagination, user, isMessaged);
   }
 
   @Query(() => Conversation)

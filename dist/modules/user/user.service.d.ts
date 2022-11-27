@@ -36,4 +36,5 @@ export declare class UserService {
     unlikeUser(user: User, user_id: string): Promise<boolean>;
     reportUser(reasonReport: string, userReport: string, reportBy: User): Promise<boolean>;
     insertManyUser(): Promise<boolean>;
+    getCurrentUser(user: User): Promise<User>;
 }

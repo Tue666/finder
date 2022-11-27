@@ -95,7 +95,7 @@ exports.UserSchema = new mongoose_1.Schema({
     matchRequest: { type: [exports.MatchRequestSchema], default: [] },
     reports: [{ type: exports.ReportsSchema, default: [] }],
     matched: [
-        { type: mongoose_1.Schema.Types.ObjectId, user: user_entities_1.User.name, autopopulate: false },
+        { type: mongoose_1.Schema.Types.ObjectId, ref: user_entities_1.User.name, autopopulate: false },
     ],
     statusActive: { type: String, enum: Object.values(enum_1.StatusActive) },
     role: {

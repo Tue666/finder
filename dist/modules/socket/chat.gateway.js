@@ -18,17 +18,22 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const websockets_1 = require("@nestjs/websockets");
 const cache_manager_1 = require("cache-manager");
+const getuser_decorators_1 = require("../../common/decorators/getuser.decorators");
+const create_message_input_1 = require("../message/dto/create-message.input");
+const message_service_1 = require("../message/message.service");
+const user_entities_1 = require("../user/entities/user.entities");
 const socket_io_1 = require("socket.io");
 const ws_guard_1 = require("../../common/guard/ws.guard");
 const constants_1 = require("../../constants/constants");
 const logger_service_1 = require("../logger/logger.service");
 const user_service_1 = require("../user/user.service");
 let ChatGateway = class ChatGateway {
-    constructor(userService, cacheManager, jwtService, loggerService) {
+    constructor(userService, cacheManager, jwtService, loggerService, messageService) {
         this.userService = userService;
         this.cacheManager = cacheManager;
         this.jwtService = jwtService;
         this.loggerService = loggerService;
+        this.messageService = messageService;
         this.loggerService.setContext('ChatGateway');
     }
     async handleDisconnect(socket) {
@@ -67,19 +72,24 @@ let ChatGateway = class ChatGateway {
             else {
                 this.loggerService.debug('Push socket id to array');
                 socketIds = [socket.id];
-                await this.cacheManager.set(socketKey, socketIds, {
-                    ttl: constants_1.Constants.SOCKET_ID_TTL,
-                });
             }
+            await this.cacheManager.set(socketKey, socketIds, {
+                ttl: constants_1.Constants.SOCKET_ID_TTL,
+            });
         }
         else {
             throw new common_1.UnauthorizedException('Who are you?');
         }
     }
-    handleEvent(socket, data) {
-        console.log(data);
+    afterInit(server) {
+        this.server = server;
     }
-    handleHeartBeat(socket, data) {
+    async sendMessage(socket, data) {
+        const message = await this.messageService.create(data);
+        return message;
+    }
+    handleHeartBeat(socket, data, user) {
+        console.log('This is user', user);
         this.loggerService.debug(socket.id);
     }
 };
@@ -100,27 +110,31 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "handleConnection", null);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('events'),
+    (0, websockets_1.SubscribeMessage)('sendMessage'),
+    (0, common_1.UseGuards)(ws_guard_1.WsGuard),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
-    __metadata("design:returntype", Object)
-], ChatGateway.prototype, "handleEvent", null);
+    __metadata("design:paramtypes", [socket_io_1.Socket,
+        create_message_input_1.CreateMessageInput]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "sendMessage", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('heartbeat'),
     (0, common_1.UseGuards)(ws_guard_1.WsGuard),
     __param(0, (0, websockets_1.ConnectedSocket)()),
     __param(1, (0, websockets_1.MessageBody)()),
+    __param(2, (0, getuser_decorators_1.GetUserWS)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Object, user_entities_1.User]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleHeartBeat", null);
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({ transport: ['websocket'], allowEIO3: true, cors: '*' }),
     __param(1, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [user_service_1.UserService, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object, jwt_1.JwtService,
-        logger_service_1.LoggerService])
+        logger_service_1.LoggerService,
+        message_service_1.MessageService])
 ], ChatGateway);
 exports.ChatGateway = ChatGateway;
 //# sourceMappingURL=chat.gateway.js.map

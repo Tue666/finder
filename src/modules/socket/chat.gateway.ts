@@ -15,6 +15,11 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Cache } from 'cache-manager';
+import { GetUserWS } from 'common/decorators/getuser.decorators';
+import { CreateMessageInput } from 'modules/message/dto/create-message.input';
+import { Message } from 'modules/message/entities/message.entity';
+import { MessageService } from 'modules/message/message.service';
+import { User } from 'modules/user/entities/user.entities';
 import { Server, Socket } from 'socket.io';
 import { IJwtPayload } from '../../auth/entities/auth.entities';
 import { WsGuard } from '../../common/guard/ws.guard';
@@ -29,11 +34,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private jwtService: JwtService,
     private loggerService: LoggerService,
+    private messageService: MessageService,
   ) {
     this.loggerService.setContext('ChatGateway');
   }
   @WebSocketServer()
-  private server: Server;
+  public server: Server;
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
     const socketKey = Constants.SOCKET + (socket as any).userId;
     let socketIds: string[] = await this.cacheManager.get(socketKey);
@@ -70,27 +76,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       } else {
         this.loggerService.debug('Push socket id to array');
         socketIds = [socket.id];
-        await this.cacheManager.set(socketKey, socketIds, {
-          ttl: Constants.SOCKET_ID_TTL,
-        });
       }
+      await this.cacheManager.set(socketKey, socketIds, {
+        ttl: Constants.SOCKET_ID_TTL,
+      });
     } else {
       throw new UnauthorizedException('Who are you?');
     }
   }
 
-  @SubscribeMessage('events')
-  handleEvent(
+  afterInit(server: Server) {
+    this.server = server;
+  }
+
+  @SubscribeMessage('sendMessage')
+  @UseGuards(WsGuard)
+  async sendMessage(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() data: unknown,
-  ): any {
-    console.log(data);
-    // return { event, data };
+    @MessageBody() data: CreateMessageInput,
+  ): Promise<Message> {
+    const message = await this.messageService.create(data);
+    return message;
   }
 
   @SubscribeMessage('heartbeat')
   @UseGuards(WsGuard)
-  handleHeartBeat(@ConnectedSocket() socket: Socket, @MessageBody() data: any) {
+  handleHeartBeat(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: any,
+    @GetUserWS() user: User,
+  ) {
+    console.log('This is user', user);
     this.loggerService.debug(socket.id);
   }
 }

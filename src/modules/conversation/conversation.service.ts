@@ -35,7 +35,14 @@ export class ConversationService {
   async findAll(
     input: PaginationInput,
     user: User,
+    isMessaged: boolean,
   ): Promise<ConversationResult> {
+    let subQuery = {};
+    if (isMessaged === true) {
+      subQuery = { $ne: null };
+    } else if (isMessaged === false) {
+      subQuery = { $eq: null };
+    }
     const [queryFilter, querySort] = new FilterBuilder<Conversation>()
       .setFilterItem(
         'members',
@@ -44,6 +51,7 @@ export class ConversationService {
         },
         user._id,
       )
+      .setFilterItem('lastMessage', subQuery, subQuery)
       .setSortItem('updatedAt', -1)
       .buildQuery();
     const [results, totalCount] = await Promise.all([

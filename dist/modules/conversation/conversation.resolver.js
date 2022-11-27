@@ -29,8 +29,8 @@ let ConversationResolver = class ConversationResolver {
     createConversation(input) {
         return this.conversationService.create(input);
     }
-    getAllConversation(pagination, user) {
-        return this.conversationService.findAll(pagination, user);
+    getAllConversation(pagination, user, isMessaged) {
+        return this.conversationService.findAll(pagination, user, isMessaged);
     }
     getOneConversation(input) {
         return this.conversationService.findOne(input);
@@ -48,9 +48,10 @@ __decorate([
     (0, graphql_1.Query)(() => conversation_entity_1.ConversationResult),
     __param(0, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),
     __param(1, (0, getuser_decorators_1.GetUser)()),
+    __param(2, (0, graphql_1.Args)('isMessaged', { type: () => Boolean })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [common_dto_1.PaginationInput,
-        user_entities_1.User]),
+        user_entities_1.User, Boolean]),
     __metadata("design:returntype", Promise)
 ], ConversationResolver.prototype, "getAllConversation", null);
 __decorate([

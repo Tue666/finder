@@ -6,7 +6,7 @@ const utils_1 = require("./utils");
 class FilterBuilder {
     constructor() {
         this.queryFilter = {
-            $and: [],
+            $and: [{ isDeleted: false }],
         };
         this.querySort = {};
     }

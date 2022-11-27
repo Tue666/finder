@@ -95,7 +95,7 @@ let UserResolver = class UserResolver {
         return this.userHelper.getCurrentAddress(user);
     }
     getCurrentUser(user) {
-        return user;
+        return this.userService.getCurrentUser(user);
     }
     getAllUser(pagination, filter, user) {
         return this.userService.getAllUser(pagination, filter, user);
@@ -250,7 +250,7 @@ __decorate([
     __param(0, (0, getuser_decorators_1.GetUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_entities_1.User]),
-    __metadata("design:returntype", user_entities_1.User)
+    __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "getCurrentUser", null);
 __decorate([
     (0, graphql_1.Query)(() => user_entities_1.UserResult),
