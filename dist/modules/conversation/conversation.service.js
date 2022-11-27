@@ -82,8 +82,8 @@ let ConversationService = class ConversationService {
         return conversations.filter(item => {
             item.user =
                 item.members[0]._id.toString() === user_id
-                    ? item.members[0]
-                    : item.members[1];
+                    ? item.members[1]
+                    : item.members[0];
             return item;
         });
     }
