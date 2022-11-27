@@ -61,7 +61,7 @@ __decorate([
     (0, graphql_1.Query)(() => conversation_entity_1.ConversationResult),
     __param(0, (0, getuser_decorators_1.GetUser)()),
     __param(1, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),
-    __param(2, (0, graphql_1.Args)('isMessaged', { type: () => Boolean })),
+    __param(2, (0, graphql_1.Args)('isMessaged', { type: () => Boolean, nullable: true })),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_entities_1.User,
         common_dto_1.PaginationInput, Boolean]),

@@ -42,7 +42,8 @@ export class ConversationResolver {
     @GetUser() user: User,
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination: PaginationInput,
-    @Args('isMessaged', { type: () => Boolean }) isMessaged: boolean,
+    @Args('isMessaged', { type: () => Boolean, nullable: true })
+    isMessaged: boolean,
   ): Promise<ConversationResult> {
     return this.conversationService.getAllUserMatched(
       pagination,

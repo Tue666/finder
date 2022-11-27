@@ -9,7 +9,6 @@ import {
   FilterGetAllMessage,
   PaginationMessageInput,
 } from './dto/create-message.input';
-import { UpdateMessageInput } from './dto/update-message.input';
 import { Message, MessageResult } from './entities/message.entity';
 import { MessageModelType } from './schema/message.schema';
 

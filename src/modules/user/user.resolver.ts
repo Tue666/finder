@@ -190,8 +190,8 @@ export class UserResolver {
 
   @Query(() => User)
   @UseGuards(AtGuard)
-  getCurrentUser(@GetUser() user: User): Promise<User> {
-    return this.userService.getCurrentUser(user);
+  getCurrentUser(@GetUser() user: User): User {
+    return user;
   }
 
   @Query(() => UserResult)

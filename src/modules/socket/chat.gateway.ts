@@ -95,7 +95,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() socket: Socket,
     @MessageBody() data: CreateMessageInput,
   ): Promise<Message> {
-    const message = await this.messageService.create(data);
+    const [message, socketIds] = await Promise.all([
+      this.messageService.create(data),
+      this.cacheManager.get(Constants.SOCKET + data.sender),
+    ]);
+    (socketIds as string[]).forEach(item => {
+      socket.to(item).emit('receiverMessage', data);
+    });
     return message;
   }
 

@@ -85,7 +85,13 @@ let ChatGateway = class ChatGateway {
         this.server = server;
     }
     async sendMessage(socket, data) {
-        const message = await this.messageService.create(data);
+        const [message, socketIds] = await Promise.all([
+            this.messageService.create(data),
+            this.cacheManager.get(constants_1.Constants.SOCKET + data.sender),
+        ]);
+        socketIds.forEach(item => {
+            socket.to(item).emit('receiverMessage', data);
+        });
         return message;
     }
     handleHeartBeat(socket, data, user) {

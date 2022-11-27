@@ -441,15 +441,4 @@ export class UserService {
       throw error;
     }
   }
-
-  async getCurrentUser(user: User): Promise<User> {
-    try {
-      const currentUser = await this.userModel
-        .findOne({ _id: user._id })
-        .populate('matched');
-      return currentUser;
-    } catch (error) {
-      throw error;
-    }
-  }
 }
