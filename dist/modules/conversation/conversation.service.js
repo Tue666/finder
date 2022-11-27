@@ -52,7 +52,7 @@ let ConversationService = class ConversationService {
         return { results, totalCount };
     }
     async getAllUserMatched(input, user, isMessaged) {
-        let subQuery = {};
+        let subQuery = null;
         if (isMessaged === true) {
             subQuery = { $ne: null };
         }

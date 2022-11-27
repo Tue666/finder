@@ -63,7 +63,7 @@ export class ConversationService {
     user: User,
     isMessaged: boolean,
   ): Promise<ConversationResult> {
-    let subQuery = {};
+    let subQuery = null;
     if (isMessaged === true) {
       subQuery = { $ne: null };
     } else if (isMessaged === false) {
