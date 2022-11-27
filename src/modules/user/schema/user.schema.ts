@@ -39,7 +39,6 @@ export const MatchRequestSchema = new Schema<MatchRequest>(
     sender: {
       type: Schema.Types.ObjectId,
       ref: User.name,
-      autopopulate: { maxDepth: 1 },
     },
     createdAt: { type: Date },
   },
@@ -143,9 +142,7 @@ export const UserSchema = new Schema<User>(
     isConfirmMail: { type: Boolean, default: false },
     matchRequest: { type: [MatchRequestSchema], default: [] },
     reports: [{ type: ReportsSchema, default: [] }],
-    matched: [
-      { type: Schema.Types.ObjectId, ref: User.name, autopopulate: false },
-    ],
+    matched: [{ type: Schema.Types.ObjectId, ref: User.name }],
     statusActive: { type: String, enum: Object.values(StatusActive) },
     role: {
       type: String,

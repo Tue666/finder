@@ -1,4 +1,4 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, HideField, InputType } from '@nestjs/graphql';
 import { GraphQLObjectID } from 'graphql-scalars';
 import { MessageType } from '../../../constants/enum';
 import { IMessage, IMessageCreate } from '../interfaces/message';
@@ -8,7 +8,7 @@ export class CreateMessageInput implements IMessageCreate {
   @Field()
   text: string;
 
-  @Field(() => GraphQLObjectID)
+  @HideField()
   sender: string;
 
   @Field(() => GraphQLObjectID)

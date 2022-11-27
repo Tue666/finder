@@ -20,7 +20,6 @@ exports.MatchRequestSchema = new mongoose_1.Schema({
     sender: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: user_entities_1.User.name,
-        autopopulate: { maxDepth: 1 },
     },
     createdAt: { type: Date },
 }, { _id: false });
@@ -95,9 +94,7 @@ exports.UserSchema = new mongoose_1.Schema({
     isConfirmMail: { type: Boolean, default: false },
     matchRequest: { type: [exports.MatchRequestSchema], default: [] },
     reports: [{ type: exports.ReportsSchema, default: [] }],
-    matched: [
-        { type: mongoose_1.Schema.Types.ObjectId, ref: user_entities_1.User.name, autopopulate: false },
-    ],
+    matched: [{ type: mongoose_1.Schema.Types.ObjectId, ref: user_entities_1.User.name }],
     statusActive: { type: String, enum: Object.values(enum_1.StatusActive) },
     role: {
         type: String,

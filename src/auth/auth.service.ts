@@ -8,19 +8,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import axios from 'axios';
+import { Cache } from 'cache-manager';
+import { Constants } from '../constants/constants';
+import { RegisterType, RoleEnum } from '../constants/enum';
+import { MailService } from '../modules/mail/mail.service';
+import { MailResetPassword } from '../modules/mail/templates/mail.reset_password';
+import { MailVerifyAccount } from '../modules/mail/templates/mail.verify';
 import { User } from '../modules/user/entities/user.entities';
 import { UserService } from '../modules/user/user.service';
+import { randomCode } from '../utils/utils';
 import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
 import { JwtPayload, RefreshPayload } from './entities/auth.entities';
-import { Cache } from 'cache-manager';
-import { MailService } from '../modules/mail/mail.service';
-import { RegisterType, RoleEnum } from '../constants/enum';
-import { Constants } from '../constants/constants';
-import { GeoLocationInput } from '../modules/user/dto/create-user.dto';
-import { randomCode } from '../utils/utils';
-import axios from 'axios';
-import { MailVerifyAccount } from '../modules/mail/templates/mail.verify';
-import { MailResetPassword } from '../modules/mail/templates/mail.reset_password';
 @Injectable()
 export class AuthService {
   constructor(
@@ -255,11 +254,6 @@ export class AuthService {
       } else if (userNormal) {
         throw new BadRequestException('Email has been used !');
       }
-      const [long, lat] = [-73.856077, 40.848447];
-      await this.userService.findOneAndUpdate(
-        { _id: userOAuth2._id },
-        { $set: { geoLocation: { coordinates: [long, lat] } } },
-      );
       return await this.generateTokens(userOAuth2._id.toString());
     } catch (error) {
       throw error;

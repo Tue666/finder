@@ -426,7 +426,7 @@ export class UserService {
       // await this.userModel.insertMany(users);
       const users = await this.userModel.find();
       let count = 0;
-      for (let user of users) {
+      for (const user of users) {
         // if (user.email === undefined) {
         //   user.email = `user${count}@gmail.com`;
         //   user.password = await this.hashPassword('1');

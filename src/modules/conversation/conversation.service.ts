@@ -80,12 +80,14 @@ export class ConversationService {
       .setFilterItem('lastMessage', subQuery, subQuery)
       .setSortItem('updatedAt', -1)
       .buildQuery();
+    // eslint-disable-next-line prefer-const
     let [results, totalCount] = await Promise.all([
       this.conversionModel
         .find(queryFilter)
         .skip(input?.size)
         .limit((input?.page - 1) * input?.size)
-        .sort(querySort),
+        .sort(querySort)
+        .populate('members'),
       this.conversionModel.count(queryFilter),
     ]);
     results = this.filterByLastMessaged(results, user._id.toString());
@@ -138,6 +140,11 @@ export class ConversationService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async updateModel(conversation: Conversation): Promise<Conversation> {
+    const conversationUpdate = new this.conversionModel(conversation);
+    return await conversationUpdate.save();
   }
 
   getQueryOrMembers(members: string[]) {

@@ -21,7 +21,6 @@ export const ConversationSchema = new Schema<Conversation>(
       {
         type: Schema.Types.ObjectId,
         ref: User.name,
-        autopopulate: { maxDepth: 1 },
       },
     ],
   },

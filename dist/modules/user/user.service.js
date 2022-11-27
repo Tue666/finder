@@ -342,7 +342,7 @@ let UserService = class UserService {
         try {
             const users = await this.userModel.find();
             let count = 0;
-            for (let user of users) {
+            for (const user of users) {
                 user.isFirstLogin = false;
                 await user.save();
                 count++;

@@ -21,6 +21,7 @@ import { Message } from 'modules/message/entities/message.entity';
 import { MessageService } from 'modules/message/message.service';
 import { User } from 'modules/user/entities/user.entities';
 import { Server, Socket } from 'socket.io';
+import { getValueWithSocketKey } from 'utils/redis.utils';
 import { IJwtPayload } from '../../auth/entities/auth.entities';
 import { WsGuard } from '../../common/guard/ws.guard';
 import { Constants } from '../../constants/constants';
@@ -80,6 +81,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.cacheManager.set(socketKey, socketIds, {
         ttl: Constants.SOCKET_ID_TTL,
       });
+      this.loggerService.log(
+        '==========================================================',
+      );
     } else {
       throw new UnauthorizedException('Who are you?');
     }
@@ -92,17 +96,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('sendMessage')
   @UseGuards(WsGuard)
   async sendMessage(
-    @ConnectedSocket() socket: Socket,
     @MessageBody() data: CreateMessageInput,
+    @GetUserWS() user: User,
   ): Promise<Message> {
+    data.sender = user._id.toString();
     const [message, socketIds] = await Promise.all([
       this.messageService.create(data),
-      this.cacheManager.get(Constants.SOCKET + data.sender),
+      this.cacheManager.get(Constants.SOCKET + user._id.toString()),
     ]);
     (socketIds as string[]).forEach(item => {
-      socket.to(item).emit('receiverMessage', data);
+      this.server.sockets.to(item).emit('receiverMessage', message);
     });
     return message;
+  }
+
+  @SubscribeMessage('isOnline')
+  @UseGuards(WsGuard)
+  async userOnline(@GetUserWS() user: User): Promise<any> {
+    const socketKey = this.getSocketKeyOfUser(user);
+    console.log(socketKey);
+    const test = await getValueWithSocketKey(this.cacheManager, socketKey);
+    console.log(test);
+  }
+
+  getSocketKeyOfUser(user: User): string[] {
+    const socketKey: string[] = [];
+    for (const item of user.matched) {
+      const key = Constants.SOCKET + item._id;
+      socketKey.push(key);
+    }
+    return socketKey;
   }
 
   @SubscribeMessage('heartbeat')

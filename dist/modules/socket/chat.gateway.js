@@ -23,6 +23,7 @@ const create_message_input_1 = require("../message/dto/create-message.input");
 const message_service_1 = require("../message/message.service");
 const user_entities_1 = require("../user/entities/user.entities");
 const socket_io_1 = require("socket.io");
+const redis_utils_1 = require("../../utils/redis.utils");
 const ws_guard_1 = require("../../common/guard/ws.guard");
 const constants_1 = require("../../constants/constants");
 const logger_service_1 = require("../logger/logger.service");
@@ -76,6 +77,7 @@ let ChatGateway = class ChatGateway {
             await this.cacheManager.set(socketKey, socketIds, {
                 ttl: constants_1.Constants.SOCKET_ID_TTL,
             });
+            this.loggerService.log('==========================================================');
         }
         else {
             throw new common_1.UnauthorizedException('Who are you?');
@@ -84,15 +86,30 @@ let ChatGateway = class ChatGateway {
     afterInit(server) {
         this.server = server;
     }
-    async sendMessage(socket, data) {
+    async sendMessage(data, user) {
+        data.sender = user._id.toString();
         const [message, socketIds] = await Promise.all([
             this.messageService.create(data),
-            this.cacheManager.get(constants_1.Constants.SOCKET + data.sender),
+            this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
         ]);
         socketIds.forEach(item => {
-            socket.to(item).emit('receiverMessage', data);
+            this.server.sockets.to(item).emit('receiverMessage', message);
         });
         return message;
+    }
+    async userOnline(user) {
+        const socketKey = this.getSocketKeyOfUser(user);
+        console.log(socketKey);
+        const test = await (0, redis_utils_1.getValueWithSocketKey)(this.cacheManager, socketKey);
+        console.log(test);
+    }
+    getSocketKeyOfUser(user) {
+        const socketKey = [];
+        for (const item of user.matched) {
+            const key = constants_1.Constants.SOCKET + item._id;
+            socketKey.push(key);
+        }
+        return socketKey;
     }
     handleHeartBeat(socket, data, user) {
         console.log('This is user', user);
@@ -118,13 +135,21 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('sendMessage'),
     (0, common_1.UseGuards)(ws_guard_1.WsGuard),
-    __param(0, (0, websockets_1.ConnectedSocket)()),
-    __param(1, (0, websockets_1.MessageBody)()),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __param(1, (0, getuser_decorators_1.GetUserWS)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket,
-        create_message_input_1.CreateMessageInput]),
+    __metadata("design:paramtypes", [create_message_input_1.CreateMessageInput,
+        user_entities_1.User]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "sendMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('isOnline'),
+    (0, common_1.UseGuards)(ws_guard_1.WsGuard),
+    __param(0, (0, getuser_decorators_1.GetUserWS)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_entities_1.User]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "userOnline", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('heartbeat'),
     (0, common_1.UseGuards)(ws_guard_1.WsGuard),

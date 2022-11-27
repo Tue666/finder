@@ -11,21 +11,18 @@ export const MessageSchema = new Schema<Message>(
     sender: {
       type: Schema.Types.ObjectId,
       ref: User.name,
-      autopopulate: { maxDepth: 1 },
     },
     receiver: {
       type: Schema.Types.ObjectId,
       ref: User.name,
-      autopopulate: { maxDepth: 1 },
       required: true,
     },
     conversion_id: {
       type: Schema.Types.ObjectId,
       ref: Conversation.name,
-      autopopulate: { maxDepth: false },
       required: true,
     },
-    cursor: { type: Number, required: true },
+    cursor: { type: Number },
     urlMessageImage: { type: String, trim: true },
     type: { type: String, enum: Object.values(MessageType) },
     isDeleted: { type: Boolean },

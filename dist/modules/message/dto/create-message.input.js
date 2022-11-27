@@ -20,7 +20,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMessageInput.prototype, "text", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => graphql_scalars_1.GraphQLObjectID),
+    (0, graphql_1.HideField)(),
     __metadata("design:type", String)
 ], CreateMessageInput.prototype, "sender", void 0);
 __decorate([

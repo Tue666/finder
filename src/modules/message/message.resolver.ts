@@ -1,12 +1,11 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { MessageService } from './message.service';
-import { Message, MessageResult } from './entities/message.entity';
-import { UpdateMessageInput } from './dto/update-message.input';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLObjectID } from 'graphql-scalars';
 import {
   FilterGetAllMessage,
   PaginationMessageInput,
 } from './dto/create-message.input';
+import { Message, MessageResult } from './entities/message.entity';
+import { MessageService } from './message.service';
 
 @Resolver(() => Message)
 export class MessageResolver {

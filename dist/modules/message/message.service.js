@@ -26,14 +26,16 @@ let MessageService = class MessageService {
         this.conversationService = conversationService;
     }
     async create(input) {
+        var _a;
         try {
             const [conversation, message] = await Promise.all([
                 this.conversationService.findOne({ _id: input.conversion_id }),
                 this.messageModel.create(input),
             ]);
-            message.cursor = conversation.lastMessage.cursor + 1;
+            message.cursor = ((_a = conversation.lastMessage) === null || _a === void 0 ? void 0 : _a.cursor) + 1 || 1;
+            conversation.lastMessage = message;
             await Promise.all([
-                this.conversationService.findOneAndUpdate({ _id: input.conversion_id }, { lastMessage: message._id }),
+                this.conversationService.updateModel(conversation),
                 message.save(),
             ]);
             return message;

@@ -10,21 +10,18 @@ exports.MessageSchema = new mongoose_1.Schema({
     sender: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: user_entities_1.User.name,
-        autopopulate: { maxDepth: 1 },
     },
     receiver: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: user_entities_1.User.name,
-        autopopulate: { maxDepth: 1 },
         required: true,
     },
     conversion_id: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: conversation_entity_1.Conversation.name,
-        autopopulate: { maxDepth: false },
         required: true,
     },
-    cursor: { type: Number, required: true },
+    cursor: { type: Number },
     urlMessageImage: { type: String, trim: true },
     type: { type: String, enum: Object.values(enum_1.MessageType) },
     isDeleted: { type: Boolean },

@@ -20,7 +20,6 @@ exports.ConversationSchema = new mongoose_1.Schema({
         {
             type: mongoose_1.Schema.Types.ObjectId,
             ref: user_entities_1.User.name,
-            autopopulate: { maxDepth: 1 },
         },
     ],
 }, {

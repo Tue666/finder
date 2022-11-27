@@ -1,6 +1,6 @@
-import { MessageService } from './message.service';
-import { MessageResult } from './entities/message.entity';
 import { FilterGetAllMessage, PaginationMessageInput } from './dto/create-message.input';
+import { MessageResult } from './entities/message.entity';
+import { MessageService } from './message.service';
 export declare class MessageResolver {
     private readonly messageService;
     constructor(messageService: MessageService);

@@ -22,10 +22,6 @@ export class WsStrategy extends PassportStrategy(Strategy, 'ws') {
       if (!user) {
         throw new UnauthorizedException('jwt not accepted');
       }
-      await this.userService.findOneAndUpdate(
-        { _id: payload._id },
-        { $set: { lastActive: Date.now(), statusActive: StatusActive.ONLINE } },
-      );
       return user;
     } catch (error) {
       throw error;

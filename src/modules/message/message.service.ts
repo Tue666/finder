@@ -24,12 +24,11 @@ export class MessageService {
         this.conversationService.findOne({ _id: input.conversion_id }),
         this.messageModel.create(input),
       ]);
-      message.cursor = conversation.lastMessage.cursor + 1;
+      message.cursor = conversation.lastMessage?.cursor + 1 || 1;
+      conversation.lastMessage = message;
       await Promise.all([
-        this.conversationService.findOneAndUpdate(
-          { _id: input.conversion_id },
-          { lastMessage: message._id },
-        ),
+        this.conversationService.updateModel(conversation),
+        // message.populate('sender'),
         message.save(),
       ]);
       return message;

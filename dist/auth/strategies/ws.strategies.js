@@ -13,7 +13,6 @@ exports.WsStrategy = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
-const enum_1 = require("../../constants/enum");
 const user_service_1 = require("../../modules/user/user.service");
 let WsStrategy = class WsStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'ws') {
     constructor(userService) {
@@ -30,7 +29,6 @@ let WsStrategy = class WsStrategy extends (0, passport_1.PassportStrategy)(passp
             if (!user) {
                 throw new common_1.UnauthorizedException('jwt not accepted');
             }
-            await this.userService.findOneAndUpdate({ _id: payload._id }, { $set: { lastActive: Date.now(), statusActive: enum_1.StatusActive.ONLINE } });
             return user;
         }
         catch (error) {

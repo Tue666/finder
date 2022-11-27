@@ -1,11 +1,11 @@
 import { JwtService } from '@nestjs/jwt';
+import { Cache } from 'cache-manager';
+import { RegisterType } from '../constants/enum';
+import { MailService } from '../modules/mail/mail.service';
 import { User } from '../modules/user/entities/user.entities';
 import { UserService } from '../modules/user/user.service';
 import { LoginInput, RegisterInput, ResetPasswordInput } from './dto/auth.dto';
 import { JwtPayload, RefreshPayload } from './entities/auth.entities';
-import { Cache } from 'cache-manager';
-import { MailService } from '../modules/mail/mail.service';
-import { RegisterType } from '../constants/enum';
 export declare class AuthService {
     private jwtService;
     private userService;

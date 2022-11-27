@@ -71,7 +71,8 @@ let ConversationService = class ConversationService {
                 .find(queryFilter)
                 .skip(input === null || input === void 0 ? void 0 : input.size)
                 .limit(((input === null || input === void 0 ? void 0 : input.page) - 1) * (input === null || input === void 0 ? void 0 : input.size))
-                .sort(querySort),
+                .sort(querySort)
+                .populate('members'),
             this.conversionModel.count(queryFilter),
         ]);
         results = this.filterByLastMessaged(results, user._id.toString());
@@ -115,6 +116,10 @@ let ConversationService = class ConversationService {
         catch (error) {
             throw error;
         }
+    }
+    async updateModel(conversation) {
+        const conversationUpdate = new this.conversionModel(conversation);
+        return await conversationUpdate.save();
     }
     getQueryOrMembers(members) {
         const reverseMembers = members.reverse();

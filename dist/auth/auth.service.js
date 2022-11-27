@@ -19,16 +19,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
+const axios_1 = __importDefault(require("axios"));
+const cache_manager_1 = require("cache-manager");
+const constants_1 = require("../constants/constants");
+const enum_1 = require("../constants/enum");
+const mail_service_1 = require("../modules/mail/mail.service");
+const mail_reset_password_1 = require("../modules/mail/templates/mail.reset_password");
+const mail_verify_1 = require("../modules/mail/templates/mail.verify");
 const user_entities_1 = require("../modules/user/entities/user.entities");
 const user_service_1 = require("../modules/user/user.service");
-const cache_manager_1 = require("cache-manager");
-const mail_service_1 = require("../modules/mail/mail.service");
-const enum_1 = require("../constants/enum");
-const constants_1 = require("../constants/constants");
 const utils_1 = require("../utils/utils");
-const axios_1 = __importDefault(require("axios"));
-const mail_verify_1 = require("../modules/mail/templates/mail.verify");
-const mail_reset_password_1 = require("../modules/mail/templates/mail.reset_password");
 let AuthService = class AuthService {
     constructor(jwtService, userService, mailService, cacheManager) {
         this.jwtService = jwtService;

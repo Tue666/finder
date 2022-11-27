@@ -15,6 +15,7 @@ export declare class ConversationService {
     filterByLastMessaged(conversations: Conversation[], user_id: string): any;
     findOne(input: FilterGetOneConversation): Promise<Conversation>;
     findOneAndUpdate(filter: FilterQuery<Conversation>, update: UpdateQuery<Conversation>, options?: QueryOptions<Conversation> | null): Promise<Conversation>;
+    updateModel(conversation: Conversation): Promise<Conversation>;
     getQueryOrMembers(members: string[]): {
         $or: {
             members: string[];
