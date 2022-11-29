@@ -17,6 +17,7 @@ export declare class UserHelper {
     declineBlockUser(_id: string): Promise<boolean>;
     getAllReportedUser(pagination: PaginationInput): Promise<UserResult>;
     statisticUser(pagination: PaginationInput, filter: FilterStatisticUser): Promise<UserResult>;
+    calUserPercent(): Promise<number>;
     uploadImage({ stream }: {
         stream: any;
     }): Promise<any>;

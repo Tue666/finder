@@ -5,7 +5,11 @@ import { v2 } from 'cloudinary';
 import { Constants } from '../../../constants/constants';
 import { RoleEnum, StatusActive } from '../../../constants/enum';
 import { FilterBuilder } from '../../../utils/filter.query';
-import { setFilterByDate } from '../../../utils/utils';
+import {
+  setFilterByDate,
+  setLastDate,
+  setStartDate,
+} from '../../../utils/utils';
 import { PaginationInput } from '../../common/dto/common.dto';
 import { LoggerService } from '../../logger/logger.service';
 import { UserEmbeddedService } from '../../user_embedded/user_embedded.service';
@@ -167,11 +171,25 @@ export class UserHelper {
     filter: FilterStatisticUser,
   ): Promise<UserResult> {
     try {
-      const queryFilterByDate = setFilterByDate(filter.filterByDate);
+      const queryFilterByDate = setFilterByDate(filter?.filterByDate);
+      let filterInActive = null;
+      if (filter?.isInActive === true) {
+        const currentDate: Date = new Date();
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        filterInActive = {
+          $lte: currentDate,
+        };
+      }
       const [queryFilter, querySort] = new FilterBuilder()
-        .addName(filter.username)
-        .addSubQuery({ createdAt: queryFilterByDate })
-        .addSortOption(filter.sortOption)
+        .addName(filter?.username)
+        .setFilterItemWithObject(
+          'createdAt',
+          queryFilterByDate,
+          queryFilterByDate,
+        )
+        .setFilterItemWithObject('gender', filter?.gender, filter?.gender)
+        .setFilterItemWithObject('lastActive', filterInActive, filterInActive)
+        .addSortOption(filter?.sortOption)
         .buildQuery();
       const [results, totalCount] = await Promise.all([
         this.userModel
@@ -187,6 +205,38 @@ export class UserHelper {
     }
   }
 
+  async calUserPercent(): Promise<number> {
+    try {
+      // eslint-disable-next-line prefer-const
+      let [currentMonth, lastMonth, startMonth] = [
+        new Date(),
+        new Date(),
+        new Date(),
+      ];
+      lastMonth.setMonth(currentMonth.getMonth() - 1);
+      lastMonth.setDate(1);
+      startMonth.setDate(1);
+      lastMonth = setStartDate(lastMonth);
+      startMonth = setStartDate(startMonth);
+      const lastDate = setLastDate(startMonth);
+      const [totalUserLastMoth, totalUserThisMonth] = await Promise.all([
+        this.userModel.find({
+          createdAt: { $gte: lastMonth, $lte: lastDate },
+        }),
+        this.userModel.find({
+          createdAt: { $gte: startMonth, $lte: currentMonth },
+        }),
+      ]);
+      if (totalUserLastMoth.length === 0) {
+        return totalUserThisMonth.length;
+      }
+      return +(totalUserThisMonth.length / totalUserLastMoth.length).toFixed(2);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // image
   async uploadImage({ stream }): Promise<any> {
     try {
       return new Promise((resolve, reject) => {

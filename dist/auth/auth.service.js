@@ -215,8 +215,6 @@ let AuthService = class AuthService {
             else if (userNormal) {
                 throw new common_1.BadRequestException('Email has been used !');
             }
-            const [long, lat] = [-73.856077, 40.848447];
-            await this.userService.findOneAndUpdate({ _id: userOAuth2._id }, { $set: { geoLocation: { coordinates: [long, lat] } } });
             return await this.generateTokens(userOAuth2._id.toString());
         }
         catch (error) {

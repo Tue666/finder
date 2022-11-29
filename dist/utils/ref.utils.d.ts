@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
-declare type IPopulateSelect<T> = (keyof T | `-${Extract<keyof T, string>}`)[];
-declare type IRefOption<T> = {
+type IPopulateSelect<T> = (keyof T | `-${Extract<keyof T, string>}`)[];
+type IRefOption<T> = {
     autoPopulate: true;
     select: IPopulateSelect<T>;
 } | {

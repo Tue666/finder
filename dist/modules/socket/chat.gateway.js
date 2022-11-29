@@ -19,26 +19,31 @@ const jwt_1 = require("@nestjs/jwt");
 const websockets_1 = require("@nestjs/websockets");
 const cache_manager_1 = require("cache-manager");
 const getuser_decorators_1 = require("../../common/decorators/getuser.decorators");
+const enum_1 = require("../../constants/enum");
+const conversation_service_1 = require("../conversation/conversation.service");
 const create_message_input_1 = require("../message/dto/create-message.input");
 const message_service_1 = require("../message/message.service");
 const user_entities_1 = require("../user/entities/user.entities");
 const socket_io_1 = require("socket.io");
-const redis_utils_1 = require("../../utils/redis.utils");
 const ws_guard_1 = require("../../common/guard/ws.guard");
 const constants_1 = require("../../constants/constants");
 const logger_service_1 = require("../logger/logger.service");
 const user_service_1 = require("../user/user.service");
+const socket_service_1 = require("./socket.service");
 let ChatGateway = class ChatGateway {
-    constructor(userService, cacheManager, jwtService, loggerService, messageService) {
+    constructor(userService, cacheManager, jwtService, loggerService, messageService, socketService, conversationService) {
         this.userService = userService;
         this.cacheManager = cacheManager;
         this.jwtService = jwtService;
         this.loggerService = loggerService;
         this.messageService = messageService;
+        this.socketService = socketService;
+        this.conversationService = conversationService;
         this.loggerService.setContext('ChatGateway');
     }
     async handleDisconnect(socket) {
-        const socketKey = constants_1.Constants.SOCKET + socket.userId;
+        const userId = socket.userId;
+        const socketKey = constants_1.Constants.SOCKET + userId;
         let socketIds = await this.cacheManager.get(socketKey);
         this.loggerService.log(`Socket IDS in array: ${socketIds}`);
         if (!socketIds) {
@@ -49,9 +54,29 @@ let ChatGateway = class ChatGateway {
                 return socketId;
             }
         });
-        this.loggerService.log(`Socket IDS in array After: ${socketIds}`);
-        await this.cacheManager.set(socketKey, socketIds, {
-            ttl: constants_1.Constants.SOCKET_ID_TTL,
+        if (socketIds.length === 0) {
+            await Promise.all([
+                this.cacheManager.del(constants_1.Constants.SOCKET + userId),
+                this.handleBroadcastDisconnection(userId),
+            ]);
+        }
+        else {
+            this.loggerService.log(`Socket IDS in array After: ${socketIds}`);
+            await this.cacheManager.set(socketKey, socketIds, {
+                ttl: constants_1.Constants.SOCKET_ID_TTL,
+            });
+        }
+    }
+    async handleBroadcastDisconnection(userId) {
+        const user = await this.userService.findOneAndUpdate({ _id: userId }, {
+            $set: {
+                lastActive: new Date(),
+                statusActive: enum_1.StatusActive.OFFLINE,
+            },
+        });
+        const socketIds = await this.socketService.getAllSocketIds(user);
+        socketIds.forEach(item => {
+            this.server.sockets.to(item).emit('userMatchedDisconnection', user);
         });
     }
     async handleConnection(socket, ...args) {
@@ -92,28 +117,32 @@ let ChatGateway = class ChatGateway {
             this.messageService.create(data),
             this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
         ]);
-        socketIds.forEach(item => {
-            this.server.sockets.to(item).emit('receiverMessage', message);
-        });
+        this.sendEmit(socketIds, 'receiverMessage', message);
         return message;
     }
     async userOnline(user) {
-        const socketKey = this.getSocketKeyOfUser(user);
-        console.log(socketKey);
-        const test = await (0, redis_utils_1.getValueWithSocketKey)(this.cacheManager, socketKey);
-        console.log(test);
-    }
-    getSocketKeyOfUser(user) {
-        const socketKey = [];
-        for (const item of user.matched) {
-            const key = constants_1.Constants.SOCKET + item._id;
-            socketKey.push(key);
-        }
-        return socketKey;
+        const socketIds = await this.socketService.getAllSocketIds(user);
+        socketIds.forEach(item => {
+            this.server.sockets.to(item).emit('userMatchedConnection', user);
+        });
     }
     handleHeartBeat(socket, data, user) {
         console.log('This is user', user);
         this.loggerService.debug(socket.id);
+    }
+    async getAllUserMatched(user) {
+        const [socketIds, users] = await Promise.all([
+            this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
+            this.conversationService.getAllUserMatched(null, user, true),
+        ]);
+        this.sendEmit(socketIds, 'listUserMatched', users);
+    }
+    sendEmit(socketIds, event, data) {
+        if (socketIds) {
+            socketIds.forEach(item => {
+                this.server.sockets.to(item).emit(event, data);
+            });
+        }
     }
 };
 __decorate([
@@ -160,12 +189,23 @@ __decorate([
     __metadata("design:paramtypes", [socket_io_1.Socket, Object, user_entities_1.User]),
     __metadata("design:returntype", void 0)
 ], ChatGateway.prototype, "handleHeartBeat", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('getAllUserMatched'),
+    (0, common_1.UseGuards)(ws_guard_1.WsGuard),
+    __param(0, (0, getuser_decorators_1.GetUserWS)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_entities_1.User]),
+    __metadata("design:returntype", Promise)
+], ChatGateway.prototype, "getAllUserMatched", null);
 ChatGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({ transport: ['websocket'], allowEIO3: true, cors: '*' }),
+    __param(0, (0, common_1.Inject)((0, common_1.forwardRef)(() => user_service_1.UserService))),
     __param(1, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
     __metadata("design:paramtypes", [user_service_1.UserService, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object, jwt_1.JwtService,
         logger_service_1.LoggerService,
-        message_service_1.MessageService])
+        message_service_1.MessageService,
+        socket_service_1.SocketService,
+        conversation_service_1.ConversationService])
 ], ChatGateway);
 exports.ChatGateway = ChatGateway;
 //# sourceMappingURL=chat.gateway.js.map

@@ -10,6 +10,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
 import { Cache } from 'cache-manager';
+import { throwIfNotExists } from 'utils/model.utils';
 import { Constants } from '../constants/constants';
 import { RegisterType, RoleEnum } from '../constants/enum';
 import { MailService } from '../modules/mail/mail.service';

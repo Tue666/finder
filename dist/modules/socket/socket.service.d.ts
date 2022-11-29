@@ -1,12 +1,13 @@
 import { MessageService } from 'modules/message/message.service';
-import { CreateSocketInput } from './dto/create-socket.input';
-import { UpdateSocketInput } from './dto/update-socket.input';
+import { User } from 'modules/user/entities/user.entities';
+import { Cache } from 'cache-manager';
 export declare class SocketService {
     private messageService;
-    constructor(messageService: MessageService);
-    create(createSocketInput: CreateSocketInput): string;
+    private cacheManager;
+    constructor(messageService: MessageService, cacheManager: Cache);
+    getSocketKeyOfUser(user: User): string[];
+    getAllSocketIds(user: User): Promise<string[]>;
     findAll(): string;
     findOne(id: number): string;
-    update(id: number, updateSocketInput: UpdateSocketInput): string;
     remove(id: number): string;
 }

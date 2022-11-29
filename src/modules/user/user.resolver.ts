@@ -92,9 +92,18 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AtGuard)
+  unMatched(
+    @Args('user_id', { type: () => GraphQLObjectID }) user_id: string,
+    @GetUser() user: User,
+  ): Promise<boolean> {
+    return this.userService.unMatched(user, user_id);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(AtGuard)
   reportUser(
     @Args('reasonReport') reasonReport: string,
-    @Args('reasonReport') descriptionReport: string,
+    @Args('reportDetail') descriptionReport: string,
     @Args('userReport', { type: () => GraphQLObjectID }) user_id: string,
     @GetUser() user: User,
   ): Promise<boolean> {
@@ -104,6 +113,13 @@ export class UserResolver {
       user_id,
       user,
     );
+  }
+
+  @Query(() => Number)
+  @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
+  calUserPercent(): Promise<number> {
+    return this.userHelper.calUserPercent();
   }
 
   @Mutation(() => Boolean)

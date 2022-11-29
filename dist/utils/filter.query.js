@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilterBuilder = void 0;
+const enum_1 = require("../constants/enum");
 const string_utils_1 = require("./string.utils");
 const utils_1 = require("./utils");
 class FilterBuilder {
     constructor() {
         this.queryFilter = {
-            $and: [{ isDeleted: false }],
+            $and: [{ isDeleted: false }, { role: enum_1.RoleEnum.USER }],
         };
         this.querySort = {};
     }

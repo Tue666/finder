@@ -19,6 +19,6 @@ export declare class Constants {
     static RESET_CODE_PASSWORD: string;
     static CLOUDINARY: string;
 }
-export declare type SortQuery = {
+export type SortQuery = {
     [key: string]: SortOrder;
 };

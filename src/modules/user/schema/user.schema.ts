@@ -131,7 +131,12 @@ export const UserSchema = new Schema<User>(
     aboutMe: { type: String, trim: true },
     company: { type: String, trim: true },
     age: { type: Number },
-    gender: { type: String, enum: Object.values(GenderEnum) },
+    gender: {
+      type: String,
+      trim: true,
+      enum: Object.values(GenderEnum),
+      default: GenderEnum.MALE,
+    },
     phoneNumber: { type: String, trim: true },
     birthDays: { type: Date },
     images: { type: [String], default: [] },

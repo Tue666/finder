@@ -1,5 +1,6 @@
 import {
   CACHE_MANAGER,
+  forwardRef,
   Inject,
   UnauthorizedException,
   UseGuards,
@@ -10,39 +11,48 @@ import {
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Cache } from 'cache-manager';
 import { GetUserWS } from 'common/decorators/getuser.decorators';
+import { StatusActive } from 'constants/enum';
+import { ConversationService } from 'modules/conversation/conversation.service';
 import { CreateMessageInput } from 'modules/message/dto/create-message.input';
 import { Message } from 'modules/message/entities/message.entity';
 import { MessageService } from 'modules/message/message.service';
 import { User } from 'modules/user/entities/user.entities';
 import { Server, Socket } from 'socket.io';
-import { getValueWithSocketKey } from 'utils/redis.utils';
 import { IJwtPayload } from '../../auth/entities/auth.entities';
 import { WsGuard } from '../../common/guard/ws.guard';
 import { Constants } from '../../constants/constants';
 import { LoggerService } from '../logger/logger.service';
 import { UserService } from '../user/user.service';
+import { SocketService } from './socket.service';
 
 @WebSocketGateway({ transport: ['websocket'], allowEIO3: true, cors: '*' })
-export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
+{
   constructor(
+    @Inject(forwardRef(() => UserService))
     private userService: UserService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private jwtService: JwtService,
     private loggerService: LoggerService,
     private messageService: MessageService,
+    private socketService: SocketService,
+    private conversationService: ConversationService,
   ) {
     this.loggerService.setContext('ChatGateway');
   }
   @WebSocketServer()
   public server: Server;
   async handleDisconnect(@ConnectedSocket() socket: Socket) {
-    const socketKey = Constants.SOCKET + (socket as any).userId;
+    const userId = (socket as any).userId;
+    const socketKey = Constants.SOCKET + userId;
     let socketIds: string[] = await this.cacheManager.get(socketKey);
     this.loggerService.log(`Socket IDS in array: ${socketIds}`);
     if (!socketIds) {
@@ -53,9 +63,32 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return socketId;
       }
     });
-    this.loggerService.log(`Socket IDS in array After: ${socketIds}`);
-    await this.cacheManager.set(socketKey, socketIds, {
-      ttl: Constants.SOCKET_ID_TTL,
+    if (socketIds.length === 0) {
+      await Promise.all([
+        this.cacheManager.del(Constants.SOCKET + userId),
+        this.handleBroadcastDisconnection(userId),
+      ]);
+    } else {
+      this.loggerService.log(`Socket IDS in array After: ${socketIds}`);
+      await this.cacheManager.set(socketKey, socketIds, {
+        ttl: Constants.SOCKET_ID_TTL,
+      });
+    }
+  }
+
+  async handleBroadcastDisconnection(userId: string): Promise<void> {
+    const user = await this.userService.findOneAndUpdate(
+      { _id: userId },
+      {
+        $set: {
+          lastActive: new Date(),
+          statusActive: StatusActive.OFFLINE,
+        },
+      },
+    );
+    const socketIds = await this.socketService.getAllSocketIds(user);
+    socketIds.forEach(item => {
+      this.server.sockets.to(item).emit('userMatchedDisconnection', user);
     });
   }
 
@@ -104,28 +137,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.messageService.create(data),
       this.cacheManager.get(Constants.SOCKET + user._id.toString()),
     ]);
-    (socketIds as string[]).forEach(item => {
-      this.server.sockets.to(item).emit('receiverMessage', message);
-    });
+    this.sendEmit(socketIds, 'receiverMessage', message);
     return message;
   }
 
   @SubscribeMessage('isOnline')
   @UseGuards(WsGuard)
   async userOnline(@GetUserWS() user: User): Promise<any> {
-    const socketKey = this.getSocketKeyOfUser(user);
-    console.log(socketKey);
-    const test = await getValueWithSocketKey(this.cacheManager, socketKey);
-    console.log(test);
-  }
-
-  getSocketKeyOfUser(user: User): string[] {
-    const socketKey: string[] = [];
-    for (const item of user.matched) {
-      const key = Constants.SOCKET + item._id;
-      socketKey.push(key);
-    }
-    return socketKey;
+    const socketIds = await this.socketService.getAllSocketIds(user);
+    socketIds.forEach(item => {
+      this.server.sockets.to(item).emit('userMatchedConnection', user);
+    });
   }
 
   @SubscribeMessage('heartbeat')
@@ -137,5 +159,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     console.log('This is user', user);
     this.loggerService.debug(socket.id);
+  }
+
+  @SubscribeMessage('getAllUserMatched')
+  @UseGuards(WsGuard)
+  async getAllUserMatched(@GetUserWS() user: User) {
+    const [socketIds, users] = await Promise.all([
+      this.cacheManager.get(Constants.SOCKET + user._id.toString()),
+      this.conversationService.getAllUserMatched(null, user, true),
+    ]);
+    this.sendEmit(socketIds, 'listUserMatched', users);
+  }
+
+  sendEmit(socketIds, event: string, data) {
+    if (socketIds) {
+      (socketIds as string[]).forEach(item => {
+        this.server.sockets.to(item).emit(event, data);
+      });
+    }
   }
 }

@@ -1,4 +1,5 @@
 import { Cache } from 'cache-manager';
+import { ChatGateway } from 'modules/socket/chat.gateway';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
 import { PaginationInput } from '../common/dto/common.dto';
@@ -11,12 +12,13 @@ import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
 export declare class UserService {
     private userModel;
+    private cacheManager;
+    private chatGateway;
     private userEmbeddedService;
     private loggerService;
     private conversationService;
     private userHelper;
-    private cacheManager;
-    constructor(userModel: UserModelType, userEmbeddedService: UserEmbeddedService, loggerService: LoggerService, conversationService: ConversationService, userHelper: UserHelper, cacheManager: Cache);
+    constructor(userModel: UserModelType, cacheManager: Cache, chatGateway: ChatGateway, userEmbeddedService: UserEmbeddedService, loggerService: LoggerService, conversationService: ConversationService, userHelper: UserHelper);
     createWithOAuth2(userGoogle: User): Promise<User>;
     changePassword(oldPassword: string, newPassword: string, user: User): Promise<boolean>;
     resetPassword(user: User, password: string): Promise<boolean>;
@@ -32,8 +34,10 @@ export declare class UserService {
     updateProfile(user: User, input: UpdateUserInput | MySettingInput, feature: string): Promise<boolean>;
     skipUser(user: User, user_id: string): Promise<boolean>;
     unSkipUser(user: User, user_id: string): Promise<boolean>;
+    matchedUser(user: User, user_id: string, requestedUser: User): Promise<void>;
     likeUser(user_id: string, user: User): Promise<boolean>;
     unlikeUser(user: User, user_id: string): Promise<boolean>;
+    unMatched(user: User, user_id: string): Promise<boolean>;
     reportUser(reasonReport: string, descriptionReport: string, userReport: string, reportBy: User): Promise<boolean>;
     insertManyUser(): Promise<boolean>;
 }

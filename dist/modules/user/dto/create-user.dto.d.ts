@@ -55,8 +55,10 @@ export declare class NewInformationAfterLogin {
     coordinates?: number[];
     user?: User;
 }
-export declare class FilterStatisticUser {
+export declare class FilterStatisticUser implements Partial<IUser> {
     filterByDate: FilterByDate;
     username: string;
+    gender?: GenderEnum;
+    isInActive: boolean;
     sortOption: SortOption;
 }

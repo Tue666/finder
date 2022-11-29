@@ -4,7 +4,7 @@ exports.getValueWithSocketKey = void 0;
 async function getValueWithSocketKey(cacheManager, socketKey) {
     let socketIds = [];
     for (let i = 0; i < socketKey.length; i++) {
-        const cacheValue = await cacheManager.getall(socketKey[i]);
+        const cacheValue = await cacheManager.get(socketKey[i]);
         if (cacheValue) {
             socketIds = socketIds.concat(cacheValue);
         }

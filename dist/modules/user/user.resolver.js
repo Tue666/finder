@@ -56,8 +56,14 @@ let UserResolver = class UserResolver {
     unlikeUser(user_id, user) {
         return this.userService.unlikeUser(user, user_id);
     }
+    unMatched(user_id, user) {
+        return this.userService.unMatched(user, user_id);
+    }
     reportUser(reasonReport, descriptionReport, user_id, user) {
         return this.userService.reportUser(reasonReport, descriptionReport, user_id, user);
+    }
+    calUserPercent() {
+        return this.userHelper.calUserPercent();
     }
     confirmBlockUser(user_id) {
         return this.userHelper.confirmBlockUser(user_id);
@@ -160,14 +166,31 @@ __decorate([
 __decorate([
     (0, graphql_1.Mutation)(() => Boolean),
     (0, common_1.UseGuards)(at_guard_1.AtGuard),
+    __param(0, (0, graphql_1.Args)('user_id', { type: () => graphql_scalars_1.GraphQLObjectID })),
+    __param(1, (0, getuser_decorators_1.GetUser)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_entities_1.User]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "unMatched", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean),
+    (0, common_1.UseGuards)(at_guard_1.AtGuard),
     __param(0, (0, graphql_1.Args)('reasonReport')),
-    __param(1, (0, graphql_1.Args)('reasonReport')),
+    __param(1, (0, graphql_1.Args)('reportDetail')),
     __param(2, (0, graphql_1.Args)('userReport', { type: () => graphql_scalars_1.GraphQLObjectID })),
     __param(3, (0, getuser_decorators_1.GetUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, String, String, user_entities_1.User]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "reportUser", null);
+__decorate([
+    (0, graphql_1.Query)(() => Number),
+    (0, common_1.UseGuards)(at_guard_1.AtGuard, role_guard_1.RolesGuard),
+    (0, role_decorators_1.hasRoles)(enum_1.RoleEnum.ADMIN),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "calUserPercent", null);
 __decorate([
     (0, graphql_1.Mutation)(() => Boolean),
     (0, common_1.UseGuards)(at_guard_1.AtGuard, role_guard_1.RolesGuard),

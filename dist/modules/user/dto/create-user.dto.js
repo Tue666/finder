@@ -216,6 +216,14 @@ __decorate([
     __metadata("design:type", String)
 ], FilterStatisticUser.prototype, "username", void 0);
 __decorate([
+    (0, graphql_1.Field)(() => enum_1.GenderEnum, { nullable: true }),
+    __metadata("design:type", String)
+], FilterStatisticUser.prototype, "gender", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => Boolean, { nullable: true }),
+    __metadata("design:type", Boolean)
+], FilterStatisticUser.prototype, "isInActive", void 0);
+__decorate([
     (0, graphql_1.Field)(() => enum_1.SortOption, { nullable: true }),
     __metadata("design:type", String)
 ], FilterStatisticUser.prototype, "sortOption", void 0);

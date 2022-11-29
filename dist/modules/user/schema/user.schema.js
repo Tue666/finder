@@ -83,7 +83,12 @@ exports.UserSchema = new mongoose_1.Schema({
     aboutMe: { type: String, trim: true },
     company: { type: String, trim: true },
     age: { type: Number },
-    gender: { type: String, enum: Object.values(enum_1.GenderEnum) },
+    gender: {
+        type: String,
+        trim: true,
+        enum: Object.values(enum_1.GenderEnum),
+        default: enum_1.GenderEnum.MALE,
+    },
     phoneNumber: { type: String, trim: true },
     birthDays: { type: Date },
     images: { type: [String], default: [] },

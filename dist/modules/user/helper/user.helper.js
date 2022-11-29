@@ -153,11 +153,21 @@ let UserHelper = class UserHelper {
     }
     async statisticUser(pagination, filter) {
         try {
-            const queryFilterByDate = (0, utils_1.setFilterByDate)(filter.filterByDate);
+            const queryFilterByDate = (0, utils_1.setFilterByDate)(filter === null || filter === void 0 ? void 0 : filter.filterByDate);
+            let filterInActive = null;
+            if ((filter === null || filter === void 0 ? void 0 : filter.isInActive) === true) {
+                const currentDate = new Date();
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                filterInActive = {
+                    $lte: currentDate,
+                };
+            }
             const [queryFilter, querySort] = new filter_query_1.FilterBuilder()
-                .addName(filter.username)
-                .addSubQuery({ createdAt: queryFilterByDate })
-                .addSortOption(filter.sortOption)
+                .addName(filter === null || filter === void 0 ? void 0 : filter.username)
+                .setFilterItemWithObject('createdAt', queryFilterByDate, queryFilterByDate)
+                .setFilterItemWithObject('gender', filter === null || filter === void 0 ? void 0 : filter.gender, filter === null || filter === void 0 ? void 0 : filter.gender)
+                .setFilterItemWithObject('lastActive', filterInActive, filterInActive)
+                .addSortOption(filter === null || filter === void 0 ? void 0 : filter.sortOption)
                 .buildQuery();
             const [results, totalCount] = await Promise.all([
                 this.userModel
@@ -168,6 +178,36 @@ let UserHelper = class UserHelper {
                 this.userModel.countDocuments(queryFilter),
             ]);
             return { results, totalCount };
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    async calUserPercent() {
+        try {
+            let [currentMonth, lastMonth, startMonth] = [
+                new Date(),
+                new Date(),
+                new Date(),
+            ];
+            lastMonth.setMonth(currentMonth.getMonth() - 1);
+            lastMonth.setDate(1);
+            startMonth.setDate(1);
+            lastMonth = (0, utils_1.setStartDate)(lastMonth);
+            startMonth = (0, utils_1.setStartDate)(startMonth);
+            const lastDate = (0, utils_1.setLastDate)(startMonth);
+            const [totalUserLastMoth, totalUserThisMonth] = await Promise.all([
+                this.userModel.find({
+                    createdAt: { $gte: lastMonth, $lte: lastDate },
+                }),
+                this.userModel.find({
+                    createdAt: { $gte: startMonth, $lte: currentMonth },
+                }),
+            ]);
+            if (totalUserLastMoth.length === 0) {
+                return totalUserThisMonth.length;
+            }
+            return +(totalUserThisMonth.length / totalUserLastMoth.length).toFixed(2);
         }
         catch (error) {
             throw error;

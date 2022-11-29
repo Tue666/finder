@@ -14,7 +14,9 @@ export declare class UserResolver {
     unSkipUser(user_id: string, user: User): Promise<boolean>;
     likeUser(user_id: string, user: User): Promise<boolean>;
     unlikeUser(user_id: string, user: User): Promise<boolean>;
+    unMatched(user_id: string, user: User): Promise<boolean>;
     reportUser(reasonReport: string, descriptionReport: string, user_id: string, user: User): Promise<boolean>;
+    calUserPercent(): Promise<number>;
     confirmBlockUser(user_id: string): Promise<boolean>;
     declineBlockUser(user_id: string): Promise<boolean>;
     updateLocation(user: User, coordinates: number[]): Promise<boolean>;

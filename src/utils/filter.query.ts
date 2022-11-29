@@ -1,12 +1,12 @@
 import { SortOrder } from 'mongoose';
 import { SortQuery } from '../constants/constants';
-import { SortOption } from '../constants/enum';
+import { RoleEnum, SortOption } from '../constants/enum';
 import { transformTextSearch } from './string.utils';
 import { setFilterSortOption } from './utils';
 
 export class FilterBuilder<T> {
   public queryFilter: any = {
-    $and: [{ isDeleted: false }],
+    $and: [{ isDeleted: false }, { role: RoleEnum.USER }],
   };
 
   public querySort: SortQuery = {};

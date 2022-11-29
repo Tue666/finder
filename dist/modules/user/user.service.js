@@ -21,6 +21,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const cache_manager_1 = require("cache-manager");
+const chat_gateway_1 = require("../socket/chat.gateway");
 const constants_1 = require("../../constants/constants");
 const model_utils_1 = require("../../utils/model.utils");
 const utils_1 = require("../../utils/utils");
@@ -30,13 +31,14 @@ const user_embedded_service_1 = require("../user_embedded/user_embedded.service"
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
 let UserService = class UserService {
-    constructor(userModel, userEmbeddedService, loggerService, conversationService, userHelper, cacheManager) {
+    constructor(userModel, cacheManager, chatGateway, userEmbeddedService, loggerService, conversationService, userHelper) {
         this.userModel = userModel;
+        this.cacheManager = cacheManager;
+        this.chatGateway = chatGateway;
         this.userEmbeddedService = userEmbeddedService;
         this.loggerService = loggerService;
         this.conversationService = conversationService;
         this.userHelper = userHelper;
-        this.cacheManager = cacheManager;
         this.loggerService.setContext('UserService');
     }
     async createWithOAuth2(userGoogle) {
@@ -168,6 +170,7 @@ let UserService = class UserService {
     async signInAsAdmin(email, password) {
         try {
             const user = await this.userModel.findOne({ email });
+            (0, model_utils_1.throwIfNotExists)(user, 'Admin không tồn tại');
             await this.isNotCorrectPassword(password, user.password);
             return user;
         }
@@ -267,22 +270,29 @@ let UserService = class UserService {
             throw error;
         }
     }
+    async matchedUser(user, user_id, requestedUser) {
+        this.loggerService.log('User match request with request user');
+        const members = [user._id.toString(), requestedUser._id.toString()];
+        const query = this.conversationService.getQueryOrMembers(members);
+        await Promise.all([
+            this.conversationService.findOneAndUpdate(query, { $set: { members: members, isDeleted: false } }, { upsert: true }),
+            this.userModel.findOneAndUpdate({ _id: user._id }, {
+                $pull: { matchRequest: { sender: user_id } },
+                $push: { matched: requestedUser },
+            }),
+            requestedUser.matched.push(user),
+        ]);
+    }
     async likeUser(user_id, user) {
         try {
             const requestedUser = await this.userModel.findOne({ _id: user_id });
             const isContainsInRequest = (0, utils_1.includesInObject)(user.matchRequest, 'sender', '_id', user_id);
             if (isContainsInRequest) {
-                this.loggerService.log('User match request with request user');
-                const members = [user._id.toString(), requestedUser._id.toString()];
-                const query = this.conversationService.getQueryOrMembers(members);
-                await Promise.all([
-                    this.conversationService.findOneAndUpdate(query, { $set: { members: members, isDeleted: false } }, { upsert: true }),
-                    this.userModel.findOneAndUpdate({ _id: user._id }, {
-                        $pull: { matchRequest: { sender: user_id } },
-                        $push: { matched: requestedUser },
-                    }),
-                    requestedUser.matched.push(user),
+                const [, socketIds] = await Promise.all([
+                    this.matchedUser(user, user_id, requestedUser),
+                    this.cacheManager.get(constants_1.Constants.SOCKET + requestedUser._id.toString()),
                 ]);
+                this.chatGateway.sendEmit(socketIds, 'matchedUser', user);
             }
             else {
                 this.loggerService.log(`Request match request to ${requestedUser.username}`);
@@ -290,14 +300,18 @@ let UserService = class UserService {
                     sender: user,
                     createdAt: new Date(),
                 });
-                await this.userEmbeddedService.findOneAndUpdate({
-                    user: user._id,
-                    countLike: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
-                }, {
-                    $push: { like: user_id },
-                    $inc: { countLike: 1 },
-                    $set: { user: user._id },
-                }, { upsert: true, new: true });
+                const [, socketIds] = await Promise.all([
+                    this.userEmbeddedService.findOneAndUpdate({
+                        user: user._id,
+                        countLike: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
+                    }, {
+                        $push: { like: user_id },
+                        $inc: { countLike: 1 },
+                        $set: { user: user._id },
+                    }, { upsert: true, new: true }),
+                    this.cacheManager.get(constants_1.Constants.SOCKET + requestedUser._id.toString()),
+                ]);
+                this.chatGateway.sendEmit(socketIds, 'matchRequest', user);
             }
             await requestedUser.save();
             return true;
@@ -327,6 +341,23 @@ let UserService = class UserService {
         }
         return userUpdated ? true : false;
     }
+    async unMatched(user, user_id) {
+        try {
+            const members = [user._id.toString(), user_id];
+            const query = this.conversationService.getQueryOrMembers(members);
+            await Promise.all([
+                this.userModel.findOneAndUpdate({ _id: user_id }, { $pull: { matched: user._id } }),
+                this.userModel.findOneAndUpdate({ _id: user._id }, { $pull: { matched: user_id } }),
+                this.conversationService.findOneAndUpdate(query, {
+                    $set: { isDeleted: false },
+                }),
+            ]);
+            return true;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     async reportUser(reasonReport, descriptionReport, userReport, reportBy) {
         try {
             const user = await this.userModel.findOneAndUpdate({ _id: userReport }, { $push: { reports: { reportBy, reasonReport, descriptionReport } } });
@@ -343,7 +374,8 @@ let UserService = class UserService {
             const users = await this.userModel.find();
             let count = 0;
             for (const user of users) {
-                user.isFirstLogin = false;
+                user.matched = [];
+                user.matchRequest = [];
                 await user.save();
                 count++;
             }
@@ -357,11 +389,13 @@ let UserService = class UserService {
 UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_entities_1.User.name)),
-    __param(5, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [Object, user_embedded_service_1.UserEmbeddedService,
+    __param(1, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
+    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => chat_gateway_1.ChatGateway))),
+    __metadata("design:paramtypes", [Object, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object, chat_gateway_1.ChatGateway,
+        user_embedded_service_1.UserEmbeddedService,
         logger_service_1.LoggerService,
         conversation_service_1.ConversationService,
-        user_helper_1.UserHelper, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object])
+        user_helper_1.UserHelper])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

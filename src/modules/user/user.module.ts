@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+import { SocketModule } from 'modules/socket/socket.module';
 import { Constants } from '../../constants/constants';
 import { toKeyword, toSlug } from '../../utils/string.utils';
 import { CloudinaryProvider } from '../common/cloudinary/cloudinary.provider';
@@ -39,6 +40,7 @@ import { UserService } from './user.service';
     UserEmbeddedModule,
     LoggerModule,
     ConversationModule,
+    forwardRef(() => SocketModule),
   ],
   providers: [
     UserResolver,

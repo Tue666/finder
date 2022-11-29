@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
+const socket_module_1 = require("../socket/socket.module");
 const constants_1 = require("../../constants/constants");
 const string_utils_1 = require("../../utils/string.utils");
 const cloudinary_provider_1 = require("../common/cloudinary/cloudinary.provider");
@@ -50,6 +51,7 @@ UserModule = __decorate([
             user_embedded_module_1.UserEmbeddedModule,
             logger_module_1.LoggerModule,
             conversation_module_1.ConversationModule,
+            (0, common_1.forwardRef)(() => socket_module_1.SocketModule),
         ],
         providers: [
             user_resolver_1.UserResolver,

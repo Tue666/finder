@@ -8,5 +8,5 @@ export declare const ControlWhoYouSeeSchema: Schema<ControlWhoYouSee, Model<Cont
 export declare const AddressSchema: Schema<Address, Model<Address, any, any, any, any>, {}, {}, {}, {}, "type", Address>;
 export declare const MySettingSchema: Schema<MySetting, Model<MySetting, any, any, any, any>, {}, {}, {}, {}, "type", MySetting>;
 export declare const ReportsSchema: Schema<Reports, Model<Reports, any, any, any, any>, {}, {}, {}, {}, "type", Reports>;
-export declare type UserModelType = Model<User>;
+export type UserModelType = Model<User>;
 export declare const UserSchema: Schema<User, Model<User, any, any, any, any>, {}, {}, {}, {}, "type", User>;

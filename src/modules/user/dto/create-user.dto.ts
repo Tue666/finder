@@ -156,12 +156,18 @@ export class NewInformationAfterLogin {
 }
 
 @InputType()
-export class FilterStatisticUser {
+export class FilterStatisticUser implements Partial<IUser> {
   @Field(() => FilterByDate, { nullable: true })
   filterByDate: FilterByDate;
 
   @Field({ nullable: true })
   username: string;
+
+  @Field(() => GenderEnum, { nullable: true })
+  gender?: GenderEnum;
+
+  @Field(() => Boolean, { nullable: true })
+  isInActive: boolean;
 
   @Field(() => SortOption, { nullable: true })
   sortOption: SortOption;

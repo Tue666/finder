@@ -8,16 +8,34 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SocketService = void 0;
 const common_1 = require("@nestjs/common");
+const constants_1 = require("../../constants/constants");
 const message_service_1 = require("../message/message.service");
+const redis_utils_1 = require("../../utils/redis.utils");
+const cache_manager_1 = require("cache-manager");
 let SocketService = class SocketService {
-    constructor(messageService) {
+    constructor(messageService, cacheManager) {
         this.messageService = messageService;
+        this.cacheManager = cacheManager;
     }
-    create(createSocketInput) {
-        return 'This action adds a new socket';
+    getSocketKeyOfUser(user) {
+        const socketKey = [];
+        for (const item of user.matched) {
+            const key = constants_1.Constants.SOCKET + item._id;
+            socketKey.push(key);
+        }
+        return socketKey;
+    }
+    async getAllSocketIds(user) {
+        const socketKey = this.getSocketKeyOfUser(user);
+        const socketIds = await (0, redis_utils_1.getValueWithSocketKey)(this.cacheManager, socketKey);
+        return socketIds;
     }
     findAll() {
         return `This action returns all socket`;
@@ -25,16 +43,14 @@ let SocketService = class SocketService {
     findOne(id) {
         return `This action returns a #${id} socket`;
     }
-    update(id, updateSocketInput) {
-        return `This action updates a #${id} socket`;
-    }
     remove(id) {
         return `This action removes a #${id} socket`;
     }
 };
 SocketService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [message_service_1.MessageService])
+    __param(1, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
+    __metadata("design:paramtypes", [message_service_1.MessageService, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object])
 ], SocketService);
 exports.SocketService = SocketService;
 //# sourceMappingURL=socket.service.js.map

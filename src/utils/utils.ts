@@ -17,7 +17,7 @@ export function includesInObject<T>(
 
 export function setFilterByDate(filterByDate: FilterByDate) {
   if (!filterByDate) {
-    return {};
+    return null;
   }
   const currentDate: Date = new Date();
   const filterDate = {
@@ -25,7 +25,7 @@ export function setFilterByDate(filterByDate: FilterByDate) {
       $gte: new Date(
         currentDate.getFullYear(),
         currentDate.getMonth(),
-        currentDate.getDay() - 1,
+        currentDate.getDay() - 7,
       ),
       $lte: currentDate,
     },
@@ -38,7 +38,7 @@ export function setFilterByDate(filterByDate: FilterByDate) {
       $lte: currentDate,
     },
     THIS_YEAR: {
-      $gte: new Date(currentDate.getFullYear(), 1, currentDate.getDay()),
+      $gte: new Date(currentDate.getFullYear(), 1, 1),
       $lte: currentDate,
     },
   };
@@ -59,4 +59,19 @@ export function setFilterSortOption(sortOption: SortOption) {
 
 export function randomCode(): number {
   return +(Math.random() * (999999 - 100000) + 100000).toFixed(0);
+}
+
+export function setLastDate(endOfDateConvert: Date): Date {
+  endOfDateConvert.setHours(23);
+  endOfDateConvert.setMinutes(59);
+  endOfDateConvert.setSeconds(59);
+  endOfDateConvert.setMilliseconds(59);
+  return endOfDateConvert;
+}
+export function setStartDate(startOfDate: Date): Date {
+  startOfDate.setHours(0);
+  startOfDate.setMinutes(0);
+  startOfDate.setSeconds(0);
+  startOfDate.setMilliseconds(0);
+  return startOfDate;
 }
