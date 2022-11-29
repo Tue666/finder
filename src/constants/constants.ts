@@ -19,5 +19,6 @@ export class Constants {
   public static RESET_CODE_DELETE_ACCOUNT = 'reset_code_delete_account';
   public static RESET_CODE_PASSWORD = 'reset_code_password';
   public static CLOUDINARY = 'Cloudinary';
+  public static EXCLUDE_FIELDS = '-password';
 }
 export type SortQuery = { [key: string]: SortOrder };

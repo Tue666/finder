@@ -73,7 +73,9 @@ let UserService = class UserService {
     }
     async findOne(filter) {
         try {
-            const user = await this.userModel.findOne(filter);
+            const user = await this.userModel
+                .findOne(filter)
+                .select(constants_1.Constants.EXCLUDE_FIELDS);
             (0, model_utils_1.throwIfNotExists)(user, 'Không tìm thấy User tương ứng');
             return user;
         }

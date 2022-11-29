@@ -82,7 +82,9 @@ export class UserService {
 
   async findOne(filter: FilterGetOneUser): Promise<User> {
     try {
-      const user = await this.userModel.findOne(filter);
+      const user = await this.userModel
+        .findOne(filter)
+        .select(Constants.EXCLUDE_FIELDS);
       throwIfNotExists(user, 'Không tìm thấy User tương ứng');
       return user;
     } catch (error) {
