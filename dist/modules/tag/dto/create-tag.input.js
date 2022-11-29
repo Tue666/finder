@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FilterGetAllTag = exports.CreateTagInput = void 0;
 const graphql_1 = require("@nestjs/graphql");
+const graphql_scalars_1 = require("graphql-scalars");
 const enum_1 = require("../../../constants/enum");
 let CreateTagInput = class CreateTagInput {
 };
@@ -48,6 +49,10 @@ __decorate([
     (0, graphql_1.Field)(() => enum_1.TagType, { nullable: true }),
     __metadata("design:type", String)
 ], FilterGetAllTag.prototype, "parentType", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => [graphql_scalars_1.GraphQLObjectID], { nullable: true }),
+    __metadata("design:type", Array)
+], FilterGetAllTag.prototype, "ids", void 0);
 FilterGetAllTag = __decorate([
     (0, graphql_1.InputType)()
 ], FilterGetAllTag);

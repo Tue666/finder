@@ -10,4 +10,5 @@ export declare class FilterGetAllTag implements Partial<ITag> {
     name: string;
     type?: TagType;
     parentType?: TagType;
+    ids: string[];
 }

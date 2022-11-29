@@ -11,7 +11,6 @@ import {
 import { FilterBuilder } from '../../utils/filter.query';
 import { PaginationInput } from '../common/dto/common.dto';
 import { CreateTagInput, FilterGetAllTag } from './dto/create-tag.input';
-import { UpdateTagInput } from './dto/update-tag.input';
 import { Tag, TagResult } from './entities/tag.entity';
 import { TagModelType } from './schema/tag.schema';
 
@@ -35,6 +34,7 @@ export class TagService {
         },
         filter?.type,
       )
+      .setFilterItem('_id', { $in: filter?.ids }, filter?.ids)
       .setFilterItem(
         'parentType',
         { $eq: filter?.parentType },
@@ -42,7 +42,6 @@ export class TagService {
       )
       .setSortItem('createdAt', 1)
       .buildQuery();
-    console.log(querySort);
     const [results, totalCount] = await Promise.all([
       this.tagModel
         .find(queryFilter)

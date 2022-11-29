@@ -31,10 +31,10 @@ let TagService = class TagService {
             .setFilterItem('type', {
             $eq: filter === null || filter === void 0 ? void 0 : filter.type,
         }, filter === null || filter === void 0 ? void 0 : filter.type)
+            .setFilterItem('_id', { $in: filter === null || filter === void 0 ? void 0 : filter.ids }, filter === null || filter === void 0 ? void 0 : filter.ids)
             .setFilterItem('parentType', { $eq: filter === null || filter === void 0 ? void 0 : filter.parentType }, filter === null || filter === void 0 ? void 0 : filter.parentType)
             .setSortItem('createdAt', 1)
             .buildQuery();
-        console.log(querySort);
         const [results, totalCount] = await Promise.all([
             this.tagModel
                 .find(queryFilter)

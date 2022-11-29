@@ -14,10 +14,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TagResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
-const tag_service_1 = require("./tag.service");
-const tag_entity_1 = require("./entities/tag.entity");
-const create_tag_input_1 = require("./dto/create-tag.input");
 const common_dto_1 = require("../common/dto/common.dto");
+const create_tag_input_1 = require("./dto/create-tag.input");
+const tag_entity_1 = require("./entities/tag.entity");
+const tag_service_1 = require("./tag.service");
 let TagResolver = class TagResolver {
     constructor(tagService) {
         this.tagService = tagService;

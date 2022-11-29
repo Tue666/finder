@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { GraphQLObjectID } from 'graphql-scalars';
 import { TagType } from '../../../constants/enum';
 import { ITag, ITagCreate } from '../interfaces/tag';
 
@@ -27,4 +28,7 @@ export class FilterGetAllTag implements Partial<ITag> {
 
   @Field(() => TagType, { nullable: true })
   parentType?: TagType;
+
+  @Field(() => [GraphQLObjectID], { nullable: true })
+  ids: string[];
 }

@@ -480,8 +480,8 @@ export class UserService {
         //   user.password = await this.hashPassword('1');
         //   user.isConfirmMail = true;
         // }
-        user.matched = [];
-        user.matchRequest = [];
+        // user.matched = [];
+        // user.matchRequest = [];
         await user.save();
         count++;
       }

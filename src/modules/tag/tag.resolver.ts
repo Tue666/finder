@@ -1,9 +1,8 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { TagService } from './tag.service';
-import { Tag, TagResult } from './entities/tag.entity';
-import { CreateTagInput, FilterGetAllTag } from './dto/create-tag.input';
-import { UpdateTagInput } from './dto/update-tag.input';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { PaginationInput } from '../common/dto/common.dto';
+import { CreateTagInput, FilterGetAllTag } from './dto/create-tag.input';
+import { Tag, TagResult } from './entities/tag.entity';
+import { TagService } from './tag.service';
 
 @Resolver(() => Tag)
 export class TagResolver {

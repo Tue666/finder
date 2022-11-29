@@ -374,8 +374,6 @@ let UserService = class UserService {
             const users = await this.userModel.find();
             let count = 0;
             for (const user of users) {
-                user.matched = [];
-                user.matchRequest = [];
                 await user.save();
                 count++;
             }
