@@ -104,7 +104,13 @@ let UserService = class UserService {
                 this.userModel.aggregate([
                     {
                         $geoNear: {
-                            near: { type: 'Point', coordinates: [106.6510748, 10.7715686] },
+                            near: {
+                                type: 'Point',
+                                coordinates: [
+                                    user.geoLocation.coordinates[0],
+                                    user.geoLocation.coordinates[1],
+                                ],
+                            },
                             spherical: true,
                             distanceField: 'calcDistance',
                             maxDistance: maxDistance,
@@ -133,7 +139,13 @@ let UserService = class UserService {
                 this.userModel.aggregate([
                     {
                         $geoNear: {
-                            near: { type: 'Point', coordinates: [106.6510748, 10.7715686] },
+                            near: {
+                                type: 'Point',
+                                coordinates: [
+                                    user.geoLocation.coordinates[0],
+                                    user.geoLocation.coordinates[1],
+                                ],
+                            },
                             spherical: true,
                             distanceField: 'calcDistance',
                             maxDistance: maxDistance,

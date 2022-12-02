@@ -20,22 +20,21 @@ export class MessageService {
   ) {}
   async create(input: CreateMessageInput): Promise<Message> {
     try {
-      //1
       const [conversation, message] = await Promise.all([
-        this.conversationService.findOne({ _id: input.conversion_id }), //2
-        this.messageModel.create(input), //3
+        this.conversationService.findOne({ _id: input.conversion_id }), //1
+        this.messageModel.create(input), //2
       ]);
-      message.cursor = conversation.lastMessage?.cursor + 1 || 1; //4  //5 //6
-      conversation.lastMessage = message; //7
+      message.cursor = conversation.lastMessage?.cursor + 1 || 1; //3  //4 //5
+      conversation.lastMessage = message; //6
       await Promise.all([
-        this.conversationService.updateModel(conversation), //8
+        this.conversationService.updateModel(conversation), //7
         // message.populate('sender'),
-        message.save(), //9
+        message.save(), //8
       ]);
-      return message; //10
+      return message; //9
     } catch (error) {
-      //11
-      throw error; // 12
+      //10
+      throw error; // 11
     }
   }
 

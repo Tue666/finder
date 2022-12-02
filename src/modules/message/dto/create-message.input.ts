@@ -1,4 +1,5 @@
 import { Field, HideField, InputType } from '@nestjs/graphql';
+import { IsNotEmpty } from 'class-validator';
 import { GraphQLObjectID } from 'graphql-scalars';
 import { MessageType } from '../../../constants/enum';
 import { IMessage, IMessageCreate } from '../interfaces/message';
@@ -6,6 +7,7 @@ import { IMessage, IMessageCreate } from '../interfaces/message';
 @InputType()
 export class CreateMessageInput implements IMessageCreate {
   @Field()
+  @IsNotEmpty()
   text: string;
 
   @HideField()

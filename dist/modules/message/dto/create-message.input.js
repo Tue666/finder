@@ -11,12 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PaginationMessageInput = exports.FilterGetAllMessage = exports.CreateMessageInput = void 0;
 const graphql_1 = require("@nestjs/graphql");
+const class_validator_1 = require("class-validator");
 const graphql_scalars_1 = require("graphql-scalars");
 const enum_1 = require("../../../constants/enum");
 let CreateMessageInput = class CreateMessageInput {
 };
 __decorate([
     (0, graphql_1.Field)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateMessageInput.prototype, "text", void 0);
 __decorate([
