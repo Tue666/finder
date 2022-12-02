@@ -20,6 +20,7 @@ export class MessageService {
   ) {}
   async create(input: CreateMessageInput): Promise<Message> {
     try {
+      console.log('as');
       const [conversation, message] = await Promise.all([
         this.conversationService.findOne({ _id: input.conversion_id }), //1
         this.messageModel.create(input), //2
