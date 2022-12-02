@@ -28,7 +28,6 @@ let MessageService = class MessageService {
     async create(input) {
         var _a;
         try {
-            console.log('as');
             const [conversation, message] = await Promise.all([
                 this.conversationService.findOne({ _id: input.conversion_id }),
                 this.messageModel.create(input),

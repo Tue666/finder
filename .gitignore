@@ -31,8 +31,13 @@ lerna-debug.log*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+<<<<<<< HEAD
 !.vscode/extensions.json
 .vercel
+=======
+!.vscode/extensions.json
+.vercel
+>>>>>>> c384b84a0286c765a1c3039ce81590e085de892e
 
 # Local Netlify folder
 .netlify
