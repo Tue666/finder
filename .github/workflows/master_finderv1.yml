@@ -40,7 +40,8 @@ jobs:
     needs: build
     environment:
       name: 'Production'
-      url: $
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
 
     steps:
       - name: Download artifact from build job
@@ -54,5 +55,8 @@ jobs:
         with:
           app-name: 'finderv1'
           slot-name: 'Production'
-          publish-profile: $
+          publish-profile:
+            ${{
+            secrets.AzureAppService_PublishProfile_8aac02acd3d54c3d9b0882737b3eb6e2
+            }}
           package: nest.zip
