@@ -28,7 +28,6 @@ export class MessageService {
       conversation.lastMessage = message; //6
       await Promise.all([
         this.conversationService.updateModel(conversation), //7
-        // message.populate('sender'),
         message.save(), //8
       ]);
       return message; //9

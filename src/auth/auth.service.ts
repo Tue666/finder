@@ -133,8 +133,7 @@ export class AuthService {
       ),
     ]);
     const html = MailVerifyAccount.createHTML(code.toString());
-    await Promise.all([]);
-    this.mailService.sendMail(
+    await this.mailService.sendMail(
       user.email,
       Constants.VERIFY_ACCOUNT_SUBJECT,
       html,

@@ -112,8 +112,7 @@ let AuthService = class AuthService {
             this.cacheManager.set(`${constants_1.Constants.VERIFY_ACCOUNT_CODE}_${register.email}`, code, 60 * 15),
         ]);
         const html = mail_verify_1.MailVerifyAccount.createHTML(code.toString());
-        await Promise.all([]);
-        this.mailService.sendMail(user.email, constants_1.Constants.VERIFY_ACCOUNT_SUBJECT, html);
+        await this.mailService.sendMail(user.email, constants_1.Constants.VERIFY_ACCOUNT_SUBJECT, html);
         return true;
     }
     async forgotPassword(email) {

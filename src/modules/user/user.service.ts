@@ -496,16 +496,16 @@ export class UserService {
   }
   async insertManyUser(): Promise<boolean> {
     try {
-      // const users = mappingData();
-      // const usersL = await this.userModel.insertMany(users);
-      const usersL = await this.userModel.find();
-      let count = 17;
+      const users = mappingData();
+      const usersL = await this.userModel.insertMany(users);
+      // const usersL = await this.userModel.find();
+      let count = 0;
       for (const user of usersL) {
-        // if (user.email === undefined) {
-        //   user.email = `user${count}@gmail.com`;
-        //   user.password = await this.hashPassword('1');
-        //   user.isConfirmMail = true;
-        // }
+        if (user.email === undefined) {
+          user.email = `user${count}@gmail.com`;
+          user.password = await this.hashPassword('1');
+          user.isConfirmMail = true;
+        }
         user.geoLocation = new GeoLocation();
         user.geoLocation.coordinates = [106.7116815, 10.821203];
         await user.save();
