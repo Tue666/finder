@@ -143,7 +143,7 @@ export const UserSchema = new Schema<User>(
     geoLocation: { type: GeoLocationSchema },
     lastActive: { type: Date, default: new Date() },
     isDeleted: { type: Boolean, default: false },
-    isFirstLogin: { type: Boolean, default: false },
+    isFirstLogin: { type: Boolean, default: true },
     isConfirmMail: { type: Boolean, default: false },
     matchRequest: { type: [MatchRequestSchema], default: [] },
     reports: [{ type: ReportsSchema, default: [] }],
