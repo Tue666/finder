@@ -11,9 +11,9 @@ export declare class ConversationService {
     constructor(conversionModel: ConversationModelType, loggerService: LoggerService);
     create(input: CreateConversationInput): Promise<boolean>;
     findAll(input: PaginationInput, user: User): Promise<ConversationResult>;
-    getAllUserMatched(input: PaginationInput, user: User, isMessaged: boolean): Promise<ConversationResult>;
+    getAllUserMatched(input: PaginationInput, user_id: string, isMessaged: boolean): Promise<ConversationResult>;
     filterByLastMessaged(conversations: Conversation[], user_id: string): any;
-    findOne(input: FilterGetOneConversation): Promise<Conversation>;
+    findOne(input: FilterGetOneConversation, user: User): Promise<Conversation>;
     findOneAndUpdate(filter: FilterQuery<Conversation>, update: UpdateQuery<Conversation>, options?: QueryOptions<Conversation> | null): Promise<Conversation>;
     updateModel(conversation: Conversation): Promise<Conversation>;
     getQueryOrMembers(members: string[]): {

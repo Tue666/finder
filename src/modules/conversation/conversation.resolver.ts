@@ -15,6 +15,7 @@ import {
 } from './entities/conversation.entity';
 
 @Resolver(() => Conversation)
+@UseGuards(AtGuard)
 export class ConversationResolver {
   constructor(private readonly conversationService: ConversationService) {}
 
@@ -26,7 +27,6 @@ export class ConversationResolver {
     return this.conversationService.create(input);
   }
 
-  @UseGuards(AtGuard)
   @Query(() => ConversationResult)
   getAllConversation(
     @Args('pagination', { type: () => PaginationInput, nullable: true })
@@ -36,7 +36,6 @@ export class ConversationResolver {
     return this.conversationService.findAll(pagination, user);
   }
 
-  @UseGuards(AtGuard)
   @Query(() => ConversationResult)
   getAllUserMatched(
     @GetUser() user: User,
@@ -47,7 +46,7 @@ export class ConversationResolver {
   ): Promise<ConversationResult> {
     return this.conversationService.getAllUserMatched(
       pagination,
-      user,
+      user._id.toString(),
       isMessaged,
     );
   }
@@ -56,7 +55,8 @@ export class ConversationResolver {
   getOneConversation(
     @Args('input', { type: () => FilterGetOneConversation, nullable: true })
     input: FilterGetOneConversation,
+    @GetUser() user: User,
   ) {
-    return this.conversationService.findOne(input);
+    return this.conversationService.findOne(input, user);
   }
 }

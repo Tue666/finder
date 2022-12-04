@@ -9,5 +9,5 @@ export declare class ConversationResolver {
     createConversation(input: CreateConversationInput): Promise<boolean>;
     getAllConversation(pagination: PaginationInput, user: User): Promise<ConversationResult>;
     getAllUserMatched(user: User, pagination: PaginationInput, isMessaged: boolean): Promise<ConversationResult>;
-    getOneConversation(input: FilterGetOneConversation): Promise<Conversation>;
+    getOneConversation(input: FilterGetOneConversation, user: User): Promise<Conversation>;
 }

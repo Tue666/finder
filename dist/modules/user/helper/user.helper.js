@@ -46,10 +46,19 @@ let UserHelper = class UserHelper {
     async buildQueryWithUser(user, filter) {
         const isApplyAge = user.mySetting.discovery.onlyShowAgeThisRange;
         const queryFilter = new filter_query_1.FilterBuilder()
-            .setFilterItem('matched', { $in: filter === null || filter === void 0 ? void 0 : filter.matched }, filter === null || filter === void 0 ? void 0 : filter.matched)
             .setFilterItem('statusActive', { $eq: filter === null || filter === void 0 ? void 0 : filter.statusActive }, filter === null || filter === void 0 ? void 0 : filter.statusActive)
-            .setFilterItem('isFirstLogin', { $eq: false }, 'true')
+            .setFilterItem('isFirstLogin', { $eq: false }, 'false')
             .setFilterItem('showMeTinder', { $eq: user.showMeTinder }, user.showMeTinder);
+        if (user.mySetting.discovery.lookingFor === enum_1.LookingFor.WOMEN) {
+            queryFilter.setFilterItem('gender', {
+                $eq: enum_1.GenderEnum.FEMALE,
+            }, { $eq: enum_1.GenderEnum.FEMALE });
+        }
+        else if (user.mySetting.discovery.lookingFor === enum_1.LookingFor.MEN) {
+            queryFilter.setFilterItem('gender', {
+                $eq: enum_1.GenderEnum.MALE,
+            }, { $eq: enum_1.GenderEnum.MALE });
+        }
         if (isApplyAge) {
             queryFilter.setFilterItem('age', {
                 $gte: user.mySetting.discovery.minAge,

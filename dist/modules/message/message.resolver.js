@@ -13,8 +13,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageResolver = void 0;
+const common_1 = require("@nestjs/common");
 const graphql_1 = require("@nestjs/graphql");
 const graphql_scalars_1 = require("graphql-scalars");
+const at_guard_1 = require("../../common/guard/at.guard");
 const create_message_input_1 = require("./dto/create-message.input");
 const message_entity_1 = require("./entities/message.entity");
 const message_service_1 = require("./message.service");
@@ -27,6 +29,9 @@ let MessageResolver = class MessageResolver {
     }
     removeMessage(_id) {
         return this.messageService.remove(_id);
+    }
+    createMessage(input) {
+        return true;
     }
 };
 __decorate([
@@ -45,8 +50,16 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], MessageResolver.prototype, "removeMessage", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, graphql_1.Args)('input')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_message_input_1.MessageInput]),
+    __metadata("design:returntype", void 0)
+], MessageResolver.prototype, "createMessage", null);
 MessageResolver = __decorate([
     (0, graphql_1.Resolver)(() => message_entity_1.Message),
+    (0, common_1.UseGuards)(at_guard_1.AtGuard),
     __metadata("design:paramtypes", [message_service_1.MessageService])
 ], MessageResolver);
 exports.MessageResolver = MessageResolver;

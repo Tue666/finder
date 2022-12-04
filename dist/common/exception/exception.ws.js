@@ -17,7 +17,6 @@ let WebsocketExceptionsFilter = class WebsocketExceptionsFilter extends websocke
             ? exception.getError()
             : exception.getResponse();
         const details = error instanceof Object ? Object.assign({}, error) : { message: error };
-        console.log('This is details', details);
         client.send(JSON.stringify({
             event: 'error',
             data: Object.assign({ id: client === null || client === void 0 ? void 0 : client.id, rid: data === null || data === void 0 ? void 0 : data.rid }, details),

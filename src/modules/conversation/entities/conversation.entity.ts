@@ -14,10 +14,10 @@ export class Conversation implements IConversation {
   @Field(() => Message, { nullable: true })
   messagePin: Message;
 
-  @Field(() => [User])
+  @Field(() => [User], { nullable: true })
   members: User[];
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   user: User;
 
   @Field(() => Boolean)

@@ -52,7 +52,7 @@ let ConversationService = class ConversationService {
         this.loggerService.debug(`Conversation result :${results.length}`);
         return { results, totalCount };
     }
-    async getAllUserMatched(input, user, isMessaged) {
+    async getAllUserMatched(input, user_id, isMessaged) {
         let subQuery = null;
         if (isMessaged === true) {
             subQuery = { $ne: null };
@@ -62,8 +62,8 @@ let ConversationService = class ConversationService {
         }
         const [queryFilter, querySort] = new filter_query_1.FilterBuilder()
             .setFilterItem('members', {
-            $elemMatch: { $eq: user._id },
-        }, user._id)
+            $elemMatch: { $eq: user_id },
+        }, user_id)
             .setFilterItem('lastMessage', subQuery, subQuery)
             .setSortItem('updatedAt', -1)
             .buildQuery();
@@ -73,23 +73,23 @@ let ConversationService = class ConversationService {
                 .skip(input === null || input === void 0 ? void 0 : input.size)
                 .limit(((input === null || input === void 0 ? void 0 : input.page) - 1) * (input === null || input === void 0 ? void 0 : input.size))
                 .sort(querySort)
-                .populate('members', constants_1.Constants.EXCLUDE_FIELDS),
+                .populate('members', constants_1.Constants.EXCLUDE_FIELDS)
+                .lean(),
             this.conversionModel.count(queryFilter),
         ]);
-        results = this.filterByLastMessaged(results, user._id.toString());
+        results = this.filterByLastMessaged(results, user_id);
         this.loggerService.debug(`Conversation result :${results.length}`);
         return { results, totalCount };
     }
     filterByLastMessaged(conversations, user_id) {
-        return conversations.filter(item => {
+        return conversations.map(item => {
             item.user =
                 item.members[0]._id.toString() === user_id
-                    ? item.members[1]
-                    : item.members[0];
+                    ? Object.assign({}, item.members[1]) : Object.assign({}, item.members[0]);
             return item;
         });
     }
-    async findOne(input) {
+    async findOne(input, user) {
         try {
             let queryFilter = {};
             if (input === null || input === void 0 ? void 0 : input.members) {
@@ -101,8 +101,15 @@ let ConversationService = class ConversationService {
             if (input === null || input === void 0 ? void 0 : input._id) {
                 queryFilter['_id'] = input === null || input === void 0 ? void 0 : input._id;
             }
-            const conversation = await this.conversionModel.findOne(queryFilter);
+            const conversation = await this.conversionModel
+                .findOne(queryFilter)
+                .populate('members')
+                .lean();
             (0, model_utils_1.throwIfNotExists)(conversation, 'Conversation not found');
+            conversation.user =
+                conversation.members[0]._id.toString() === user._id.toString()
+                    ? conversation.members[1]
+                    : conversation.members[0];
             return conversation;
         }
         catch (error) {

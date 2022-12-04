@@ -3,7 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
 import { v2 } from 'cloudinary';
 import { Constants } from '../../../constants/constants';
-import { RoleEnum, StatusActive } from '../../../constants/enum';
+import {
+  GenderEnum,
+  LookingFor,
+  RoleEnum,
+  StatusActive,
+} from '../../../constants/enum';
 import { FilterBuilder } from '../../../utils/filter.query';
 import {
   setFilterByDate,
@@ -27,18 +32,35 @@ export class UserHelper {
   async buildQueryWithUser(user: User, filter: FilterGetAllUser): Promise<any> {
     const isApplyAge = user.mySetting.discovery.onlyShowAgeThisRange; //2
     const queryFilter: FilterBuilder<User> = new FilterBuilder<User>() //3
-      .setFilterItem('matched', { $in: filter?.matched }, filter?.matched)
       .setFilterItem(
         'statusActive',
         { $eq: filter?.statusActive },
         filter?.statusActive,
       )
-      .setFilterItem('isFirstLogin', { $eq: false }, 'true')
+
+      .setFilterItem('isFirstLogin', { $eq: false }, 'false')
       .setFilterItem(
         'showMeTinder',
         { $eq: user.showMeTinder },
         user.showMeTinder,
       );
+    if (user.mySetting.discovery.lookingFor === LookingFor.WOMEN) {
+      queryFilter.setFilterItem(
+        'gender',
+        {
+          $eq: GenderEnum.FEMALE,
+        },
+        { $eq: GenderEnum.FEMALE },
+      );
+    } else if (user.mySetting.discovery.lookingFor === LookingFor.MEN) {
+      queryFilter.setFilterItem(
+        'gender',
+        {
+          $eq: GenderEnum.MALE,
+        },
+        { $eq: GenderEnum.MALE },
+      );
+    }
 
     if (isApplyAge) {
       //4

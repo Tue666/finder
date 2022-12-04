@@ -5,25 +5,6 @@ import { MessageType } from '../../../constants/enum';
 import { IMessage, IMessageCreate } from '../interfaces/message';
 
 @InputType()
-export class CreateMessageInput implements IMessageCreate {
-  @Field()
-  @IsNotEmpty()
-  text: string;
-
-  @HideField()
-  sender: string;
-
-  @Field(() => GraphQLObjectID)
-  receiver: string;
-
-  @Field(() => GraphQLObjectID)
-  conversion_id: string;
-
-  @Field(() => MessageType)
-  type: MessageType;
-}
-
-@InputType()
 export class FilterGetAllMessage implements Partial<IMessage> {
   @Field(() => GraphQLObjectID, { nullable: true })
   conversion_id?: string;
@@ -39,4 +20,31 @@ export class PaginationMessageInput {
 
   @Field(() => Number, { nullable: true })
   limit: number;
+}
+
+@InputType()
+export class MessageInput implements IMessageCreate {
+  @Field({ nullable: true })
+  text: string;
+
+  @Field({ nullable: true })
+  uuid: string;
+
+  @HideField()
+  sender: string;
+
+  @Field(() => GraphQLObjectID)
+  receiver: string;
+
+  @Field(() => GraphQLObjectID)
+  conversion_id: string;
+
+  @Field(() => MessageType)
+  type: MessageType;
+}
+
+@InputType()
+export class Here {
+  @Field()
+  txt: string;
 }

@@ -61,7 +61,7 @@ export class ConversationService {
 
   async getAllUserMatched(
     input: PaginationInput,
-    user: User,
+    user_id: string,
     isMessaged: boolean,
   ): Promise<ConversationResult> {
     let subQuery = null;
@@ -74,9 +74,9 @@ export class ConversationService {
       .setFilterItem(
         'members',
         {
-          $elemMatch: { $eq: user._id },
+          $elemMatch: { $eq: user_id },
         },
-        user._id,
+        user_id,
       )
       .setFilterItem('lastMessage', subQuery, subQuery)
       .setSortItem('updatedAt', -1)
@@ -88,25 +88,29 @@ export class ConversationService {
         .skip(input?.size)
         .limit((input?.page - 1) * input?.size)
         .sort(querySort)
-        .populate('members', Constants.EXCLUDE_FIELDS),
+        .populate('members', Constants.EXCLUDE_FIELDS)
+        .lean(),
       this.conversionModel.count(queryFilter),
     ]);
-    results = this.filterByLastMessaged(results, user._id.toString());
+    results = this.filterByLastMessaged(results, user_id);
     this.loggerService.debug(`Conversation result :${results.length}`);
     return { results, totalCount };
   }
 
   filterByLastMessaged(conversations: Conversation[], user_id: string): any {
-    return conversations.filter(item => {
+    return conversations.map(item => {
       item.user =
         item.members[0]._id.toString() === user_id
-          ? item.members[1]
-          : item.members[0];
+          ? { ...item.members[1] }
+          : { ...item.members[0] };
       return item;
     });
   }
 
-  async findOne(input: FilterGetOneConversation): Promise<Conversation> {
+  async findOne(
+    input: FilterGetOneConversation,
+    user: User,
+  ): Promise<Conversation> {
     try {
       let queryFilter = {};
       if (input?.members) {
@@ -118,8 +122,15 @@ export class ConversationService {
       if (input?._id) {
         queryFilter['_id'] = input?._id;
       }
-      const conversation = await this.conversionModel.findOne(queryFilter);
+      const conversation = await this.conversionModel
+        .findOne(queryFilter)
+        .populate('members')
+        .lean();
       throwIfNotExists(conversation, 'Conversation not found');
+      conversation.user =
+        conversation.members[0]._id.toString() === user._id.toString()
+          ? conversation.members[1]
+          : conversation.members[0];
       return conversation;
     } catch (error) {
       throw error;

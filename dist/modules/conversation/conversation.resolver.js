@@ -33,10 +33,10 @@ let ConversationResolver = class ConversationResolver {
         return this.conversationService.findAll(pagination, user);
     }
     getAllUserMatched(user, pagination, isMessaged) {
-        return this.conversationService.getAllUserMatched(pagination, user, isMessaged);
+        return this.conversationService.getAllUserMatched(pagination, user._id.toString(), isMessaged);
     }
-    getOneConversation(input) {
-        return this.conversationService.findOne(input);
+    getOneConversation(input, user) {
+        return this.conversationService.findOne(input, user);
     }
 };
 __decorate([
@@ -47,7 +47,6 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ConversationResolver.prototype, "createConversation", null);
 __decorate([
-    (0, common_1.UseGuards)(at_guard_1.AtGuard),
     (0, graphql_1.Query)(() => conversation_entity_1.ConversationResult),
     __param(0, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),
     __param(1, (0, getuser_decorators_1.GetUser)()),
@@ -57,7 +56,6 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ConversationResolver.prototype, "getAllConversation", null);
 __decorate([
-    (0, common_1.UseGuards)(at_guard_1.AtGuard),
     (0, graphql_1.Query)(() => conversation_entity_1.ConversationResult),
     __param(0, (0, getuser_decorators_1.GetUser)()),
     __param(1, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),
@@ -70,12 +68,15 @@ __decorate([
 __decorate([
     (0, graphql_1.Query)(() => conversation_entity_1.Conversation),
     __param(0, (0, graphql_1.Args)('input', { type: () => create_conversation_input_1.FilterGetOneConversation, nullable: true })),
+    __param(1, (0, getuser_decorators_1.GetUser)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_conversation_input_1.FilterGetOneConversation]),
+    __metadata("design:paramtypes", [create_conversation_input_1.FilterGetOneConversation,
+        user_entities_1.User]),
     __metadata("design:returntype", void 0)
 ], ConversationResolver.prototype, "getOneConversation", null);
 ConversationResolver = __decorate([
     (0, graphql_1.Resolver)(() => conversation_entity_1.Conversation),
+    (0, common_1.UseGuards)(at_guard_1.AtGuard),
     __metadata("design:paramtypes", [conversation_service_1.ConversationService])
 ], ConversationResolver);
 exports.ConversationResolver = ConversationResolver;

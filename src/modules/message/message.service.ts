@@ -4,8 +4,9 @@ import { Constants } from '../../constants/constants';
 import { FilterBuilder } from '../../utils/filter.query';
 import { throwIfNotExists } from '../../utils/model.utils';
 import { ConversationService } from '../conversation/conversation.service';
+import { User } from '../user/entities/user.entities';
 import {
-  CreateMessageInput,
+  MessageInput,
   FilterGetAllMessage,
   PaginationMessageInput,
 } from './dto/create-message.input';
@@ -18,10 +19,10 @@ export class MessageService {
     @InjectModel(Message.name) private messageModel: MessageModelType,
     private conversationService: ConversationService,
   ) {}
-  async create(input: CreateMessageInput): Promise<Message> {
+  async create(input: MessageInput, user: User): Promise<Message> {
     try {
       const [conversation, message] = await Promise.all([
-        this.conversationService.findOne({ _id: input.conversion_id }), //1
+        this.conversationService.findOne({ _id: input.conversion_id }, user), //1
         this.messageModel.create(input), //2
       ]);
       message.cursor = conversation.lastMessage?.cursor + 1 || 1; //3  //4 //5
@@ -57,7 +58,10 @@ export class MessageService {
         .setSortItem('cursor', 1)
         .buildQuery();
       const [results, totalCount] = await Promise.all([
-        this.messageModel.find(queryFilter).limit(pagination?.limit),
+        this.messageModel
+          .find(queryFilter)
+          .limit(pagination?.limit)
+          .sort(querySort),
         this.messageModel.countDocuments(queryFilter),
       ]);
       return { results, totalCount };

@@ -30,7 +30,6 @@ const logger_service_1 = require("../logger/logger.service");
 const user_embedded_service_1 = require("../user_embedded/user_embedded.service");
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
-const mapping_tinder_1 = require("../../pattern/mapping.tinder");
 let UserService = class UserService {
     constructor(userModel, cacheManager, chatGateway, userEmbeddedService, loggerService, conversationService, userHelper) {
         this.userModel = userModel;
@@ -171,10 +170,10 @@ let UserService = class UserService {
             if (user.isBlocked) {
                 throw new common_1.UnauthorizedException('Tài khoản của bạn đã bị khóa. Vui lòng nạp tiền để mở khóa');
             }
-            await this.isNotCorrectPassword(input.password, user.password);
-            if (!user.isConfirmMail) {
-                throw new common_1.UnauthorizedException('Tài khoản của bạn chưa được xác thực email. Vui lòng xác thực email để tiếp tục');
+            if (user.isDeleted) {
+                throw new common_1.UnauthorizedException('Bạn đã xóa tài khoản này. Vui lòng chọn chức năng khôi phục tài khoản để tiếp tục');
             }
+            await this.isNotCorrectPassword(input.password, user.password);
             this.loggerService.debug('Passed password');
             return user;
         }
@@ -303,11 +302,26 @@ let UserService = class UserService {
             const requestedUser = await this.userModel.findOne({ _id: user_id });
             const isContainsInRequest = (0, utils_1.includesInObject)(user.matchRequest, 'sender', '_id', user_id);
             if (isContainsInRequest) {
-                const [, socketIds] = await Promise.all([
+                const [, socketIds1, socketIds2] = await Promise.all([
                     this.matchedUser(user, user_id, requestedUser),
                     this.cacheManager.get(constants_1.Constants.SOCKET + requestedUser._id.toString()),
+                    this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
+                    this.userEmbeddedService.findOneAndUpdate({
+                        user: user._id,
+                        countLike: { $lt: constants_1.Constants.MAX_COUNT_IN_USER_EMBEDDED },
+                    }, {
+                        $push: { like: user_id },
+                        $inc: { countLike: 1 },
+                        $set: { user: user._id },
+                    }, { upsert: true, new: true }),
                 ]);
-                this.chatGateway.sendEmit(socketIds, 'matchedUser', user);
+                const [users1, users2] = await Promise.all([
+                    this.conversationService.getAllUserMatched(null, requestedUser._id.toString(), false),
+                    this.conversationService.getAllUserMatched(null, user._id.toString(), false),
+                ]);
+                this.chatGateway.sendEmit(socketIds1, 'matchedUser', user);
+                this.chatGateway.sendEmit(socketIds1, 'listUserMatched_tabMatched', users1);
+                this.chatGateway.sendEmit(socketIds2, 'listUserMatched_tabMatched', users2);
             }
             else {
                 this.loggerService.log(`Request match request to ${requestedUser.username}`);
@@ -386,17 +400,11 @@ let UserService = class UserService {
     }
     async insertManyUser() {
         try {
-            const users = (0, mapping_tinder_1.mappingData)();
-            const usersL = await this.userModel.insertMany(users);
+            const usersL = await this.userModel.find();
             let count = 0;
             for (const user of usersL) {
-                if (user.email === undefined) {
-                    user.email = `user${count}@gmail.com`;
-                    user.password = await this.hashPassword('1');
-                    user.isConfirmMail = true;
-                }
-                user.geoLocation = new user_entities_1.GeoLocation();
-                user.geoLocation.coordinates = [106.7116815, 10.821203];
+                user.matchRequest = [];
+                user.matched = [];
                 await user.save();
                 count++;
             }

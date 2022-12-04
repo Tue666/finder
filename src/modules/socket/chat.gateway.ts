@@ -23,7 +23,7 @@ import { Cache } from 'cache-manager';
 import { GetUserWS } from 'common/decorators/getuser.decorators';
 import { StatusActive } from 'constants/enum';
 import { ConversationService } from 'modules/conversation/conversation.service';
-import { CreateMessageInput } from 'modules/message/dto/create-message.input';
+import { MessageInput } from 'modules/message/dto/create-message.input';
 import { Message } from 'modules/message/entities/message.entity';
 import { MessageService } from 'modules/message/message.service';
 import { User } from 'modules/user/entities/user.entities';
@@ -33,6 +33,7 @@ import { WsGuard } from '../../common/guard/ws.guard';
 import { Constants } from '../../constants/constants';
 import { LoggerService } from '../logger/logger.service';
 import { UserService } from '../user/user.service';
+import { ResponseType } from './dto/create-socket.input';
 import { SocketService } from './socket.service';
 
 @WebSocketGateway({ transport: ['websocket'], allowEIO3: true, cors: '*' })
@@ -45,7 +46,6 @@ export class ChatGateway
     @Inject(forwardRef(() => UserService))
     private userService: UserService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private jwtService: JwtService,
     private loggerService: LoggerService,
     private messageService: MessageService,
     private socketService: SocketService,
@@ -112,6 +112,7 @@ export class ChatGateway
     @GetUserWS() user: User,
   ) {
     try {
+      console.log('Run here');
       let socketIds: string[] = [];
       if (socket.handshake.query && socket.handshake.query.token) {
         (socket as any).userId = user._id.toString();
@@ -148,16 +149,26 @@ export class ChatGateway
   @SubscribeMessage('sendMessage')
   @UseGuards(WsGuard)
   async sendMessage(
-    @MessageBody() data: CreateMessageInput,
+    @MessageBody() data: MessageInput,
     @GetUserWS() user: User,
   ): Promise<Message> {
     try {
       data.sender = user._id.toString();
-      const [message, socketIds] = await Promise.all([
-        this.messageService.create(data),
+      const [message, socketIds1, socketIds2] = await Promise.all([
+        this.messageService.create(data, user),
+        this.cacheManager.get(Constants.SOCKET + data.receiver),
         this.cacheManager.get(Constants.SOCKET + user._id.toString()),
       ]);
-      this.sendEmit(socketIds, 'receiverMessage', message);
+      this.sendEmit(socketIds1, 'receiverMessage', message);
+      this.sendEmit(socketIds2, 'isSendMessageSuccess', {
+        code: 200,
+        success: true,
+        message: 'Send Message Success',
+        data: {
+          message_id: message._id.toString(),
+          uuid: data.uuid,
+        },
+      });
       return message;
     } catch (error) {
       throw error;
@@ -194,7 +205,11 @@ export class ChatGateway
     try {
       const [socketIds, users] = await Promise.all([
         this.cacheManager.get(Constants.SOCKET + user._id.toString()),
-        this.conversationService.getAllUserMatched(null, user, true),
+        this.conversationService.getAllUserMatched(
+          null,
+          user._id.toString(),
+          true,
+        ),
       ]);
       this.sendEmit(socketIds, 'listUserMatched_tabMessage', users);
     } catch (error) {
@@ -208,7 +223,11 @@ export class ChatGateway
     try {
       const [socketIds, users] = await Promise.all([
         this.cacheManager.get(Constants.SOCKET + user._id.toString()),
-        this.conversationService.getAllUserMatched(null, user, false),
+        this.conversationService.getAllUserMatched(
+          null,
+          user._id.toString(),
+          false,
+        ),
       ]);
       this.sendEmit(socketIds, 'listUserMatched_tabMatched', users);
     } catch (error) {

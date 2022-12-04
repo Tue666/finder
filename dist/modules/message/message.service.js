@@ -25,11 +25,11 @@ let MessageService = class MessageService {
         this.messageModel = messageModel;
         this.conversationService = conversationService;
     }
-    async create(input) {
+    async create(input, user) {
         var _a;
         try {
             const [conversation, message] = await Promise.all([
-                this.conversationService.findOne({ _id: input.conversion_id }),
+                this.conversationService.findOne({ _id: input.conversion_id }, user),
                 this.messageModel.create(input),
             ]);
             message.cursor = ((_a = conversation.lastMessage) === null || _a === void 0 ? void 0 : _a.cursor) + 1 || 1;
@@ -53,7 +53,10 @@ let MessageService = class MessageService {
                 .setSortItem('cursor', 1)
                 .buildQuery();
             const [results, totalCount] = await Promise.all([
-                this.messageModel.find(queryFilter).limit(pagination === null || pagination === void 0 ? void 0 : pagination.limit),
+                this.messageModel
+                    .find(queryFilter)
+                    .limit(pagination === null || pagination === void 0 ? void 0 : pagination.limit)
+                    .sort(querySort),
                 this.messageModel.countDocuments(queryFilter),
             ]);
             return { results, totalCount };

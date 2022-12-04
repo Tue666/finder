@@ -15,7 +15,6 @@ var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatGateway = void 0;
 const common_1 = require("@nestjs/common");
-const jwt_1 = require("@nestjs/jwt");
 const websockets_1 = require("@nestjs/websockets");
 const cache_manager_1 = require("cache-manager");
 const getuser_decorators_1 = require("../../common/decorators/getuser.decorators");
@@ -32,10 +31,9 @@ const logger_service_1 = require("../logger/logger.service");
 const user_service_1 = require("../user/user.service");
 const socket_service_1 = require("./socket.service");
 let ChatGateway = class ChatGateway {
-    constructor(userService, cacheManager, jwtService, loggerService, messageService, socketService, conversationService) {
+    constructor(userService, cacheManager, loggerService, messageService, socketService, conversationService) {
         this.userService = userService;
         this.cacheManager = cacheManager;
-        this.jwtService = jwtService;
         this.loggerService = loggerService;
         this.messageService = messageService;
         this.socketService = socketService;
@@ -90,6 +88,7 @@ let ChatGateway = class ChatGateway {
     }
     async verifyFirstConnection(socket, user) {
         try {
+            console.log('Run here');
             let socketIds = [];
             if (socket.handshake.query && socket.handshake.query.token) {
                 socket.userId = user._id.toString();
@@ -123,11 +122,21 @@ let ChatGateway = class ChatGateway {
     async sendMessage(data, user) {
         try {
             data.sender = user._id.toString();
-            const [message, socketIds] = await Promise.all([
-                this.messageService.create(data),
+            const [message, socketIds1, socketIds2] = await Promise.all([
+                this.messageService.create(data, user),
+                this.cacheManager.get(constants_1.Constants.SOCKET + data.receiver),
                 this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
             ]);
-            this.sendEmit(socketIds, 'receiverMessage', message);
+            this.sendEmit(socketIds1, 'receiverMessage', message);
+            this.sendEmit(socketIds2, 'isSendMessageSuccess', {
+                code: 200,
+                success: true,
+                message: 'Send Message Success',
+                data: {
+                    message_id: message._id.toString(),
+                    uuid: data.uuid,
+                },
+            });
             return message;
         }
         catch (error) {
@@ -153,7 +162,7 @@ let ChatGateway = class ChatGateway {
         try {
             const [socketIds, users] = await Promise.all([
                 this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
-                this.conversationService.getAllUserMatched(null, user, true),
+                this.conversationService.getAllUserMatched(null, user._id.toString(), true),
             ]);
             this.sendEmit(socketIds, 'listUserMatched_tabMessage', users);
         }
@@ -165,7 +174,7 @@ let ChatGateway = class ChatGateway {
         try {
             const [socketIds, users] = await Promise.all([
                 this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
-                this.conversationService.getAllUserMatched(null, user, false),
+                this.conversationService.getAllUserMatched(null, user._id.toString(), false),
             ]);
             this.sendEmit(socketIds, 'listUserMatched_tabMatched', users);
         }
@@ -213,7 +222,7 @@ __decorate([
     __param(0, (0, websockets_1.MessageBody)()),
     __param(1, (0, getuser_decorators_1.GetUserWS)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_message_input_1.CreateMessageInput,
+    __metadata("design:paramtypes", [create_message_input_1.MessageInput,
         user_entities_1.User]),
     __metadata("design:returntype", Promise)
 ], ChatGateway.prototype, "sendMessage", null);
@@ -257,8 +266,7 @@ ChatGateway = __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true })),
     __param(0, (0, common_1.Inject)((0, common_1.forwardRef)(() => user_service_1.UserService))),
     __param(1, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [user_service_1.UserService, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object, jwt_1.JwtService,
-        logger_service_1.LoggerService,
+    __metadata("design:paramtypes", [user_service_1.UserService, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object, logger_service_1.LoggerService,
         message_service_1.MessageService,
         socket_service_1.SocketService,
         conversation_service_1.ConversationService])

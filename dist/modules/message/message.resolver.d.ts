@@ -1,4 +1,4 @@
-import { FilterGetAllMessage, PaginationMessageInput } from './dto/create-message.input';
+import { FilterGetAllMessage, MessageInput, PaginationMessageInput } from './dto/create-message.input';
 import { MessageResult } from './entities/message.entity';
 import { MessageService } from './message.service';
 export declare class MessageResolver {
@@ -6,4 +6,5 @@ export declare class MessageResolver {
     constructor(messageService: MessageService);
     getAllMessage(filter: FilterGetAllMessage, pagination: PaginationMessageInput): Promise<MessageResult>;
     removeMessage(_id: string): Promise<boolean>;
+    createMessage(input: MessageInput): boolean;
 }

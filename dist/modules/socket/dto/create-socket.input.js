@@ -9,16 +9,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateSocketInput = void 0;
+exports.ResponseType = void 0;
 const graphql_1 = require("@nestjs/graphql");
-let CreateSocketInput = class CreateSocketInput {
+let ResponseType = class ResponseType {
+    constructor(code, success, message) {
+        this.code = code;
+        this.success = success;
+        this.message = message;
+    }
 };
 __decorate([
-    (0, graphql_1.Field)(() => graphql_1.Int, { description: 'Example field (placeholder)' }),
+    (0, graphql_1.Field)(() => Number, { nullable: true }),
     __metadata("design:type", Number)
-], CreateSocketInput.prototype, "exampleField", void 0);
-CreateSocketInput = __decorate([
-    (0, graphql_1.InputType)()
-], CreateSocketInput);
-exports.CreateSocketInput = CreateSocketInput;
+], ResponseType.prototype, "code", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => Boolean, { nullable: true }),
+    __metadata("design:type", Boolean)
+], ResponseType.prototype, "success", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => String, { nullable: true }),
+    __metadata("design:type", String)
+], ResponseType.prototype, "message", void 0);
+ResponseType = __decorate([
+    (0, graphql_1.InputType)(),
+    __metadata("design:paramtypes", [Number, Boolean, String])
+], ResponseType);
+exports.ResponseType = ResponseType;
 //# sourceMappingURL=create-socket.input.js.map
