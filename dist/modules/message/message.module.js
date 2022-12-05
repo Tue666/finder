@@ -15,6 +15,8 @@ const message_entity_1 = require("./entities/message.entity");
 const message_schema_1 = require("./schema/message.schema");
 const string_utils_1 = require("../../utils/string.utils");
 const conversation_module_1 = require("../conversation/conversation.module");
+const socket_module_1 = require("../socket/socket.module");
+const user_module_1 = require("../user/user.module");
 let MessageModule = class MessageModule {
 };
 MessageModule = __decorate([
@@ -34,6 +36,8 @@ MessageModule = __decorate([
                 },
             ]),
             conversation_module_1.ConversationModule,
+            (0, common_1.forwardRef)(() => user_module_1.UserModule),
+            (0, common_1.forwardRef)(() => socket_module_1.SocketModule),
         ],
         providers: [message_resolver_1.MessageResolver, message_service_1.MessageService],
         exports: [message_service_1.MessageService],

@@ -8,7 +8,6 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -33,7 +32,6 @@ import { WsGuard } from '../../common/guard/ws.guard';
 import { Constants } from '../../constants/constants';
 import { LoggerService } from '../logger/logger.service';
 import { UserService } from '../user/user.service';
-import { ResponseType } from './dto/create-socket.input';
 import { SocketService } from './socket.service';
 
 @WebSocketGateway({ transport: ['websocket'], allowEIO3: true, cors: '*' })
@@ -47,6 +45,7 @@ export class ChatGateway
     private userService: UserService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private loggerService: LoggerService,
+    @Inject(forwardRef(() => MessageService))
     private messageService: MessageService,
     private socketService: SocketService,
     private conversationService: ConversationService,
@@ -112,31 +111,21 @@ export class ChatGateway
     @GetUserWS() user: User,
   ) {
     try {
-      console.log('Run here');
       let socketIds: string[] = [];
-      if (socket.handshake.query && socket.handshake.query.token) {
-        (socket as any).userId = user._id.toString();
-        const socketKey = Constants.SOCKET + user._id.toString();
-        socketIds = await this.cacheManager.get(socketKey);
-        this.loggerService.debug(`Socket IDS in array: ${socketIds}`);
-        if (socketIds) {
-          socketIds.push(socket.id);
-          this.loggerService.debug(
-            `Socket IDS after push to array:${socketIds}`,
-          );
-        } else {
-          this.loggerService.debug('Push socket id to array');
-          socketIds = [socket.id];
-        }
-        await this.cacheManager.set(socketKey, socketIds, {
-          ttl: Constants.SOCKET_ID_TTL,
-        });
-        this.loggerService.log(
-          '==========================================================',
-        );
+      (socket as any).userId = user._id.toString();
+      const socketKey = Constants.SOCKET + user._id.toString();
+      socketIds = await this.cacheManager.get(socketKey);
+      this.loggerService.debug(`Socket IDS in array: ${socketIds}`);
+      if (socketIds) {
+        socketIds.push(socket.id);
+        this.loggerService.debug(`Socket IDS after push to array:${socketIds}`);
       } else {
-        throw new UnauthorizedException('Who are you?');
+        this.loggerService.debug('Push socket id to array');
+        socketIds = [socket.id];
       }
+      await this.cacheManager.set(socketKey, socketIds, {
+        ttl: Constants.SOCKET_ID_TTL,
+      });
     } catch (error) {
       throw error;
     }

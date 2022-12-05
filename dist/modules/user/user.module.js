@@ -16,6 +16,7 @@ const cloudinary_provider_1 = require("../common/cloudinary/cloudinary.provider"
 const cloudinary_service_1 = require("../common/cloudinary/cloudinary.service");
 const conversation_module_1 = require("../conversation/conversation.module");
 const logger_module_1 = require("../logger/logger.module");
+const tag_module_1 = require("../tag/tag.module");
 const user_embedded_module_1 = require("../user_embedded/user_embedded.module");
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
@@ -51,6 +52,7 @@ UserModule = __decorate([
             user_embedded_module_1.UserEmbeddedModule,
             logger_module_1.LoggerModule,
             conversation_module_1.ConversationModule,
+            tag_module_1.TagModule,
             (0, common_1.forwardRef)(() => socket_module_1.SocketModule),
         ],
         providers: [

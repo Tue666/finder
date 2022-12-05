@@ -27,11 +27,12 @@ const model_utils_1 = require("../../utils/model.utils");
 const utils_1 = require("../../utils/utils");
 const conversation_service_1 = require("../conversation/conversation.service");
 const logger_service_1 = require("../logger/logger.service");
+const tag_service_1 = require("../tag/tag.service");
 const user_embedded_service_1 = require("../user_embedded/user_embedded.service");
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
 let UserService = class UserService {
-    constructor(userModel, cacheManager, chatGateway, userEmbeddedService, loggerService, conversationService, userHelper) {
+    constructor(userModel, cacheManager, chatGateway, userEmbeddedService, loggerService, conversationService, userHelper, tagService) {
         this.userModel = userModel;
         this.cacheManager = cacheManager;
         this.chatGateway = chatGateway;
@@ -39,6 +40,7 @@ let UserService = class UserService {
         this.loggerService = loggerService;
         this.conversationService = conversationService;
         this.userHelper = userHelper;
+        this.tagService = tagService;
         this.loggerService.setContext('UserService');
     }
     async createWithOAuth2(userGoogle) {
@@ -115,6 +117,27 @@ let UserService = class UserService {
                             distanceField: 'calcDistance',
                             maxDistance: maxDistance,
                             query: queryFilter,
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: 'tags',
+                            let: { tags: '$tags' },
+                            pipeline: [
+                                {
+                                    $match: {
+                                        $expr: { $in: ['$_id', '$$tags'] },
+                                    },
+                                },
+                                {
+                                    $project: {
+                                        name: 1,
+                                        type: 1,
+                                        parentType: 1,
+                                    },
+                                },
+                            ],
+                            as: 'tags',
                         },
                     },
                     {
@@ -424,7 +447,8 @@ UserService = __decorate([
         user_embedded_service_1.UserEmbeddedService,
         logger_service_1.LoggerService,
         conversation_service_1.ConversationService,
-        user_helper_1.UserHelper])
+        user_helper_1.UserHelper,
+        tag_service_1.TagService])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

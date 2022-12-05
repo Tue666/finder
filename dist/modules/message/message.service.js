@@ -19,29 +19,52 @@ const constants_1 = require("../../constants/constants");
 const filter_query_1 = require("../../utils/filter.query");
 const model_utils_1 = require("../../utils/model.utils");
 const conversation_service_1 = require("../conversation/conversation.service");
+const chat_gateway_1 = require("../socket/chat.gateway");
+const user_service_1 = require("../user/user.service");
 const message_entity_1 = require("./entities/message.entity");
 let MessageService = class MessageService {
-    constructor(messageModel, conversationService) {
+    constructor(messageModel, conversationService, userService, chatGateway) {
         this.messageModel = messageModel;
         this.conversationService = conversationService;
+        this.userService = userService;
+        this.chatGateway = chatGateway;
     }
     async create(input, user) {
-        var _a;
+        var _a, _b;
         try {
+            const receiver = await this.userService.findOne({ _id: input.receiver });
             const [conversation, message] = await Promise.all([
                 this.conversationService.findOne({ _id: input.conversion_id }, user),
                 this.messageModel.create(input),
             ]);
-            message.cursor = ((_a = conversation.lastMessage) === null || _a === void 0 ? void 0 : _a.cursor) + 1 || 1;
+            let isFirstMessage = false;
+            if (!((_a = conversation.lastMessage) === null || _a === void 0 ? void 0 : _a.cursor)) {
+                isFirstMessage = true;
+                message.cursor = 1;
+            }
+            else {
+                message.cursor = ((_b = conversation.lastMessage) === null || _b === void 0 ? void 0 : _b.cursor) + 1;
+            }
             conversation.lastMessage = message;
             await Promise.all([
                 this.conversationService.updateModel(conversation),
                 message.save(),
             ]);
+            await this.handleFirstMessage(user, receiver, isFirstMessage);
             return message;
         }
         catch (error) {
             throw error;
+        }
+    }
+    async handleFirstMessage(sender, receiver, isFirstMessage) {
+        if (isFirstMessage === true) {
+            await Promise.all([
+                this.chatGateway.getAllUserMatchedTabMatched(sender),
+                this.chatGateway.getAllUserMatchedTabMessage(sender),
+                this.chatGateway.getAllUserMatchedTabMatched(receiver),
+                this.chatGateway.getAllUserMatchedTabMessage(receiver),
+            ]);
         }
     }
     async findAll(filter, pagination) {
@@ -79,7 +102,11 @@ let MessageService = class MessageService {
 MessageService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(message_entity_1.Message.name)),
-    __metadata("design:paramtypes", [Object, conversation_service_1.ConversationService])
+    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => user_service_1.UserService))),
+    __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => chat_gateway_1.ChatGateway))),
+    __metadata("design:paramtypes", [Object, conversation_service_1.ConversationService,
+        user_service_1.UserService,
+        chat_gateway_1.ChatGateway])
 ], MessageService);
 exports.MessageService = MessageService;
 //# sourceMappingURL=message.service.js.map

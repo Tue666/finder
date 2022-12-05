@@ -8,11 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TagModule = void 0;
 const common_1 = require("@nestjs/common");
-const tag_service_1 = require("./tag.service");
-const tag_resolver_1 = require("./tag.resolver");
 const mongoose_1 = require("@nestjs/mongoose");
 const tag_entity_1 = require("./entities/tag.entity");
 const tag_schema_1 = require("./schema/tag.schema");
+const tag_resolver_1 = require("./tag.resolver");
+const tag_service_1 = require("./tag.service");
 let TagModule = class TagModule {
 };
 TagModule = __decorate([
@@ -31,6 +31,7 @@ TagModule = __decorate([
             ]),
         ],
         providers: [tag_resolver_1.TagResolver, tag_service_1.TagService],
+        exports: [tag_service_1.TagService],
     })
 ], TagModule);
 exports.TagModule = TagModule;
