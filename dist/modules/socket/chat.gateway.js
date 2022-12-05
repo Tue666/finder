@@ -88,29 +88,22 @@ let ChatGateway = class ChatGateway {
     }
     async verifyFirstConnection(socket, user) {
         try {
-            console.log('Run here');
             let socketIds = [];
-            if (socket.handshake.query && socket.handshake.query.token) {
-                socket.userId = user._id.toString();
-                const socketKey = constants_1.Constants.SOCKET + user._id.toString();
-                socketIds = await this.cacheManager.get(socketKey);
-                this.loggerService.debug(`Socket IDS in array: ${socketIds}`);
-                if (socketIds) {
-                    socketIds.push(socket.id);
-                    this.loggerService.debug(`Socket IDS after push to array:${socketIds}`);
-                }
-                else {
-                    this.loggerService.debug('Push socket id to array');
-                    socketIds = [socket.id];
-                }
-                await this.cacheManager.set(socketKey, socketIds, {
-                    ttl: constants_1.Constants.SOCKET_ID_TTL,
-                });
-                this.loggerService.log('==========================================================');
+            socket.userId = user._id.toString();
+            const socketKey = constants_1.Constants.SOCKET + user._id.toString();
+            socketIds = await this.cacheManager.get(socketKey);
+            this.loggerService.debug(`Socket IDS in array: ${socketIds}`);
+            if (socketIds) {
+                socketIds.push(socket.id);
+                this.loggerService.debug(`Socket IDS after push to array:${socketIds}`);
             }
             else {
-                throw new common_1.UnauthorizedException('Who are you?');
+                this.loggerService.debug('Push socket id to array');
+                socketIds = [socket.id];
             }
+            await this.cacheManager.set(socketKey, socketIds, {
+                ttl: constants_1.Constants.SOCKET_ID_TTL,
+            });
         }
         catch (error) {
             throw error;
@@ -127,15 +120,11 @@ let ChatGateway = class ChatGateway {
                 this.cacheManager.get(constants_1.Constants.SOCKET + data.receiver),
                 this.cacheManager.get(constants_1.Constants.SOCKET + user._id.toString()),
             ]);
+            console.log('----------------------------------------------------');
             this.sendEmit(socketIds1, 'receiverMessage', message);
             this.sendEmit(socketIds2, 'isSendMessageSuccess', {
-                code: 200,
-                success: true,
-                message: 'Send Message Success',
-                data: {
-                    message_id: message._id.toString(),
-                    uuid: data.uuid,
-                },
+                message: message,
+                uuid: data.uuid,
             });
             return message;
         }
@@ -266,6 +255,7 @@ ChatGateway = __decorate([
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true })),
     __param(0, (0, common_1.Inject)((0, common_1.forwardRef)(() => user_service_1.UserService))),
     __param(1, (0, common_1.Inject)(common_1.CACHE_MANAGER)),
+    __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => message_service_1.MessageService))),
     __metadata("design:paramtypes", [user_service_1.UserService, typeof (_a = typeof cache_manager_1.Cache !== "undefined" && cache_manager_1.Cache) === "function" ? _a : Object, logger_service_1.LoggerService,
         message_service_1.MessageService,
         socket_service_1.SocketService,

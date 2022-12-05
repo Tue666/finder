@@ -15,7 +15,7 @@ const enum_1 = require("../../../constants/enum");
 let Tag = class Tag {
 };
 __decorate([
-    (0, graphql_1.Field)(() => graphql_1.ID),
+    (0, graphql_1.Field)(() => graphql_1.ID, { nullable: true }),
     __metadata("design:type", String)
 ], Tag.prototype, "_id", void 0);
 __decorate([

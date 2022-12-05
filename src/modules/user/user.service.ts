@@ -18,6 +18,9 @@ import { includesInObject } from '../../utils/utils';
 import { PaginationInput } from '../common/dto/common.dto';
 import { ConversationService } from '../conversation/conversation.service';
 import { LoggerService } from '../logger/logger.service';
+import { Tag } from '../tag/entities/tag.entity';
+import { TagModelType, TagSchema } from '../tag/schema/tag.schema';
+import { TagService } from '../tag/tag.service';
 import { UserEmbeddedService } from '../user_embedded/user_embedded.service';
 import {
   FilterGetAllUser,
@@ -25,15 +28,9 @@ import {
   MySettingInput,
   UpdateUserInput,
 } from './dto/create-user.dto';
-import {
-  GeoLocation,
-  MatchRequest,
-  User,
-  UserResult,
-} from './entities/user.entities';
+import { MatchRequest, User, UserResult } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
-import { mappingData } from '../../pattern/mapping.tinder';
 @Injectable()
 export class UserService {
   constructor(
@@ -45,6 +42,7 @@ export class UserService {
     private loggerService: LoggerService,
     private conversationService: ConversationService,
     private userHelper: UserHelper,
+    private tagService: TagService,
   ) {
     this.loggerService.setContext('UserService');
   }
@@ -138,6 +136,27 @@ export class UserService {
               distanceField: 'calcDistance',
               maxDistance: maxDistance,
               query: queryFilter,
+            },
+          },
+          {
+            $lookup: {
+              from: 'tags',
+              let: { tags: '$tags' },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $in: ['$_id', '$$tags'] },
+                  },
+                },
+                {
+                  $project: {
+                    name: 1,
+                    type: 1,
+                    parentType: 1,
+                  },
+                },
+              ],
+              as: 'tags',
             },
           },
           {

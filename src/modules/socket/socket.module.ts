@@ -1,22 +1,20 @@
-import { forwardRef, Global, Module } from '@nestjs/common';
-import { SocketService } from './socket.service';
-import { ChatGateway } from './chat.gateway';
-import { UserModule } from '../user/user.module';
-import { JwtService } from '@nestjs/jwt';
-import { LoggerModule } from '../logger/logger.module';
-import { WsStrategy } from '../../auth/strategies/ws.strategies';
-import { MessageModule } from 'modules/message/message.module';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConversationModule } from 'modules/conversation/conversation.module';
+import { MessageModule } from 'modules/message/message.module';
+import { WsStrategy } from '../../auth/strategies/ws.strategies';
+import { LoggerModule } from '../logger/logger.module';
+import { UserModule } from '../user/user.module';
+import { ChatGateway } from './chat.gateway';
+import { SocketService } from './socket.service';
 
-@Global()
 @Module({
   imports: [
     forwardRef(() => UserModule),
+    forwardRef(() => MessageModule),
     LoggerModule,
-    MessageModule,
     ConversationModule,
   ],
-  providers: [SocketService, ChatGateway, JwtService, WsStrategy],
+  providers: [SocketService, ChatGateway, WsStrategy],
   exports: [ChatGateway],
 })
 export class SocketModule {}

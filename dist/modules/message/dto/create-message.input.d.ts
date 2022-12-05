@@ -16,6 +16,3 @@ export declare class MessageInput implements IMessageCreate {
     conversion_id: string;
     type: MessageType;
 }
-export declare class Here {
-    txt: string;
-}

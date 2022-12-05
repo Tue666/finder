@@ -24,8 +24,8 @@ export const MessageSchema = new Schema<Message>(
     },
     cursor: { type: Number },
     urlMessageImage: { type: String, trim: true },
-    type: { type: String, enum: Object.values(MessageType) },
-    isDeleted: { type: Boolean },
+    type: { type: String },
+    isDeleted: { type: Boolean, default: false },
     keyword: {
       type: String,
       trim: true,

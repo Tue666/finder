@@ -6,40 +6,40 @@ import { IMessage } from '../interfaces/message';
 
 @ObjectType()
 export class Message implements IMessage {
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   _id: string;
 
   @Field({ nullable: true })
   text: string;
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   sender: User;
 
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   receiver: User;
 
-  @Field(() => Conversation)
+  @Field(() => Conversation, { nullable: true })
   conversion_id: Conversation;
 
-  @Field(() => MessageType)
-  type: MessageType;
+  @Field(() => String, { nullable: true })
+  type: string;
 
   @Field({ nullable: true })
   urlMessageImage: string;
 
-  @Field(() => Number)
+  @Field(() => Number, { nullable: true })
   cursor: number;
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: true })
   isDeleted: boolean;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   createdAt: Date;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
-  @Field()
+  @Field({ nullable: true })
   keyword: string;
 }
 
