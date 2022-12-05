@@ -89,6 +89,7 @@ export class ConversationService {
         .limit((input?.page - 1) * input?.size)
         .sort(querySort)
         .populate('members', Constants.EXCLUDE_FIELDS)
+        .populate('lastMessage')
         .lean(),
       this.conversionModel.count(queryFilter),
     ]);
@@ -124,8 +125,7 @@ export class ConversationService {
       }
       const conversation = await this.conversionModel
         .findOne(queryFilter)
-        .populate('members')
-        .lean();
+        .populate('members');
       throwIfNotExists(conversation, 'Conversation not found');
       conversation.user =
         conversation.members[0]._id.toString() === user._id.toString()

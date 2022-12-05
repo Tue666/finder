@@ -11,13 +11,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageResult = exports.Message = void 0;
 const graphql_1 = require("@nestjs/graphql");
-const enum_1 = require("../../../constants/enum");
 const conversation_entity_1 = require("../../conversation/entities/conversation.entity");
 const user_entities_1 = require("../../user/entities/user.entities");
 let Message = class Message {
 };
 __decorate([
-    (0, graphql_1.Field)(() => graphql_1.ID),
+    (0, graphql_1.Field)(() => graphql_1.ID, { nullable: true }),
     __metadata("design:type", String)
 ], Message.prototype, "_id", void 0);
 __decorate([
@@ -25,19 +24,19 @@ __decorate([
     __metadata("design:type", String)
 ], Message.prototype, "text", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => user_entities_1.User),
+    (0, graphql_1.Field)(() => user_entities_1.User, { nullable: true }),
     __metadata("design:type", user_entities_1.User)
 ], Message.prototype, "sender", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => user_entities_1.User),
+    (0, graphql_1.Field)(() => user_entities_1.User, { nullable: true }),
     __metadata("design:type", user_entities_1.User)
 ], Message.prototype, "receiver", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => conversation_entity_1.Conversation),
+    (0, graphql_1.Field)(() => conversation_entity_1.Conversation, { nullable: true }),
     __metadata("design:type", conversation_entity_1.Conversation)
 ], Message.prototype, "conversion_id", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => enum_1.MessageType),
+    (0, graphql_1.Field)(() => String, { nullable: true }),
     __metadata("design:type", String)
 ], Message.prototype, "type", void 0);
 __decorate([
@@ -45,23 +44,23 @@ __decorate([
     __metadata("design:type", String)
 ], Message.prototype, "urlMessageImage", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => Number),
+    (0, graphql_1.Field)(() => Number, { nullable: true }),
     __metadata("design:type", Number)
 ], Message.prototype, "cursor", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => Boolean),
+    (0, graphql_1.Field)(() => Boolean, { nullable: true }),
     __metadata("design:type", Boolean)
 ], Message.prototype, "isDeleted", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => Date),
+    (0, graphql_1.Field)(() => Date, { nullable: true }),
     __metadata("design:type", Date)
 ], Message.prototype, "createdAt", void 0);
 __decorate([
-    (0, graphql_1.Field)(() => Date),
+    (0, graphql_1.Field)(() => Date, { nullable: true }),
     __metadata("design:type", Date)
 ], Message.prototype, "updatedAt", void 0);
 __decorate([
-    (0, graphql_1.Field)(),
+    (0, graphql_1.Field)({ nullable: true }),
     __metadata("design:type", String)
 ], Message.prototype, "keyword", void 0);
 Message = __decorate([

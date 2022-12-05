@@ -159,15 +159,11 @@ export class ChatGateway
         this.cacheManager.get(Constants.SOCKET + data.receiver),
         this.cacheManager.get(Constants.SOCKET + user._id.toString()),
       ]);
+      console.log('----------------------------------------------------');
       this.sendEmit(socketIds1, 'receiverMessage', message);
       this.sendEmit(socketIds2, 'isSendMessageSuccess', {
-        code: 200,
-        success: true,
-        message: 'Send Message Success',
-        data: {
-          message_id: message._id.toString(),
-          uuid: data.uuid,
-        },
+        message: message,
+        uuid: data.uuid,
       });
       return message;
     } catch (error) {

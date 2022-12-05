@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Here = exports.MessageInput = exports.PaginationMessageInput = exports.FilterGetAllMessage = void 0;
+exports.MessageInput = exports.PaginationMessageInput = exports.FilterGetAllMessage = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const graphql_scalars_1 = require("graphql-scalars");
 const enum_1 = require("../../../constants/enum");
@@ -71,14 +71,4 @@ MessageInput = __decorate([
     (0, graphql_1.InputType)()
 ], MessageInput);
 exports.MessageInput = MessageInput;
-let Here = class Here {
-};
-__decorate([
-    (0, graphql_1.Field)(),
-    __metadata("design:type", String)
-], Here.prototype, "txt", void 0);
-Here = __decorate([
-    (0, graphql_1.InputType)()
-], Here);
-exports.Here = Here;
 //# sourceMappingURL=create-message.input.js.map

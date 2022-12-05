@@ -1,4 +1,3 @@
-import { MessageType } from '../../../constants/enum';
 import { Conversation } from '../../conversation/entities/conversation.entity';
 import { User } from '../../user/entities/user.entities';
 import { IMessage } from '../interfaces/message';
@@ -8,7 +7,7 @@ export declare class Message implements IMessage {
     sender: User;
     receiver: User;
     conversion_id: Conversation;
-    type: MessageType;
+    type: string;
     urlMessageImage: string;
     cursor: number;
     isDeleted: boolean;
