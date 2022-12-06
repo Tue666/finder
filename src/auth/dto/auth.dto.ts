@@ -32,10 +32,4 @@ export class ResetPasswordInput {
 
   @Field()
   code: string;
-
-  @Field()
-  password: string;
-
-  @Field()
-  confirmPassword: string;
 }
