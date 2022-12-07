@@ -66,6 +66,12 @@ let MessageService = class MessageService {
                 this.chatGateway.getAllUserMatchedTabMessage(receiver),
             ]);
         }
+        else {
+            await Promise.all([
+                this.chatGateway.getAllUserMatchedTabMessage(receiver),
+                this.chatGateway.getAllUserMatchedTabMessage(sender),
+            ]);
+        }
     }
     async findAll(filter, pagination) {
         try {
