@@ -60,12 +60,8 @@ let AuthService = class AuthService {
     }
     async resetPassword(input) {
         try {
-            if (input.password != input.confirmPassword) {
-                throw new common_1.BadRequestException('Mật khẩu không khớp');
-            }
-            const [user, hashPassword, code] = await Promise.all([
+            const [user, code] = await Promise.all([
                 this.userService.findOne({ email: input.email }),
-                this.userService.hashPassword(input.password),
                 this.cacheManager.get(`${constants_1.Constants.RESET_CODE_PASSWORD}_${input.email}`),
             ]);
             if (!code) {
@@ -74,11 +70,8 @@ let AuthService = class AuthService {
             if (code != input.code) {
                 throw new common_1.BadRequestException('Code không chính xác. Vui lòng nhập lại !');
             }
-            await Promise.allSettled([
-                this.userService.resetPassword(user, hashPassword),
-                this.cacheManager.del(`${constants_1.Constants.RESET_CODE_PASSWORD}_${input.email}`),
-            ]);
-            return true;
+            await this.cacheManager.del(`${constants_1.Constants.RESET_CODE_PASSWORD}_${input.email}`);
+            return await this.generateTokens(user._id.toString());
         }
         catch (error) {
             throw error;

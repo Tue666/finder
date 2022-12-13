@@ -47,7 +47,7 @@ export class AuthResolver {
   resetPassword(
     @Args('input', { type: () => ResetPasswordInput })
     input: ResetPasswordInput,
-  ): Promise<boolean> {
+  ): Promise<JwtPayload> {
     return this.authService.resetPassword(input);
   }
 
