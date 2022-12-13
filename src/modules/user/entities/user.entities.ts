@@ -186,7 +186,7 @@ export class User implements IUser {
   @Field({ nullable: true })
   keyword: string;
 
-  @HideField()
+  @Field()
   isBlocked?: boolean;
 
   @HideField()
