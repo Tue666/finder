@@ -1,5 +1,10 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { GraphQLObjectID } from 'graphql-scalars';
+import { hasRoles } from '../../common/decorators/role.decorators';
+import { AtGuard } from '../../common/guard/at.guard';
+import { RolesGuard } from '../../common/guard/role.guard';
+import { RoleEnum } from '../../constants/enum';
 import { PaginationInput } from '../common/dto/common.dto';
 import {
   CreateTagInput,
@@ -14,11 +19,15 @@ export class TagResolver {
   constructor(private readonly tagService: TagService) {}
 
   @Mutation(() => Boolean)
+  @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
   createTag(@Args('input') createTagInput: CreateTagInput) {
     return this.tagService.create(createTagInput);
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
   updateTag(
     @Args('tag_id', { type: () => GraphQLObjectID }) tag_id: string,
     @Args('input', { type: () => UpdateTagInput }) input: UpdateTagInput,
@@ -27,6 +36,8 @@ export class TagResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
   deleteTag(
     @Args('tag_id', { type: () => GraphQLObjectID }) tag_id: string,
   ): Promise<boolean> {
