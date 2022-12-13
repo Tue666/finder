@@ -247,6 +247,7 @@ __decorate([
 __decorate([
     (0, graphql_1.Query)(() => user_entities_1.UserResult),
     (0, common_1.UseGuards)(at_guard_1.AtGuard, role_guard_1.RolesGuard),
+    (0, role_decorators_1.hasRoles)(enum_1.RoleEnum.ADMIN),
     __param(0, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),
     __param(1, (0, graphql_1.Args)('filter', { type: () => create_user_dto_1.FilterStatisticUser, nullable: true })),
     __metadata("design:type", Function),

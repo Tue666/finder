@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FilterGetAllTag = exports.CreateTagInput = void 0;
+exports.FilterGetAllTag = exports.UpdateTagInput = exports.CreateTagInput = void 0;
 const graphql_1 = require("@nestjs/graphql");
 const graphql_scalars_1 = require("graphql-scalars");
 const enum_1 = require("../../../constants/enum");
@@ -35,6 +35,28 @@ CreateTagInput = __decorate([
     (0, graphql_1.InputType)()
 ], CreateTagInput);
 exports.CreateTagInput = CreateTagInput;
+let UpdateTagInput = class UpdateTagInput {
+};
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], UpdateTagInput.prototype, "name", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => enum_1.TagType, { nullable: true }),
+    __metadata("design:type", String)
+], UpdateTagInput.prototype, "type", void 0);
+__decorate([
+    (0, graphql_1.Field)(() => enum_1.TagType, { nullable: true }),
+    __metadata("design:type", String)
+], UpdateTagInput.prototype, "parentType", void 0);
+__decorate([
+    (0, graphql_1.Field)({ nullable: true }),
+    __metadata("design:type", String)
+], UpdateTagInput.prototype, "description", void 0);
+UpdateTagInput = __decorate([
+    (0, graphql_1.InputType)()
+], UpdateTagInput);
+exports.UpdateTagInput = UpdateTagInput;
 let FilterGetAllTag = class FilterGetAllTag {
 };
 __decorate([

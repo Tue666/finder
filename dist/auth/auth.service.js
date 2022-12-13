@@ -247,7 +247,12 @@ let AuthService = class AuthService {
     }
     async verifyTokenGoogle(token) {
         try {
-            const response = await axios_1.default.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`);
+            const response = await axios_1.default.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept-Encoding': 'application/json',
+                },
+            });
             if (!response.data.email) {
                 throw new common_1.UnauthorizedException('Token not accepted');
             }
@@ -266,7 +271,6 @@ let AuthService = class AuthService {
     async verifyTokenFacebook(token) {
         try {
             const response = await axios_1.default.get(`https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`);
-            console.log(response);
             if (!response.data.email) {
                 throw new common_1.UnauthorizedException('Token not accepted');
             }

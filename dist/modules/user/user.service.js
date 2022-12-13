@@ -23,16 +23,16 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const cache_manager_1 = require("cache-manager");
 const chat_gateway_1 = require("../socket/chat.gateway");
 const constants_1 = require("../../constants/constants");
+const mapping_tinder_1 = require("../../pattern/mapping.tinder");
 const model_utils_1 = require("../../utils/model.utils");
 const utils_1 = require("../../utils/utils");
 const conversation_service_1 = require("../conversation/conversation.service");
 const logger_service_1 = require("../logger/logger.service");
-const tag_service_1 = require("../tag/tag.service");
 const user_embedded_service_1 = require("../user_embedded/user_embedded.service");
 const user_entities_1 = require("./entities/user.entities");
 const user_helper_1 = require("./helper/user.helper");
 let UserService = class UserService {
-    constructor(userModel, cacheManager, chatGateway, userEmbeddedService, loggerService, conversationService, userHelper, tagService) {
+    constructor(userModel, cacheManager, chatGateway, userEmbeddedService, loggerService, conversationService, userHelper) {
         this.userModel = userModel;
         this.cacheManager = cacheManager;
         this.chatGateway = chatGateway;
@@ -40,7 +40,6 @@ let UserService = class UserService {
         this.loggerService = loggerService;
         this.conversationService = conversationService;
         this.userHelper = userHelper;
-        this.tagService = tagService;
         this.loggerService.setContext('UserService');
     }
     async createWithOAuth2(userGoogle) {
@@ -396,13 +395,18 @@ let UserService = class UserService {
     async unMatched(user, user_id) {
         try {
             const members = [user._id.toString(), user_id];
+            const receiver = await this.findOne({ _id: user_id });
             const query = this.conversationService.getQueryOrMembers(members);
             await Promise.all([
                 this.userModel.findOneAndUpdate({ _id: user_id }, { $pull: { matched: user._id } }),
                 this.userModel.findOneAndUpdate({ _id: user._id }, { $pull: { matched: user_id } }),
                 this.conversationService.findOneAndUpdate(query, {
-                    $set: { isDeleted: false },
+                    $set: { isDeleted: true },
                 }),
+            ]);
+            await Promise.all([
+                this.chatGateway.getAllUserMatchedTabMessage(user),
+                this.chatGateway.getAllUserMatchedTabMessage(receiver),
             ]);
             return true;
         }
@@ -423,11 +427,17 @@ let UserService = class UserService {
     }
     async insertManyUser() {
         try {
-            const usersL = await this.userModel.find();
-            let count = 0;
+            const users = (0, mapping_tinder_1.mappingData)();
+            const usersL = await this.userModel.insertMany(users);
+            let count = 7;
             for (const user of usersL) {
-                user.matchRequest = [];
-                user.matched = [];
+                if (user.email === undefined) {
+                    user.email = `user${count}@gmail.com`;
+                    user.password = await this.hashPassword('1');
+                    user.isConfirmMail = true;
+                }
+                user.geoLocation = new user_entities_1.GeoLocation();
+                user.geoLocation.coordinates = [106.7116815, 10.821203];
                 await user.save();
                 count++;
             }
@@ -447,8 +457,7 @@ UserService = __decorate([
         user_embedded_service_1.UserEmbeddedService,
         logger_service_1.LoggerService,
         conversation_service_1.ConversationService,
-        user_helper_1.UserHelper,
-        tag_service_1.TagService])
+        user_helper_1.UserHelper])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

@@ -19,6 +19,21 @@ export class CreateTagInput implements ITagCreate {
 }
 
 @InputType()
+export class UpdateTagInput implements Partial<ITag> {
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field(() => TagType, { nullable: true })
+  type?: TagType;
+
+  @Field(() => TagType, { nullable: true })
+  parentType?: TagType;
+
+  @Field({ nullable: true })
+  description?: string;
+}
+
+@InputType()
 export class FilterGetAllTag implements Partial<ITag> {
   @Field({ nullable: true })
   name: string;

@@ -5,7 +5,6 @@ import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
 import { PaginationInput } from '../common/dto/common.dto';
 import { ConversationService } from '../conversation/conversation.service';
 import { LoggerService } from '../logger/logger.service';
-import { TagService } from '../tag/tag.service';
 import { UserEmbeddedService } from '../user_embedded/user_embedded.service';
 import { FilterGetAllUser, FilterGetOneUser, MySettingInput, UpdateUserInput } from './dto/create-user.dto';
 import { User, UserResult } from './entities/user.entities';
@@ -19,8 +18,7 @@ export declare class UserService {
     private loggerService;
     private conversationService;
     private userHelper;
-    private tagService;
-    constructor(userModel: UserModelType, cacheManager: Cache, chatGateway: ChatGateway, userEmbeddedService: UserEmbeddedService, loggerService: LoggerService, conversationService: ConversationService, userHelper: UserHelper, tagService: TagService);
+    constructor(userModel: UserModelType, cacheManager: Cache, chatGateway: ChatGateway, userEmbeddedService: UserEmbeddedService, loggerService: LoggerService, conversationService: ConversationService, userHelper: UserHelper);
     createWithOAuth2(userGoogle: User): Promise<User>;
     changePassword(oldPassword: string, newPassword: string, user: User): Promise<boolean>;
     resetPassword(user: User, password: string): Promise<boolean>;

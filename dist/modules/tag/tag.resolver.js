@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TagResolver = void 0;
 const graphql_1 = require("@nestjs/graphql");
+const graphql_scalars_1 = require("graphql-scalars");
 const common_dto_1 = require("../common/dto/common.dto");
 const create_tag_input_1 = require("./dto/create-tag.input");
 const tag_entity_1 = require("./entities/tag.entity");
@@ -25,6 +26,12 @@ let TagResolver = class TagResolver {
     createTag(createTagInput) {
         return this.tagService.create(createTagInput);
     }
+    updateTag(tag_id, input) {
+        return this.tagService.update(tag_id, input);
+    }
+    deleteTag(tag_id) {
+        return this.tagService.delete(tag_id);
+    }
     getAllTag(pagination, filter) {
         return this.tagService.findAll(pagination, filter);
     }
@@ -34,6 +41,7 @@ let TagResolver = class TagResolver {
             this.tagService.createTagDiet(),
             this.tagService.createTagEducation(),
             this.tagService.createTagPersonality(),
+            this.tagService.createTagZodiac(),
             this.tagService.createTagPet(),
             this.tagService.createTagSmokeQuestion(),
         ]);
@@ -42,11 +50,26 @@ let TagResolver = class TagResolver {
 };
 __decorate([
     (0, graphql_1.Mutation)(() => Boolean),
-    __param(0, (0, graphql_1.Args)('createTagInput')),
+    __param(0, (0, graphql_1.Args)('input')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_tag_input_1.CreateTagInput]),
     __metadata("design:returntype", void 0)
 ], TagResolver.prototype, "createTag", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, graphql_1.Args)('tag_id', { type: () => graphql_scalars_1.GraphQLObjectID })),
+    __param(1, (0, graphql_1.Args)('input', { type: () => create_tag_input_1.UpdateTagInput })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, create_tag_input_1.UpdateTagInput]),
+    __metadata("design:returntype", Promise)
+], TagResolver.prototype, "updateTag", null);
+__decorate([
+    (0, graphql_1.Mutation)(() => Boolean),
+    __param(0, (0, graphql_1.Args)('tag_id', { type: () => graphql_scalars_1.GraphQLObjectID })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TagResolver.prototype, "deleteTag", null);
 __decorate([
     (0, graphql_1.Query)(() => tag_entity_1.TagResult),
     __param(0, (0, graphql_1.Args)('pagination', { type: () => common_dto_1.PaginationInput, nullable: true })),

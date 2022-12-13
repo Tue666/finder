@@ -26,6 +26,24 @@ let TagService = class TagService {
         const tag = await this.tagModel.create(input);
         return tag ? true : false;
     }
+    async delete(tag_id) {
+        try {
+            const tag = await this.tagModel.findOneAndUpdate({ _id: tag_id }, { $set: { isDeleted: true } });
+            return tag ? true : false;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    async update(_id, input) {
+        try {
+            const tag = await this.tagModel.findOneAndUpdate({ _id }, input);
+            return tag ? true : false;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
     async findAll(pagination, filter) {
         const [queryFilter, querySort] = new filter_query_1.FilterBuilder()
             .setFilterItem('type', {
@@ -79,7 +97,7 @@ let TagService = class TagService {
         return true;
     }
     async createTagSmokeQuestion() {
-        const tags = (0, mapping_tinder_1.mappingDataEducation)();
+        const tags = (0, mapping_tinder_1.mappingDataSmokeQuestion)();
         await this.tagModel.insertMany(tags);
         return true;
     }
