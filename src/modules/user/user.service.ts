@@ -13,13 +13,12 @@ import { ChatGateway } from 'modules/socket/chat.gateway';
 import { FilterQuery, UpdateQuery } from 'mongoose';
 import { LoginInput, RegisterInput } from '../../auth/dto/auth.dto';
 import { Constants } from '../../constants/constants';
+import { mappingData } from '../../pattern/mapping.tinder';
 import { throwIfNotExists } from '../../utils/model.utils';
 import { includesInObject } from '../../utils/utils';
 import { PaginationInput } from '../common/dto/common.dto';
 import { ConversationService } from '../conversation/conversation.service';
 import { LoggerService } from '../logger/logger.service';
-import { Tag } from '../tag/entities/tag.entity';
-import { TagModelType, TagSchema } from '../tag/schema/tag.schema';
 import { TagService } from '../tag/tag.service';
 import { UserEmbeddedService } from '../user_embedded/user_embedded.service';
 import {
@@ -28,7 +27,12 @@ import {
   MySettingInput,
   UpdateUserInput,
 } from './dto/create-user.dto';
-import { MatchRequest, User, UserResult } from './entities/user.entities';
+import {
+  GeoLocation,
+  MatchRequest,
+  User,
+  UserResult,
+} from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
 import { UserModelType } from './schema/user.schema';
 @Injectable()
@@ -42,7 +46,6 @@ export class UserService {
     private loggerService: LoggerService,
     private conversationService: ConversationService,
     private userHelper: UserHelper,
-    private tagService: TagService,
   ) {
     this.loggerService.setContext('UserService');
   }
@@ -506,6 +509,7 @@ export class UserService {
   async unMatched(user: User, user_id: string): Promise<boolean> {
     try {
       const members = [user._id.toString(), user_id];
+      const receiver = await this.findOne({ _id: user_id });
       const query = this.conversationService.getQueryOrMembers(members);
       await Promise.all([
         this.userModel.findOneAndUpdate(
@@ -517,8 +521,12 @@ export class UserService {
           { $pull: { matched: user_id } },
         ),
         this.conversationService.findOneAndUpdate(query, {
-          $set: { isDeleted: false },
+          $set: { isDeleted: true },
         }),
+      ]);
+      await Promise.all([
+        this.chatGateway.getAllUserMatchedTabMessage(user),
+        this.chatGateway.getAllUserMatchedTabMessage(receiver),
       ]);
       return true;
     } catch (error) {
@@ -550,20 +558,21 @@ export class UserService {
   }
   async insertManyUser(): Promise<boolean> {
     try {
-      // const users = mappingData();
-      // const usersL = await this.userModel.insertMany(users);
-      const usersL = await this.userModel.find();
-      let count = 0;
+      const users = mappingData();
+      const usersL = await this.userModel.insertMany(users);
+      // const usersL = await this.userModel.find();
+      let count = 7;
       for (const user of usersL) {
-        // if (user.email === undefined) {
-        //   user.email = `user${count}@gmail.com`;
-        //   user.password = await this.hashPassword('1');
-        //   user.isConfirmMail = true;
-        // }
-        // user.geoLocation = new GeoLocation();
-        // user.geoLocation.coordinates = [106.7116815, 10.821203];
-        user.matchRequest = [];
-        user.matched = [];
+        if (user.email === undefined) {
+          user.email = `user${count}@gmail.com`;
+          user.password = await this.hashPassword('1');
+          user.isConfirmMail = true;
+        }
+        user.geoLocation = new GeoLocation();
+        user.geoLocation.coordinates = [106.7116815, 10.821203];
+        // user.matchRequest = [];
+        // user.matched = [];
+        // user.tags = [];
         await user.save();
         count++;
       }

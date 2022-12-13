@@ -43,13 +43,13 @@ export class AuthResolver {
     }
   }
 
-//   @Mutation(() => Boolean)
-//   resetPassword(
-//     @Args('input', { type: () => ResetPasswordInput })
-//     input: ResetPasswordInput,
-//   ): Promise<boolean> {
-//     return this.authService.resetPassword(input);
-//   }
+  @Mutation(() => Boolean)
+  resetPassword(
+    @Args('input', { type: () => ResetPasswordInput })
+    input: ResetPasswordInput,
+  ): Promise<JwtPayload> {
+    return this.authService.resetPassword(input);
+  }
 
   @Query(() => JwtPayload)
   signInAsAdmin(
