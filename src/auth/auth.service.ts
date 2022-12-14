@@ -10,7 +10,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
 import { Cache } from 'cache-manager';
-import { throwIfNotExists } from 'utils/model.utils';
 import { Constants } from '../constants/constants';
 import { RegisterType, RoleEnum } from '../constants/enum';
 import { MailService } from '../modules/mail/mail.service';
@@ -69,10 +68,14 @@ export class AuthService {
     );
   }
 
-  async resetPassword(input: ResetPasswordInput): Promise<JwtPayload> {
+  async resetPassword(input: ResetPasswordInput): Promise<boolean> {
     try {
-      const [user, code] = await Promise.all([
+      if (input.password != input.confirmPassword) {
+        throw new BadRequestException('Mật khẩu không khớp');
+      }
+      const [user, hashPassword, code] = await Promise.all([
         this.userService.findOne({ email: input.email }),
+        this.userService.hashPassword(input.password),
         this.cacheManager.get(
           `${Constants.RESET_CODE_PASSWORD}_${input.email}`,
         ),
@@ -85,12 +88,13 @@ export class AuthService {
           'Code không chính xác. Vui lòng nhập lại !',
         );
       }
-
-      await this.cacheManager.del(
-        `${Constants.RESET_CODE_PASSWORD}_${input.email}`,
-      );
-
-      return await this.generateTokens(user._id.toString());
+      await Promise.allSettled([
+        this.userService.resetPassword(user, hashPassword),
+        this.cacheManager.del(
+          `${Constants.RESET_CODE_PASSWORD}_${input.email}`,
+        ),
+      ]);
+      return true;
     } catch (error) {
       throw error;
     }
