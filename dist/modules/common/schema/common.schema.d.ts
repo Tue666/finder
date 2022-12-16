@@ -24,4 +24,4 @@
 /// <reference types="mongoose/types/inferschematype" />
 import { Schema } from 'mongoose';
 import { Image } from '../entities/common.entities';
-export declare const ImageSchema: Schema<Image, import("mongoose").Model<Image, any, any, any, any>, {}, {}, {}, {}, "type", Image>;
+export declare const ImageSchema: Schema<Image, import("mongoose").Model<Image, any, any, any, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Image>;

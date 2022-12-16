@@ -43,7 +43,8 @@ export class UserHelper {
         'showMeTinder',
         { $eq: user.showMeTinder },
         user.showMeTinder,
-      );
+      )
+      .setFilterItem('isBlocked', { $eq: false }, 'false');
     if (user.mySetting.discovery.lookingFor === LookingFor.WOMEN) {
       queryFilter.setFilterItem(
         'gender',

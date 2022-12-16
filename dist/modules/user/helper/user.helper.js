@@ -48,7 +48,8 @@ let UserHelper = class UserHelper {
         const queryFilter = new filter_query_1.FilterBuilder()
             .setFilterItem('statusActive', { $eq: filter === null || filter === void 0 ? void 0 : filter.statusActive }, filter === null || filter === void 0 ? void 0 : filter.statusActive)
             .setFilterItem('isFirstLogin', { $eq: false }, 'false')
-            .setFilterItem('showMeTinder', { $eq: user.showMeTinder }, user.showMeTinder);
+            .setFilterItem('showMeTinder', { $eq: user.showMeTinder }, user.showMeTinder)
+            .setFilterItem('isBlocked', { $eq: false }, 'false');
         if (user.mySetting.discovery.lookingFor === enum_1.LookingFor.WOMEN) {
             queryFilter.setFilterItem('gender', {
                 $eq: enum_1.GenderEnum.FEMALE,
