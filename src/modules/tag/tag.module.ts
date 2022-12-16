@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { TagService } from './tag.service';
-import { TagResolver } from './tag.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Tag } from './entities/tag.entity';
 import { TagSchema } from './schema/tag.schema';
-import { toKeyword, toSlug } from '../../utils/string.utils';
+import { TagResolver } from './tag.resolver';
+import { TagService } from './tag.service';
 
 @Module({
   imports: [
@@ -22,5 +21,6 @@ import { toKeyword, toSlug } from '../../utils/string.utils';
     ]),
   ],
   providers: [TagResolver, TagService],
+  exports: [TagService],
 })
 export class TagModule {}

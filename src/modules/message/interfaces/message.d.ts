@@ -7,8 +7,8 @@ export interface IMessage extends IEntity {
   sender: string | User;
   receiver: string | User;
   conversion_id: string | Conversation;
-  type: MessageType;
-  urlMessageImage: string;
+  type: string;
+  urlMessageImage: string | MessageType;
   cursor: number;
 }
 

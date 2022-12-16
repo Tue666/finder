@@ -42,9 +42,3 @@ export class MessageInput implements IMessageCreate {
   @Field(() => MessageType)
   type: MessageType;
 }
-
-@InputType()
-export class Here {
-  @Field()
-  txt: string;
-}

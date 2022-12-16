@@ -180,6 +180,7 @@ export class UserResolver {
 
   @Query(() => UserResult)
   @UseGuards(AtGuard, RolesGuard)
+  @hasRoles(RoleEnum.ADMIN)
   statisticUser(
     @Args('pagination', { type: () => PaginationInput, nullable: true })
     pagination: PaginationInput,

@@ -4,7 +4,7 @@ import { ITag } from '../interfaces/tag';
 
 @ObjectType()
 export class Tag implements ITag {
-  @Field(() => ID)
+  @Field(() => ID, { nullable: true })
   _id: string;
 
   @Field({ nullable: true })

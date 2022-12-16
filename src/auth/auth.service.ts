@@ -10,7 +10,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import axios from 'axios';
 import { Cache } from 'cache-manager';
-import { throwIfNotExists } from 'utils/model.utils';
 import { Constants } from '../constants/constants';
 import { RegisterType, RoleEnum } from '../constants/enum';
 import { MailService } from '../modules/mail/mail.service';
@@ -289,6 +288,12 @@ export class AuthService {
     try {
       const response = await axios.get(
         `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept-Encoding': 'application/json',
+          },
+        },
       );
       if (!response.data.email) {
         throw new UnauthorizedException('Token not accepted');
@@ -310,7 +315,6 @@ export class AuthService {
       const response = await axios.get(
         `https://graph.facebook.com/me?fields=id,email,name,picture.type(large)&access_token=${token}`,
       );
-      console.log(response);
       if (!response.data.email) {
         throw new UnauthorizedException('Token not accepted');
       }

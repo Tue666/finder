@@ -6,7 +6,7 @@ import {
 import * as redisStore from 'cache-manager-redis-store';
 @Injectable()
 export class CacheConfigService implements CacheOptionsFactory {
-  createCacheOptions(): CacheModuleOptions {
+  createCacheOptions(): CacheModuleOptions{
     return {
       store: redisStore,
       url: `redis://${process.env.REDIS_HOST_PROD}:${process.env.REDIS_PORT_PROD}`,

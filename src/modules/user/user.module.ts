@@ -7,6 +7,7 @@ import { CloudinaryProvider } from '../common/cloudinary/cloudinary.provider';
 import { CloudinaryService } from '../common/cloudinary/cloudinary.service';
 import { ConversationModule } from '../conversation/conversation.module';
 import { LoggerModule } from '../logger/logger.module';
+import { TagModule } from '../tag/tag.module';
 import { UserEmbeddedModule } from '../user_embedded/user_embedded.module';
 import { User } from './entities/user.entities';
 import { UserHelper } from './helper/user.helper';
@@ -40,6 +41,7 @@ import { UserService } from './user.service';
     UserEmbeddedModule,
     LoggerModule,
     ConversationModule,
+    TagModule,
     forwardRef(() => SocketModule),
   ],
   providers: [
