@@ -1,6 +1,6 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { TagType } from '../../../constants/enum';
-import { ITag } from '../interfaces/tag';
+import { Field, ID, ObjectType } from "@nestjs/graphql";
+import { TagType } from "../../../constants/enum";
+import { ITag } from "../interfaces/tag";
 
 @ObjectType()
 export class Tag implements ITag {
@@ -28,10 +28,10 @@ export class Tag implements ITag {
   @Field(() => Date)
   updatedAt: Date;
 
-  @Field()
+  @Field({ nullable: true })
   slug?: string;
 
-  @Field()
+  @Field({ nullable: true })
   keyword: string;
 }
 

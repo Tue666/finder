@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
 import {
   mappingDataDietaryPreference,
   mappingDataEducation,
@@ -8,16 +8,16 @@ import {
   mappingDataPets,
   mappingDataSmokeQuestion,
   mappingDataZodiac,
-} from '../../pattern/mapping.tinder';
-import { FilterBuilder } from '../../utils/filter.query';
-import { PaginationInput } from '../common/dto/common.dto';
+} from "../../pattern/mapping.tinder";
+import { FilterBuilder } from "../../utils/filter.query";
+import { PaginationInput } from "../common/dto/common.dto";
 import {
   CreateTagInput,
   FilterGetAllTag,
   UpdateTagInput,
-} from './dto/create-tag.input';
-import { Tag, TagResult } from './entities/tag.entity';
-import { TagModelType } from './schema/tag.schema';
+} from "./dto/create-tag.input";
+import { Tag, TagResult } from "./entities/tag.entity";
+import { TagModelType } from "./schema/tag.schema";
 
 @Injectable()
 export class TagService {
@@ -31,7 +31,7 @@ export class TagService {
     try {
       const tag = await this.tagModel.findOneAndUpdate(
         { _id: tag_id },
-        { $set: { isDeleted: true } },
+        { $set: { isDeleted: true } }
       );
       return tag ? true : false;
     } catch (error) {
@@ -42,6 +42,7 @@ export class TagService {
   async update(_id: string, input: UpdateTagInput): Promise<boolean> {
     try {
       const tag = await this.tagModel.findOneAndUpdate({ _id }, input);
+      await tag.save();
       return tag ? true : false;
     } catch (error) {
       throw error;
@@ -50,23 +51,23 @@ export class TagService {
 
   async findAll(
     pagination: PaginationInput,
-    filter: FilterGetAllTag,
+    filter: FilterGetAllTag
   ): Promise<TagResult> {
     const [queryFilter, querySort] = new FilterBuilder<Tag>()
       .setFilterItem(
-        'type',
+        "type",
         {
           $eq: filter?.type,
         },
-        filter?.type,
+        filter?.type
       )
-      .setFilterItem('_id', { $in: filter?.ids }, filter?.ids)
+      .setFilterItem("_id", { $in: filter?.ids }, filter?.ids)
       .setFilterItem(
-        'parentType',
+        "parentType",
         { $eq: filter?.parentType },
-        filter?.parentType,
+        filter?.parentType
       )
-      .setSortItem('createdAt', 1)
+      .setSortItem("createdAt", 1)
       .buildQuery();
     const [results, totalCount] = await Promise.all([
       this.tagModel
@@ -126,7 +127,7 @@ export class TagService {
   }
 
   async deleteMany(): Promise<boolean> {
-    await this.tagModel.deleteMany({ parentType: 'Life style' });
+    await this.tagModel.deleteMany({ parentType: "Life style" });
     return true;
   }
 }
